@@ -1,4 +1,4 @@
-package com.periodical_subscription.model.enum_converter;
+package com.periodical_subscription.model.entity.enum_converter;
 
 import com.periodical_subscription.model.entity.Periodical;
 
@@ -7,22 +7,22 @@ import javax.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class PeriodicalCategoryConverter implements AttributeConverter<Periodical.Category, Integer> {
+public class PeriodicalTypeConverter implements AttributeConverter<Periodical.Type, Integer> {
     @Override
-    public Integer convertToDatabaseColumn(Periodical.Category category) {
-        if (category == null) {
+    public Integer convertToDatabaseColumn(Periodical.Type type) {
+        if (type == null) {
             return null;
         }
-        return category.getId();
+        return type.getId();
     }
 
     @Override
-    public Periodical.Category convertToEntityAttribute(Integer id) {
+    public Periodical.Type convertToEntityAttribute(Integer id) {
         if (id == null) {
             return null;
         }
 
-        return Stream.of(Periodical.Category.values())
+        return Stream.of(Periodical.Type.values())
                 .filter(c -> c.getId().equals(id))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);

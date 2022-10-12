@@ -1,4 +1,4 @@
-package com.periodical_subscription.model.enum_converter;
+package com.periodical_subscription.model.entity.enum_converter;
 
 import com.periodical_subscription.model.entity.User;
 
