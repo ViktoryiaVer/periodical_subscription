@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.model.dao.PeriodicalCategoryRepository;
+import com.periodicalsubscription.model.repository.PeriodicalCategoryRepository;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.periodicalsubscription.model.dao;
+package com.periodicalsubscription.model.repository;
 
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
