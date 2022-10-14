@@ -20,7 +20,7 @@ public class Payment {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "subscription_id", referencedColumnName = "id")
+    @JoinColumn(name = "subscription_id")
     private Subscription subscription;
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;

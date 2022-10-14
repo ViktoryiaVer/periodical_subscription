@@ -9,6 +9,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -44,12 +45,13 @@ public class Periodical {
     private Status status;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "periodical", cascade =CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<PeriodicalCategory> categories;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "periodical", cascade = CascadeType.REFRESH)
-    private List<SubscriptionDetail> subscriptions;
+    @OneToMany(mappedBy = "periodical", cascade = CascadeType.ALL)
+    private List<PeriodicalCategory> categories = new ArrayList<>();
+
+    public void addCategory(PeriodicalCategory category) {
+        categories.add(category);
+        category.setPeriodical(this);
+    }
 
     public enum Type {
         MAGAZINE,

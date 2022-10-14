@@ -8,6 +8,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,7 +20,7 @@ public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "total_cost")
@@ -29,12 +30,13 @@ public class Subscription {
     private Status status;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<SubscriptionDetail> subscriptionDetails;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "subscription", cascade = CascadeType.REFRESH)
-    private List<Payment> payments;
+    @OneToMany(mappedBy = "subscription", cascade = CascadeType.ALL)
+    private List<SubscriptionDetail> subscriptionDetails = new ArrayList<>();
+
+    public void addSubscriptionDetail(SubscriptionDetail detail) {
+        subscriptionDetails.add(detail);
+        detail.setSubscription(this);
+    }
 
     public enum Status {
         PENDING,

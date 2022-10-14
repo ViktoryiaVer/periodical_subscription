@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.model.dao.PeriodicalDao;
+import com.periodicalsubscription.model.dao.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import lombok.RequiredArgsConstructor;
@@ -12,16 +12,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PeriodicalServiceImpl implements PeriodicalService {
-    private final PeriodicalDao periodicalDao;
+    private final PeriodicalRepository periodicalRepository;
 
     @Override
     public List<Periodical> findAll() {
-        return periodicalDao.findAll();
+        return periodicalRepository.findAll();
     }
 
     @Override
     public Periodical findById(Long id) {
-        Optional<Periodical> periodical = periodicalDao.findById(id);
+        Optional<Periodical> periodical = periodicalRepository.findById(id);
 
         return periodical.orElseThrow(RuntimeException::new);
     }
@@ -29,18 +29,18 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @Override
     public Periodical save(Periodical periodical) {
         //TODO some validation
-        return periodicalDao.save(periodical);
+        return periodicalRepository.save(periodical);
     }
 
     @Override
     public Periodical update(Periodical periodical) {
         //TODO some validation
-        return periodicalDao.save(periodical);
+        return periodicalRepository.save(periodical);
     }
 
     @Override
     public void delete(Periodical periodical) {
         //TODO some validation?
-        periodicalDao.delete(periodical);
+        periodicalRepository.delete(periodical);
     }
 }

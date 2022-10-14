@@ -1,14 +1,11 @@
 package com.periodicalsubscription.model.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @Entity
@@ -34,16 +31,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH)
-    private List<Subscription> subscriptions;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH)
-    private List<Payment> payments;
 
-    @Getter
     public enum Role {
         ADMIN,
         READER,

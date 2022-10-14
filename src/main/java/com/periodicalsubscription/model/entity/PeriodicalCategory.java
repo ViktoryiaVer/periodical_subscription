@@ -11,7 +11,7 @@ public class PeriodicalCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade =  CascadeType.REFRESH)
     @JoinColumn(name = "periodical_id")
     private Periodical periodical;
     @Enumerated(EnumType.STRING)

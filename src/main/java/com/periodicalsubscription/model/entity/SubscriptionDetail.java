@@ -16,7 +16,7 @@ public class SubscriptionDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
     @ManyToOne(cascade = CascadeType.REFRESH)
