@@ -3,44 +3,49 @@ package com.periodicalsubscription.service.impl;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalService;
+import com.periodicalsubscription.service.dto.PeriodicalDto;
+import com.periodicalsubscription.service.mapper.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalRepository periodicalRepository;
+    private final ObjectMapper mapper;
 
     @Override
-    public List<Periodical> findAll() {
-        return periodicalRepository.findAll();
+    public List<PeriodicalDto> findAll() {
+        return periodicalRepository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Periodical findById(Long id) {
-        Optional<Periodical> periodical = periodicalRepository.findById(id);
+    public PeriodicalDto findById(Long id) {
+        Periodical periodical = periodicalRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        return periodical.orElseThrow(RuntimeException::new);
+        return mapper.toDto(periodical);
     }
 
     @Override
-    public Periodical save(Periodical periodical) {
+    public PeriodicalDto save(PeriodicalDto dto) {
         //TODO some validation
-        return periodicalRepository.save(periodical);
+        return mapper.toDto(periodicalRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public Periodical update(Periodical periodical) {
+    public PeriodicalDto update(PeriodicalDto dto) {
         //TODO some validation
-        return periodicalRepository.save(periodical);
+        return mapper.toDto(periodicalRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public void delete(Periodical periodical) {
+    public void delete(PeriodicalDto dto) {
         //TODO some validation?
-        periodicalRepository.delete(periodical);
+        periodicalRepository.delete(mapper.toEntity(dto));
     }
 }

@@ -1,17 +1,17 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.model.entity.SubscriptionDetail;
+import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
 
 import java.util.List;
 
 public interface SubscriptionDetailService {
-    List<SubscriptionDetail> findAll();
+    List<SubscriptionDetailDto> findAll();
 
-    SubscriptionDetail findById(Long id);
+    SubscriptionDetailDto findById(Long id);
 
-    SubscriptionDetail save(SubscriptionDetail subscriptionDetail);
+    SubscriptionDetailDto save(SubscriptionDetailDto dto);
 
-    SubscriptionDetail update (SubscriptionDetail subscriptionDetail);
+    SubscriptionDetailDto update (SubscriptionDetailDto dto);
 
-    void delete(SubscriptionDetail subscriptionDetail);
+    void delete(SubscriptionDetailDto dto);
 }

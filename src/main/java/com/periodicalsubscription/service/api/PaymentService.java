@@ -1,17 +1,17 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.model.entity.Payment;
+import com.periodicalsubscription.service.dto.PaymentDto;
 
 import java.util.List;
 
 public interface PaymentService {
-    List<Payment> findAll();
+    List<PaymentDto> findAll();
 
-    Payment findById(Long id);
+    PaymentDto findById(Long id);
 
-    Payment save(Payment payment);
+    PaymentDto save(PaymentDto dto);
 
-    Payment update (Payment payment);
+    PaymentDto update (PaymentDto dto);
 
-    void delete(Payment payment);
+    void delete(PaymentDto dto);
 }

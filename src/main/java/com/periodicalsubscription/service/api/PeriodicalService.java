@@ -1,17 +1,17 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.model.entity.Periodical;
+import com.periodicalsubscription.service.dto.PeriodicalDto;
 
 import java.util.List;
 
 public interface PeriodicalService {
-    List<Periodical> findAll();
+    List<PeriodicalDto> findAll();
 
-    Periodical findById(Long id);
+    PeriodicalDto findById(Long id);
 
-    Periodical save(Periodical periodical);
+    PeriodicalDto save(PeriodicalDto dto);
 
-    Periodical update (Periodical periodical);
+    PeriodicalDto update (PeriodicalDto dto);
 
-    void delete(Periodical periodical);
+    void delete(PeriodicalDto dto);
 }

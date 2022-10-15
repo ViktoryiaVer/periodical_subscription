@@ -3,47 +3,54 @@ package com.periodicalsubscription.service.impl;
 import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
 import com.periodicalsubscription.service.api.UserService;
+import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.service.mapper.ObjectMapper;
+import com.periodicalsubscription.service.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserValidator validator;
+    private final ObjectMapper mapper;
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User findById(Long id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserDto findById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        return user.orElseThrow(RuntimeException::new);
+        return mapper.toDto(user);
     }
 
     @Override
-    public User save(User user) {
-        if(userRepository.findByEmail(user.getEmail()) != null) {
+    public UserDto save(UserDto dto) {
+        if(userRepository.findByEmail(dto.getEmail()) != null) {
             throw new RuntimeException("User with this email already exists");
         }
-        //TODO some other validation
-        return userRepository.save(user);
+        validator.checkValidity(dto);
+        return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public User update(User user) {
+    public UserDto update(UserDto dto) {
         //TODO some validation?
-        return userRepository.save(user);
+        return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public void delete(User user) {
+    public void delete(UserDto dto) {
         //TODO some validation?
-        userRepository.delete(user);
+        userRepository.delete(mapper.toEntity(dto));
     }
 
 }
