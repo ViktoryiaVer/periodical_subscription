@@ -1,7 +1,6 @@
 package com.periodicalsubscription.model.entity;
 
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 

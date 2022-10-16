@@ -1,7 +1,7 @@
-package com.periodicalsubscription.service.mapper;
+package com.periodicalsubscription.mapper;
 
+import com.periodicalsubscription.dto.*;
 import com.periodicalsubscription.model.entity.*;
-import com.periodicalsubscription.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

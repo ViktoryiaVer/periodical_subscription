@@ -3,8 +3,8 @@ package com.periodicalsubscription.service.impl;
 import com.periodicalsubscription.model.repository.SubscriptionRepository;
 import com.periodicalsubscription.model.entity.Subscription;
 import com.periodicalsubscription.service.api.SubscriptionService;
-import com.periodicalsubscription.service.dto.SubscriptionDto;
-import com.periodicalsubscription.service.mapper.ObjectMapper;
+import com.periodicalsubscription.dto.SubscriptionDto;
+import com.periodicalsubscription.mapper.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

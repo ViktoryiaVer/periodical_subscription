@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.service.dto.PeriodicalCategoryDto;
+import com.periodicalsubscription.dto.PeriodicalCategoryDto;
 
 import java.util.List;
 

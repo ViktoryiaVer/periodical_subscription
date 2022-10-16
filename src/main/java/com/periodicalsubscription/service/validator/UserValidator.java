@@ -1,7 +1,7 @@
 package com.periodicalsubscription.service.validator;
 
 import com.periodicalsubscription.exceptions.SignUpException;
-import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.dto.UserDto;
 import org.springframework.stereotype.Component;
 
 @Component

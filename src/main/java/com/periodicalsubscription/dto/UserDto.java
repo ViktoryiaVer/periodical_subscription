@@ -1,4 +1,4 @@
-package com.periodicalsubscription.service.dto;
+package com.periodicalsubscription.dto;
 
 import lombok.Data;
 
