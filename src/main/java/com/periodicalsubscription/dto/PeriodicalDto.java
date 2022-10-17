@@ -28,7 +28,7 @@ public class PeriodicalDto {
 
     public void addCategoryDto(PeriodicalCategoryDto categoryDto) {
         categoryDtos.add(categoryDto);
-        categoryDto.setPeriodical(this);
+        categoryDto.setPeriodicalDto(this);
     }
 
     public enum TypeDto {

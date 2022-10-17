@@ -1,10 +1,10 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.dto.PeriodicalDto;
-import com.periodicalsubscription.mapper.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalRepository periodicalRepository;
-    private final ObjectMapper mapper;
+    private final PeriodicalMapper mapper;
 
     @Override
     public List<PeriodicalDto> findAll() {
-        return periodicalRepository.findAll().stream()
+        return periodicalRepository.findAllFetchCategories().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }

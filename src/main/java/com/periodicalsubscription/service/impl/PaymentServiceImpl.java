@@ -1,10 +1,10 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.PaymentMapper;
 import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.service.api.PaymentService;
 import com.periodicalsubscription.dto.PaymentDto;
-import com.periodicalsubscription.mapper.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
-    private final ObjectMapper mapper;
+    private final PaymentMapper mapper;
 
     @Override
     public List<PaymentDto> findAll() {

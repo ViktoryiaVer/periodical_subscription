@@ -1,14 +1,14 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.dto.UserDto;
-import com.periodicalsubscription.mapper.ObjectMapper;
-import com.periodicalsubscription.service.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final UserValidator validator;
-    private final ObjectMapper mapper;
+    private final UserMapper mapper;
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
@@ -33,11 +32,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto save(UserDto dto) {
+    public UserDto save(@Valid UserDto dto) {
         if(userRepository.findByEmail(dto.getEmail()) != null) {
             throw new RuntimeException("User with this email already exists");
         }
-        validator.checkValidity(dto);
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
     }
 

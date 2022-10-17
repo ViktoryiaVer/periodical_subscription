@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PeriodicalCategoryDto {
     private Long id;
-    private PeriodicalDto periodical;
+    private PeriodicalDto periodicalDto;
     private CategoryDto categoryDto;
 
     public enum CategoryDto {

@@ -1,10 +1,10 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.SubscriptionDetailMapper;
 import com.periodicalsubscription.model.repository.SubscriptionDetailRepository;
 import com.periodicalsubscription.model.entity.SubscriptionDetail;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
-import com.periodicalsubscription.mapper.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SubscriptionDetailServiceImpl implements SubscriptionDetailService {
     private final SubscriptionDetailRepository subscriptionDetailRepository;
-    private final ObjectMapper mapper;
+    private final SubscriptionDetailMapper mapper;
 
     @Override
     public List<SubscriptionDetailDto> findAll() {
