@@ -19,7 +19,11 @@ public class PageManager {
     public static final String SUBSCRIPTION = "subscription/subscription";
 
     public static final String CART = "subscription/cart";
-    public static final String PAYMENTS = "payments";
+
+    public static final String PAYMENTS = "payment/payments";
+    public static final String PAYMENT = "payment/payment";
+    public static final String CREATE_PAYMENT = "payment/createPaymentForm";
+    public static final String UPDATE_PAYMENT = "payment/updatePaymentForm";
 
 
     public static final String ALREADY_LOGGED_IN = "alreadyLoggedIn";

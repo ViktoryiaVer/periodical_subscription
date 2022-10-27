@@ -2,6 +2,7 @@ package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.manager.PageManager;
+import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final SubscriptionService subscriptionService;
 
     @GetMapping(value = "/all")
     public String getAllUsers(Model model) {
@@ -76,6 +78,12 @@ public class UserController {
 
     @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, Model model) {
+        UserDto userDto = userService.findById(id);
+
+        if(subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
+            throw new RuntimeException("User with subscriptions can't be deleted");
+        }
+
         userService.delete(id);
         model.addAttribute("message", "User was deleted successfully");
         return PageManager.HOME;
