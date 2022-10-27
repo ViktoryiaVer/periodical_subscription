@@ -1,19 +1,19 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.model.entity.User;
+import com.periodicalsubscription.dto.UserDto;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.List;
-
+@Validated
 public interface UserService {
-    List<User> findAll();
+    List<UserDto> findAll();
 
-    User findById(Long id);
+    UserDto findById(Long id);
 
-    User save(User user);
+    UserDto save(@Valid UserDto dto);
 
-    User update (User user);
+    UserDto update (UserDto dto);
 
-    void delete(User user);
-
-
+    void delete(UserDto dto);
 }

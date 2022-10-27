@@ -1,45 +1,51 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.SubscriptionDetailMapper;
 import com.periodicalsubscription.model.repository.SubscriptionDetailRepository;
 import com.periodicalsubscription.model.entity.SubscriptionDetail;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
+import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SubscriptionDetailServiceImpl implements SubscriptionDetailService {
     private final SubscriptionDetailRepository subscriptionDetailRepository;
+    private final SubscriptionDetailMapper mapper;
+
     @Override
-    public List<SubscriptionDetail> findAll() {
-        return subscriptionDetailRepository.findAll();
+    public List<SubscriptionDetailDto> findAll() {
+        return subscriptionDetailRepository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public SubscriptionDetail findById(Long id) {
-        Optional<SubscriptionDetail> subscriptionDetail = subscriptionDetailRepository.findById(id);
+    public SubscriptionDetailDto findById(Long id) {
+        SubscriptionDetail detail = subscriptionDetailRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        return subscriptionDetail.orElseThrow(RuntimeException::new);
+        return mapper.toDto(detail);
     }
 
     @Override
-    public SubscriptionDetail save(SubscriptionDetail subscriptionDetail) {
+    public SubscriptionDetailDto save(SubscriptionDetailDto dto) {
         //TODO some validation
-        return subscriptionDetailRepository.save(subscriptionDetail);
+        return mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public SubscriptionDetail update(SubscriptionDetail subscriptionDetail) {
+    public SubscriptionDetailDto update(SubscriptionDetailDto dto) {
         //TODO some validation
-        return subscriptionDetailRepository.save(subscriptionDetail);
+        return mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public void delete(SubscriptionDetail subscriptionDetail) {
+    public void delete(SubscriptionDetailDto dto) {
         //TODO some validation?
-        subscriptionDetailRepository.delete(subscriptionDetail);
+        subscriptionDetailRepository.delete(mapper.toEntity(dto));
     }
 }

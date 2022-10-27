@@ -1,46 +1,51 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.PaymentMapper;
 import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.service.api.PaymentService;
+import com.periodicalsubscription.dto.PaymentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
+    private final PaymentMapper mapper;
 
     @Override
-    public List<Payment> findAll() {
-        return paymentRepository.findAll();
+    public List<PaymentDto> findAll() {
+        return paymentRepository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Payment findById(Long id) {
-        Optional<Payment> payment = paymentRepository.findById(id);
+    public PaymentDto findById(Long id) {
+        Payment payment = paymentRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        return payment.orElseThrow(RuntimeException::new);
+        return mapper.toDto(payment);
     }
 
     @Override
-    public Payment save(Payment payment) {
+    public PaymentDto save(PaymentDto dto) {
         //TODO some validation
-        return paymentRepository.save(payment);
+        return mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public Payment update(Payment payment) {
+    public PaymentDto update(PaymentDto dto) {
         //TODO some validation
-        return paymentRepository.save(payment);
+        return mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public void delete(Payment payment) {
+    public void delete(PaymentDto dto) {
         //TODO some validation?
-        paymentRepository.delete(payment);
+        paymentRepository.delete(mapper.toEntity(dto));
     }
 }

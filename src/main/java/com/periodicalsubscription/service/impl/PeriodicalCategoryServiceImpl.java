@@ -1,46 +1,51 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.PeriodicalCategoryMapper;
 import com.periodicalsubscription.model.repository.PeriodicalCategoryRepository;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
+import com.periodicalsubscription.dto.PeriodicalCategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService {
     private final PeriodicalCategoryRepository periodicalCategoryRepository;
+    private final PeriodicalCategoryMapper mapper;
 
     @Override
-    public List<PeriodicalCategory> findAll() {
-        return periodicalCategoryRepository.findAll();
+    public List<PeriodicalCategoryDto> findAll() {
+        return periodicalCategoryRepository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public PeriodicalCategory findById(Long id) {
-        Optional<PeriodicalCategory> category = periodicalCategoryRepository.findById(id);
+    public PeriodicalCategoryDto findById(Long id) {
+        PeriodicalCategory category = periodicalCategoryRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        return category.orElseThrow(RuntimeException::new);
+        return mapper.toDto(category);
     }
 
     @Override
-    public PeriodicalCategory save(PeriodicalCategory category) {
+    public PeriodicalCategoryDto save(PeriodicalCategoryDto dto) {
         //TODO some validation
-        return periodicalCategoryRepository.save(category);
+        return mapper.toDto(periodicalCategoryRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public PeriodicalCategory update(PeriodicalCategory category) {
+    public PeriodicalCategoryDto update(PeriodicalCategoryDto dto) {
         //TODO some validation
-        return periodicalCategoryRepository.save(category);
+        return mapper.toDto(periodicalCategoryRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public void delete(PeriodicalCategory category) {
+    public void delete(PeriodicalCategoryDto dto) {
         //TODO some validation
-        periodicalCategoryRepository.delete(category);
+        periodicalCategoryRepository.delete(mapper.toEntity(dto));
     }
 }
