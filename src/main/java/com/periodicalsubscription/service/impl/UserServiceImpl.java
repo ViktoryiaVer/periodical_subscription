@@ -46,9 +46,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(UserDto dto) {
+    public void delete(Long id) {
         //TODO some validation?
-        userRepository.delete(mapper.toEntity(dto));
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDto login(String email, String password) {
+        User user = userRepository.findByEmail(email);
+
+        if(user == null || !password.equals(user.getPassword())) {
+            throw new RuntimeException("Wrong email or password");
+        }
+        return mapper.toDto(user);
     }
 
 }
