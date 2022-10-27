@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PeriodicalRepository extends JpaRepository<Periodical, Long>  {
-    @Query("select p from Periodical p join fetch p.categories")
-    List<Periodical> findAllFetchCategories();
+    @Query("select distinct p from Periodical p join fetch p.categories")
+    List<Periodical> findAllDistinctFetchCategories();
 }

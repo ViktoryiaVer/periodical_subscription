@@ -2,7 +2,9 @@ package com.periodicalsubscription.mapper;
 
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.model.entity.Periodical;
-import org.mapstruct.*;
+import org.mapstruct.CollectionMappingStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = PeriodicalCategoryMapper.class, collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED)
 public interface PeriodicalMapper {
