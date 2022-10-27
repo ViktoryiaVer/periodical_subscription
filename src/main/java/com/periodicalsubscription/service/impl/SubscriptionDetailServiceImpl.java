@@ -7,7 +7,9 @@ import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,5 +49,14 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     public void delete(SubscriptionDetailDto dto) {
         //TODO some validation?
         subscriptionDetailRepository.delete(mapper.toEntity(dto));
+    }
+    @Transactional
+    @Override
+    public SubscriptionDetailDto updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id) {
+        LocalDate endDate = startDate.plusYears(subscriptionDuration).minusDays(1);
+
+        subscriptionDetailRepository.updateSubscriptionStartDate(startDate, id);
+        subscriptionDetailRepository.updateSubscriptionEndDate(endDate, id);
+        return findById(id);
     }
 }

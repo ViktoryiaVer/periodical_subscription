@@ -13,33 +13,28 @@
               crossorigin="anonymous" />
     </head>
     <body>
-        <jsp:include page="navbar.jsp"/>
+        <jsp:include page="../navbar.jsp"/>
         <h2 style="text-align: center"> All payments</h2>
         <h4 id="message"><c:out value="${message}"/></h4>
         <table>
-            <th>#</th>
+            <th>Id</th>
             <th>User</th>
             <th>Subscription number</th>
-            <th>Payment time</th>
-            <th>Payment method</th>
-            <c:forEach var="payment" items="${payments}" varStatus="counter">
+            <c:forEach var="payment" items="${payments}">
                 <tr>
-                    <td>${counter.count}</td>
+                    <td><a href="/payment/${payment.id}">${payment.id}</a></td>
                     <td>
-                        ${payment.userDto.firstName}
-                        ${payment.userDto.lastName}
+                        <a href="/user/${payment.userDto.id}">${payment.userDto.email}</a>
                     </td>
                     <td>
-                        ${payment.subscriptionDto.id}
+                        <a href="/subscription/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
                     </td>
                     <td>
-                        ${payment.paymentTime}
-                    </td>
-                    <td>
-                        ${payment.paymentMethodDto.toString().toLowerCase()}
+                        <form action="/payment/update/${payment.id}">
+                            <button class="btn btn-light" type="submit" title="Update payment">Update</button>
+                        </form>
                     </td>
                 </tr>
-                <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
             </c:forEach>
         </table>
     </body>

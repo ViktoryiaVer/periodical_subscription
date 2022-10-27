@@ -1,13 +1,15 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.mapper.PaymentMapper;
 import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.service.api.PaymentService;
 import com.periodicalsubscription.dto.PaymentDto;
+import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper mapper;
+    private final SubscriptionService subscriptionService;
 
     @Override
     public List<PaymentDto> findAll() {
@@ -47,5 +50,16 @@ public class PaymentServiceImpl implements PaymentService {
     public void delete(PaymentDto dto) {
         //TODO some validation?
         paymentRepository.delete(mapper.toEntity(dto));
+    }
+
+    @Override
+    public PaymentDto processPaymentRegistration(Long subscriptionId, String paymentTime, String paymentMethod) {
+        PaymentDto paymentDto = new  PaymentDto();
+        SubscriptionDto subscriptionDto = subscriptionService.findById(subscriptionId);
+        paymentDto.setUserDto(subscriptionDto.getUserDto());
+        paymentDto.setSubscriptionDto(subscriptionDto);
+        paymentDto.setPaymentTime(LocalDateTime.parse(paymentTime));
+        paymentDto.setPaymentMethodDto(PaymentDto.PaymentMethodDto.valueOf(paymentMethod));
+        return paymentDto;
     }
 }

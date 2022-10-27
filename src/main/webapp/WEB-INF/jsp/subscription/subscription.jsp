@@ -24,9 +24,6 @@
                 <tr>
                     <td><a href="/subscription/${subscription.id}">${subscription.id}</a></td>
                     <td>
-                        <a href="/user/${subscription.userDto.id}">${subscription.userDto.email}</a>
-                    </td>
-                    <td>
                         <c:forEach var="detail" items="${subscription.subscriptionDetailDtos}">
                             <a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} USD for ${detail.subscriptionDurationInYears} years)
                             <br>
@@ -41,6 +38,30 @@
                     <td>
                         ${subscription.statusDto}
                     </td>
+                    <c:if test="${subscription.statusDto == 'PENDING' && sessionScope.user.roleDto == 'ADMIN'}">
+                        <td>
+                            <form action="/subscription/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="AWAITING_PAYMENT" title="Confirm subscription">Confirm</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/subscription/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="Reject subscription">Reject</button>
+                            </form>
+                        </td>
+                    </c:if>
+                    <c:if test="${sessionScope.user.roleDto == 'READER' && subscription.statusDto != 'CANCELED'}">
+                        <td>
+                            <form action="/subscription/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="Cancel subscription">Cancel</button>
+                            </form>
+                        </td>
+                    </c:if>
+                    <c:if test="${subscription.statusDto == 'AWAITING_PAYMENT' && sessionScope.user.roleDto == 'ADMIN'}}">
+                        <form action="/payment/register/${subscription.id}">
+                            <button class="btn btn-light" type="submit" title="Register payment">Register payment</button>
+                        </form>
+                    </c:if>
                 </tr>
                 <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
         </table>

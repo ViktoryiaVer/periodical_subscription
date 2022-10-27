@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -63,5 +64,13 @@ public class SubscriptionController {
         return PageManager.SUBSCRIPTION;
     }
 
+    @PostMapping("/update/{id}")
+    public String updateSubscription(@PathVariable Long id, @RequestParam String statusDto, Model model) {
+        SubscriptionDto updatedSubscription = subscriptionService.updateSubscriptionStatus(SubscriptionDto.StatusDto.valueOf(statusDto), id);
 
+        model.addAttribute("message", "Subscription status was updated successfully");
+        model.addAttribute("subscription", updatedSubscription);
+
+        return PageManager.SUBSCRIPTION;
+    }
 }

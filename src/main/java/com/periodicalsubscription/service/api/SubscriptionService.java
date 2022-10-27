@@ -18,4 +18,8 @@ public interface SubscriptionService {
     void delete(SubscriptionDto dto);
 
     SubscriptionDto processSubscriptionInCart(UserDto userDto, Map<Long, Integer> cart);
+
+    SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id);
+
+    boolean checkIfSubscriptionExistsByUSer(UserDto userDto);
 }

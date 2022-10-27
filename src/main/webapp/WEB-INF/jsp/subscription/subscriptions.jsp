@@ -31,8 +31,26 @@
                     <td>
                         ${subscription.statusDto}
                     </td>
+                    <c:if test="${subscription.statusDto == 'PENDING'}">
+                        <td>
+                            <form action="/subscription/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="AWAITING_PAYMENT" title="Confirm subscription">Confirm</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/subscription/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="Reject subscription">Reject</button>
+                            </form>
+                        </td>
+                    </c:if>
+                    <td>
+                        <c:if test="${subscription.statusDto == 'AWAITING_PAYMENT'}">
+                            <form action="/payment/register/${subscription.id}">
+                                <button class="btn btn-light" type="submit" title="Register payment">Register payment</button>
+                            </form>
+                        </c:if>
+                    </td>
                 </tr>
-                <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
             </c:forEach>
         </table>
     </body>

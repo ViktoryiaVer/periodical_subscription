@@ -4,6 +4,7 @@ import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.mapper.SubscriptionMapper;
+import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.SubscriptionRepository;
 import com.periodicalsubscription.model.entity.Subscription;
 import com.periodicalsubscription.service.api.PeriodicalService;
@@ -11,6 +12,7 @@ import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final PeriodicalService periodicalService;
     private final SubscriptionMapper mapper;
+    private final UserMapper userMapper;
 
     @Override
     public List<SubscriptionDto> findAll() {
@@ -85,5 +88,17 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             totalCost = totalCost.add(periodicalPrice.multiply(BigDecimal.valueOf(detail.getSubscriptionDurationInYears())));
         }
         return totalCost;
+    }
+
+    @Transactional
+    @Override
+    public SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id) {
+        subscriptionRepository.updateSubscriptionStatus(Subscription.Status.valueOf(status.toString()), id);
+        return findById(id);
+    }
+
+    @Override
+    public boolean checkIfSubscriptionExistsByUSer(UserDto userDto) {
+        return subscriptionRepository.existsSubscriptionByUser(userMapper.toEntity(userDto));
     }
 }
