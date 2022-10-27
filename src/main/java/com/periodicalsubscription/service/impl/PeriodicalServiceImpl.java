@@ -1,14 +1,12 @@
 package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.mapper.PeriodicalMapper;
-import com.periodicalsubscription.model.repository.PeriodicalCategoryRepository;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +15,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalRepository periodicalRepository;
-    private final PeriodicalCategoryRepository categoryRepository;
     private final PeriodicalMapper mapper;
 
     @Override
@@ -52,9 +49,4 @@ public class PeriodicalServiceImpl implements PeriodicalService {
         periodicalRepository.deleteById(id);
     }
 
-    @Transactional
-    @Override
-    public void deleteAllCategoriesForPeriodical(PeriodicalDto dto) {
-        categoryRepository.deleteAllByPeriodical(mapper.toEntity(dto));
-    }
 }

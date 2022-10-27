@@ -2,6 +2,7 @@ package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.manager.PageManager;
+import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequestMapping("/periodical")
 public class PeriodicalController {
     private final PeriodicalService periodicalService;
+    private final PeriodicalCategoryService periodicalCategoryService;
 
     @GetMapping(value = "/all")
     public String getAllPeriodicals(Model model) {
@@ -73,7 +75,7 @@ public class PeriodicalController {
         if(!imageFile.isEmpty()) {
             periodical.setImagePath(getImagePath(imageFile));
         }
-        periodicalService.deleteAllCategoriesForPeriodical(periodical);
+        periodicalCategoryService.deleteAllCategoriesForPeriodical(periodical);
         periodicalService.update(periodical);
         model.addAttribute("message", "Periodical was updated successfully");
         return PageManager.HOME;

@@ -15,5 +15,4 @@ public interface PeriodicalService {
 
     void delete(Long id);
 
-    void deleteAllCategoriesForPeriodical(PeriodicalDto dto);
 }
