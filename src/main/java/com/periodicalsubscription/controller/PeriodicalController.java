@@ -2,7 +2,6 @@ package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.manager.PageManager;
-import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -23,7 +20,6 @@ import java.util.List;
 @RequestMapping("/periodical")
 public class PeriodicalController {
     private final PeriodicalService periodicalService;
-    private final PeriodicalCategoryService periodicalCategoryService;
 
     @GetMapping(value = "/all")
     public String getAllPeriodicals(Model model) {
@@ -33,17 +29,15 @@ public class PeriodicalController {
             model.addAttribute("message", "No periodicals could be found");
             return PageManager.PERIODICALS;
         }
-        model.addAttribute("periodicals", periodicals);
 
+        model.addAttribute("periodicals", periodicals);
         return PageManager.PERIODICALS;
     }
 
     @GetMapping("/{id}")
     public String getPeriodical(Model model, @PathVariable Long id) {
         PeriodicalDto periodical = periodicalService.findById(id);
-
         model.addAttribute("periodical", periodical);
-
         return PageManager.PERIODICAL;
     }
 
@@ -54,9 +48,7 @@ public class PeriodicalController {
 
     @PostMapping("/create")
     public String createPeriodical(@ModelAttribute PeriodicalDto periodical, MultipartFile imageFile, Model model) {
-        periodical.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
-        periodical.setImagePath(getImagePath(imageFile));
-        periodicalService.save(periodical);
+        periodicalService.processPeriodicalCreation(periodical, imageFile);
         model.addAttribute("message", "Periodical was created successfully");
         return PageManager.HOME;
     }
@@ -70,13 +62,7 @@ public class PeriodicalController {
 
     @PostMapping("/update")
     public String updatePeriodical(@ModelAttribute PeriodicalDto periodical, MultipartFile imageFile, Model model) {
-        periodical.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
-
-        if(!imageFile.isEmpty()) {
-            periodical.setImagePath(getImagePath(imageFile));
-        }
-        periodicalCategoryService.deleteAllCategoriesForPeriodical(periodical);
-        periodicalService.update(periodical);
+        periodicalService.processPeriodicalUpdate(periodical, imageFile);
         model.addAttribute("message", "Periodical was updated successfully");
         return PageManager.HOME;
     }
@@ -86,18 +72,5 @@ public class PeriodicalController {
         periodicalService.delete(id);
         model.addAttribute("message", "Periodical was deleted successfully");
         return PageManager.HOME;
-    }
-
-    private String getImagePath(MultipartFile imageFile) {
-        String imageName;
-        try {
-            imageName = imageFile.getOriginalFilename();
-            String location = "periodicals/";
-            File partFile = new File(location + imageName);
-            imageFile.transferTo(partFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return imageName;
     }
 }

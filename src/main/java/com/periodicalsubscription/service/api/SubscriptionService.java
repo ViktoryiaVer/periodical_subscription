@@ -17,6 +17,8 @@ public interface SubscriptionService {
 
     void delete(SubscriptionDto dto);
 
+    SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart);
+
     SubscriptionDto processSubscriptionInCart(UserDto userDto, Map<Long, Integer> cart);
 
     SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id);

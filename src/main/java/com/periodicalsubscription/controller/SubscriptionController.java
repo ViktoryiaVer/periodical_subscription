@@ -70,13 +70,12 @@ public class SubscriptionController {
         }
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
-        SubscriptionDto subscription = subscriptionService.processSubscriptionInCart(userDto, cart);
-        SubscriptionDto createdSubscription = subscriptionService.save(subscription);
+        SubscriptionDto subscription = subscriptionService.createSubscriptionFromCart(userDto, cart);
+
         session.removeAttribute("cart");
 
         model.addAttribute("message", "Subscription was created successfully. Manager will confirm your subscription soon.");
-        model.addAttribute("subscription", createdSubscription);
-
+        model.addAttribute("subscription", subscription);
         return PageManager.SUBSCRIPTION;
     }
 

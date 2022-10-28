@@ -6,9 +6,12 @@ import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.service.api.PaymentService;
 import com.periodicalsubscription.dto.PaymentDto;
+import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper mapper;
     private final SubscriptionService subscriptionService;
+    private final SubscriptionDetailService subscriptionDetailService;
 
     @Override
     public List<PaymentDto> findAll() {
@@ -52,8 +56,18 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.delete(mapper.toEntity(dto));
     }
 
+    @Transactional
     @Override
     public PaymentDto processPaymentRegistration(Long subscriptionId, String paymentTime, String paymentMethod) {
+        PaymentDto paymentDto = createPaymentDto(subscriptionId, paymentTime, paymentMethod);
+        PaymentDto savedPayment = save(paymentDto);
+
+        SubscriptionDto subscriptionDto = subscriptionService.updateSubscriptionStatus(SubscriptionDto.StatusDto.PAYED, paymentDto.getSubscriptionDto().getId());
+        subscriptionDto.getSubscriptionDetailDtos().forEach((detail -> subscriptionDetailService.updateSubscriptionPeriod(savedPayment.getPaymentTime().toLocalDate(), detail.getSubscriptionDurationInYears(), detail.getId())));
+        return savedPayment;
+    }
+
+    private PaymentDto createPaymentDto(Long subscriptionId, String paymentTime, String paymentMethod) {
         PaymentDto paymentDto = new  PaymentDto();
         SubscriptionDto subscriptionDto = subscriptionService.findById(subscriptionId);
         paymentDto.setUserDto(subscriptionDto.getUserDto());

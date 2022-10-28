@@ -1,11 +1,8 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.dto.PaymentDto;
-import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.manager.PageManager;
 import com.periodicalsubscription.service.api.PaymentService;
-import com.periodicalsubscription.service.api.SubscriptionDetailService;
-import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,8 +20,6 @@ import java.util.List;
 @RequestMapping("/payment")
 public class PaymentController {
     private final PaymentService paymentService;
-    private final SubscriptionService subscriptionService;
-    private final SubscriptionDetailService subscriptionDetailService;
 
     @GetMapping("/all")
     public String getAllPayments(Model model) {
@@ -57,12 +52,9 @@ public class PaymentController {
     @PostMapping("/register")
     public String createPayment(@RequestParam Long subscriptionId, @RequestParam String paymentTime, @RequestParam String paymentMethodDto, Model model) {
         PaymentDto paymentDto = paymentService.processPaymentRegistration(subscriptionId, paymentTime, paymentMethodDto);
-        PaymentDto savedPayment = paymentService.save(paymentDto);
-        SubscriptionDto subscriptionDto = subscriptionService.updateSubscriptionStatus(SubscriptionDto.StatusDto.PAYED, paymentDto.getSubscriptionDto().getId());
-        subscriptionDto.getSubscriptionDetailDtos().forEach((detail -> subscriptionDetailService.updateSubscriptionPeriod(savedPayment.getPaymentTime().toLocalDate(), detail.getSubscriptionDurationInYears(), detail.getId())));
 
         model.addAttribute("message", "Payment was registered successfully");
-        model.addAttribute("payment", savedPayment);
+        model.addAttribute("payment", paymentDto);
         return PageManager.PAYMENT;
     }
 

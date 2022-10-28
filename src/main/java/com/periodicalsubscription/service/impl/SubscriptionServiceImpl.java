@@ -61,6 +61,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    public SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart) {
+        SubscriptionDto subscription = processSubscriptionInCart(userDto, cart);
+        return save(subscription);
+    }
+
+    @Override
     public SubscriptionDto processSubscriptionInCart(UserDto userDto, Map<Long, Integer> cart) {
         SubscriptionDto subscription = new SubscriptionDto();
         subscription.setUserDto(userDto);

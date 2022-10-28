@@ -15,8 +15,12 @@
         </c:if>
 
         <li><a href="/cart/show">Cart</a></li>
-        <li style="float: right"><a href="/logout">Log out</a></li>
-        <li style="float: right"><a href="/login">Log in</a></li>
-        <li style="float: right"><a href="/user/create">Sign up</a></li>
+        <c:if test="${sessionScope.user != null}">
+            <li style="float: right"><a href="/logout">Log out</a></li>
+        </c:if>
+        <c:if test="${sessionScope.user == null}">
+            <li style="float: right"><a href="/login">Log in</a></li>
+            <li style="float: right"><a href="/user/create">Sign up</a></li>
+        </c:if>
     </ul>
 </nav>
