@@ -22,4 +22,6 @@ public interface SubscriptionService {
     SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id);
 
     boolean checkIfSubscriptionExistsByUSer(UserDto userDto);
+
+    List<SubscriptionDto> findAllSubscriptionsByUser(UserDto userDto);
 }

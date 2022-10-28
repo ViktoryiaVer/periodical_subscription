@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
@@ -15,4 +17,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     void updateSubscriptionStatus(Subscription.Status status, Long id);
 
     boolean existsSubscriptionByUser(User user);
+
+    List<Subscription> findAllByUser(User user);
 }

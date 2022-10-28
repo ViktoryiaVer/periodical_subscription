@@ -38,10 +38,12 @@ public class AuthorizationController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, Model model) {
         if(session.getAttribute("user") != null) {
             session.removeAttribute("user");
         }
+
+        model.addAttribute("message", "You were logged out successfully");
         return PageManager.HOME;
     }
 }

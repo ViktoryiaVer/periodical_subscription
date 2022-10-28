@@ -101,4 +101,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public boolean checkIfSubscriptionExistsByUSer(UserDto userDto) {
         return subscriptionRepository.existsSubscriptionByUser(userMapper.toEntity(userDto));
     }
+
+    @Override
+    public List<SubscriptionDto> findAllSubscriptionsByUser(UserDto userDto) {
+        return subscriptionRepository.findAllByUser(userMapper.toEntity(userDto)).stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

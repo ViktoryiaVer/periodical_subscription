@@ -4,6 +4,7 @@ import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.manager.PageManager;
 import com.periodicalsubscription.service.api.SubscriptionService;
+import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +23,7 @@ import java.util.Map;
 @RequestMapping("/subscription")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
+    private final UserService userService;
 
     @GetMapping(value = "/all")
     public String getAllSubscriptions(Model model) {
@@ -29,6 +31,20 @@ public class SubscriptionController {
 
         if(subscriptions.isEmpty()) {
             model.addAttribute("message", "No subscriptions could be found");
+            return PageManager.SUBSCRIPTIONS;
+        }
+        model.addAttribute("subscriptions", subscriptions);
+
+        return PageManager.SUBSCRIPTIONS;
+    }
+
+    @GetMapping(value = "/user/{id}")
+    public String getAllSubscriptionsByUser(@PathVariable("id") Long userId, Model model) {
+        UserDto userDto = userService.findById(userId);
+        List<SubscriptionDto> subscriptions = subscriptionService.findAllSubscriptionsByUser(userDto);
+
+        if(subscriptions.isEmpty()) {
+            model.addAttribute("message", "You haven't ordered any subscriptions yet");
             return PageManager.SUBSCRIPTIONS;
         }
         model.addAttribute("subscriptions", subscriptions);
