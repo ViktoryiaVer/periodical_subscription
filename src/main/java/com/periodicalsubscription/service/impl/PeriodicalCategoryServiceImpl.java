@@ -1,12 +1,15 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.mapper.PeriodicalCategoryMapper;
+import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalCategoryRepository;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.dto.PeriodicalCategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService {
     private final PeriodicalCategoryRepository periodicalCategoryRepository;
     private final PeriodicalCategoryMapper mapper;
+    private final PeriodicalMapper periodicalMapper;
 
     @Override
     public List<PeriodicalCategoryDto> findAll() {
@@ -47,5 +51,11 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     public void delete(PeriodicalCategoryDto dto) {
         //TODO some validation
         periodicalCategoryRepository.delete(mapper.toEntity(dto));
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllCategoriesForPeriodical(PeriodicalDto dto) {
+        periodicalCategoryRepository.deleteAllByPeriodical(periodicalMapper.toEntity(dto));
     }
 }

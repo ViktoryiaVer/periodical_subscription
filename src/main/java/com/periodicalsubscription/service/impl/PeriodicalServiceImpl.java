@@ -3,11 +3,16 @@ package com.periodicalsubscription.service.impl;
 import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
+import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,11 +20,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalRepository periodicalRepository;
+    private final PeriodicalCategoryService periodicalCategoryService;
     private final PeriodicalMapper mapper;
 
     @Override
     public List<PeriodicalDto> findAll() {
-        return periodicalRepository.findAllFetchCategories().stream()
+        return periodicalRepository.findAllDistinctFetchCategories().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -44,8 +50,41 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     }
 
     @Override
-    public void delete(PeriodicalDto dto) {
+    public void delete(Long id) {
         //TODO some validation?
-        periodicalRepository.delete(mapper.toEntity(dto));
+        periodicalRepository.deleteById(id);
     }
+
+    @Override
+    public PeriodicalDto processPeriodicalCreation(PeriodicalDto periodicalDto, MultipartFile imageFile) {
+        periodicalDto.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
+        periodicalDto.setImagePath(getImagePath(imageFile));
+        return save(periodicalDto);
+    }
+
+    @Transactional
+    @Override
+    public PeriodicalDto processPeriodicalUpdate(PeriodicalDto periodicalDto, MultipartFile imageFile) {
+        periodicalDto.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
+
+        if(!imageFile.isEmpty()) {
+            periodicalDto.setImagePath(getImagePath(imageFile));
+        }
+        periodicalCategoryService.deleteAllCategoriesForPeriodical(periodicalDto);
+        return update(periodicalDto);
+    }
+
+    private String getImagePath(MultipartFile imageFile) {
+        String imageName;
+        try {
+            imageName = imageFile.getOriginalFilename();
+            String location = "periodicals/";
+            File partFile = new File(location + imageName);
+            imageFile.transferTo(partFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return imageName;
+    }
+
 }

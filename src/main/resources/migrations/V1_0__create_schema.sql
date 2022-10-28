@@ -56,6 +56,8 @@ CREATE TABLE  IF NOT EXISTS subscription_details (
     subscription_id BIGINT NOT NULL REFERENCES subscriptions,
     periodical_id BIGINT NOT NULL REFERENCES periodicals,
     subscription_duration_in_years INT NOT NULL,
+    subscription_start_date DATE,
+    subscription_end_date DATE,
     periodical_current_price DECIMAl(6, 2) NOT NULL,
     deleted BOOLEAN NOT NULL DEFAULT FALSE
 );

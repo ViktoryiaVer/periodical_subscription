@@ -2,6 +2,7 @@ package com.periodicalsubscription.service.api;
 
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface SubscriptionDetailService {
@@ -14,4 +15,6 @@ public interface SubscriptionDetailService {
     SubscriptionDetailDto update (SubscriptionDetailDto dto);
 
     void delete(SubscriptionDetailDto dto);
+
+    SubscriptionDetailDto updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id);
 }

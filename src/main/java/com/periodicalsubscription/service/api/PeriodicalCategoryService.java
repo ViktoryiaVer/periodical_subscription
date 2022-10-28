@@ -1,6 +1,7 @@
 package com.periodicalsubscription.service.api;
 
 import com.periodicalsubscription.dto.PeriodicalCategoryDto;
+import com.periodicalsubscription.dto.PeriodicalDto;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface PeriodicalCategoryService {
     PeriodicalCategoryDto update(PeriodicalCategoryDto dto);
 
     void delete(PeriodicalCategoryDto dto);
+
+    void deleteAllCategoriesForPeriodical(PeriodicalDto dto);
 }

@@ -13,7 +13,9 @@ public interface UserService {
 
     UserDto save(@Valid UserDto dto);
 
-    UserDto update (UserDto dto);
+    UserDto update (@Valid UserDto dto);
 
-    void delete(UserDto dto);
+    void delete(Long id);
+
+    UserDto login(String email, String password);
 }
