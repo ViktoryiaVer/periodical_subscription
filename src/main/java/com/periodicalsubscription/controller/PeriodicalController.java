@@ -1,18 +1,28 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.dto.PeriodicalDto;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
+import com.periodicalsubscription.manager.ErrorMessageManager;
 import com.periodicalsubscription.manager.PageManager;
+import com.periodicalsubscription.manager.SuccessMessageManager;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -26,7 +36,7 @@ public class PeriodicalController {
         List<PeriodicalDto> periodicals = periodicalService.findAll();
 
         if(periodicals.isEmpty()) {
-            model.addAttribute("message", "No periodicals could be found");
+            model.addAttribute("message", ErrorMessageManager.PERIODICALS_NOT_FOUND);
             return PageManager.PERIODICALS;
         }
 
@@ -35,7 +45,7 @@ public class PeriodicalController {
     }
 
     @GetMapping("/{id}")
-    public String getPeriodical(Model model, @PathVariable Long id) {
+    public String getPeriodical(@PathVariable Long id, Model model) {
         PeriodicalDto periodical = periodicalService.findById(id);
         model.addAttribute("periodical", periodical);
         return PageManager.PERIODICAL;
@@ -47,10 +57,15 @@ public class PeriodicalController {
     }
 
     @PostMapping("/create")
-    public String createPeriodical(@ModelAttribute PeriodicalDto periodical, MultipartFile imageFile, Model model) {
-        periodicalService.processPeriodicalCreation(periodical, imageFile);
-        model.addAttribute("message", "Periodical was created successfully");
-        return PageManager.HOME;
+    public String createPeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
+        if(errors.hasErrors()) {
+            model.addAttribute("errors", errors.getFieldErrors());
+            return PageManager.CREATE_PERIODICAL;
+        }
+
+        PeriodicalDto createdPeriodical = periodicalService.processPeriodicalCreation(periodical, imageFile);
+        session.setAttribute("message", SuccessMessageManager.PERIODICAL_CREATED);
+        return "redirect:/periodical/" + createdPeriodical.getId();
     }
 
     @GetMapping("/update/{id}")
@@ -61,16 +76,35 @@ public class PeriodicalController {
     }
 
     @PostMapping("/update")
-    public String updatePeriodical(@ModelAttribute PeriodicalDto periodical, MultipartFile imageFile, Model model) {
-        periodicalService.processPeriodicalUpdate(periodical, imageFile);
-        model.addAttribute("message", "Periodical was updated successfully");
-        return PageManager.HOME;
+    public String updatePeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
+        if(errors.hasErrors()) {
+            model.addAttribute("errors", errors);
+            return PageManager.UPDATE_PERIODICAL;
+        }
+
+        PeriodicalDto updatedPeriodical = periodicalService.processPeriodicalUpdate(periodical, imageFile);
+        session.setAttribute("message", SuccessMessageManager.PERIODICAL_UPDATED);
+        return "redirect:/periodical/" + updatedPeriodical.getId();
     }
 
     @PostMapping("/delete/{id}")
-    public String deletePeriodical(@PathVariable Long id, Model model) {
-        periodicalService.delete(id);
-        model.addAttribute("message", "Periodical was deleted successfully");
-        return PageManager.HOME;
+    public String deletePeriodical(@PathVariable Long id, HttpSession session) {
+        periodicalService.deleteById(id);
+        session.setAttribute("message", SuccessMessageManager.PERIODICAL_DELETED);
+        return "redirect:/periodical/all";
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handlePeriodicalNotFoundException(PeriodicalNotFoundException e, Model model) {
+        model.addAttribute("message", e.getMessage() + " Please, enter correct periodical id or contact the administrator.");
+        return PageManager.ERROR;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handlePeriodicalAlreadyExistsException(PeriodicalAlreadyExistsException e, Model model) {
+        model.addAttribute("message", e.getMessage() + " Please, check periodical title and edit the catalog if needed.");
+        return PageManager.ERROR;
     }
 }

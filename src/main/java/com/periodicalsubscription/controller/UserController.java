@@ -1,19 +1,27 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
+import com.periodicalsubscription.exceptions.user.UserNotFoundException;
+import com.periodicalsubscription.manager.ErrorMessageManager;
 import com.periodicalsubscription.manager.PageManager;
-import com.periodicalsubscription.service.api.SubscriptionService;
+import com.periodicalsubscription.manager.SuccessMessageManager;
 import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -21,27 +29,23 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
-    private final SubscriptionService subscriptionService;
 
     @GetMapping(value = "/all")
     public String getAllUsers(Model model) {
         List<UserDto> users = userService.findAll();
 
         if(users.isEmpty()) {
-            model.addAttribute("message", "No users could be found");
+            model.addAttribute("message", ErrorMessageManager.USERS_NOT_FOUND);
             return PageManager.USERS;
         }
         model.addAttribute("users", users);
-
         return PageManager.USERS;
     }
 
     @GetMapping("/{id}")
     public String getUser(@PathVariable Long id, Model model) {
         UserDto user = userService.findById(id);
-
         model.addAttribute("user", user);
-
         return PageManager.USER;
     }
 
@@ -54,12 +58,18 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String createUser(@ModelAttribute UserDto user, HttpSession session, Model model) {
+    public String createUser(@Valid @ModelAttribute UserDto user, Errors errors, HttpSession session, Model model) {
+        if(errors.hasErrors()) {
+            model.addAttribute("errors", errors.getFieldErrors());
+            return PageManager.SIGNUP;
+        }
+
         user.setRoleDto(UserDto.RoleDto.READER);
         UserDto createdUser = userService.save(user);
+
         session.setAttribute("user", createdUser);
-        model.addAttribute("message", "You were signed up successfully");
-        return PageManager.HOME;
+        session.setAttribute("message", SuccessMessageManager.USER_CREATED);
+        return "redirect:/user/" + createdUser.getId();
     }
 
     @GetMapping("/update/{id}")
@@ -70,22 +80,35 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public String updateUser(@ModelAttribute UserDto user, Model model) {
-        userService.update(user);
-        model.addAttribute("message", "User was updated successfully");
-        return PageManager.HOME;
+    public String updateUser(@Valid @ModelAttribute UserDto user, Errors errors, Model model, HttpSession session) {
+        if(errors.hasErrors()) {
+            model.addAttribute("errors", errors.getFieldErrors());
+            return PageManager.UPDATE_USER;
+        }
+
+        UserDto updatedUser = userService.update(user);
+        session.setAttribute("message", SuccessMessageManager.USER_UPDATED);
+        return "redirect:/user/" + updatedUser.getId();
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteUser(@PathVariable Long id, Model model) {
-        UserDto userDto = userService.findById(id);
+    public String deleteUser(@PathVariable Long id, HttpSession session) {
+        userService.deleteById(id);
+        session.setAttribute("message", SuccessMessageManager.USER_DELETED);
+        return "redirect:/user/all";
+    }
 
-        if(subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
-            throw new RuntimeException("User with subscriptions can't be deleted");
-        }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleUserNotFoundException(UserNotFoundException e, Model model) {
+        model.addAttribute("message", e.getMessage() + " Please, enter correct user id or sign up.");
+        return PageManager.ERROR;
+    }
 
-        userService.delete(id);
-        model.addAttribute("message", "User was deleted successfully");
-        return PageManager.HOME;
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleUserAlreadyExistsException(UserAlreadyExistsException e, Model model) {
+        model.addAttribute("message", e.getMessage() + " Please, specify a unique email address.");
+        return PageManager.ERROR;
     }
 }

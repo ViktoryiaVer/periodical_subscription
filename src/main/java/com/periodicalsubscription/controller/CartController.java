@@ -3,6 +3,7 @@ package com.periodicalsubscription.controller;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.manager.PageManager;
+import com.periodicalsubscription.manager.SuccessMessageManager;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ public class CartController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/add/{id}")
-    public String addToCart(@PathVariable("id") Long periodicalId, @RequestParam Integer subscriptionDurationInYears, HttpSession session, Model model) {
+    public String addToCart(@PathVariable("id") Long periodicalId, @RequestParam Integer subscriptionDurationInYears, HttpSession session) {
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
         if(cart == null) {
@@ -33,8 +34,8 @@ public class CartController {
 
         cart.put(periodicalId, subscriptionDurationInYears);
         session.setAttribute("cart", cart);
-        model.addAttribute("message", "Periodical was added to cart");
-        return PageManager.HOME;
+        session.setAttribute("message", SuccessMessageManager.CART_ADDED);
+        return "redirect:/periodical/" + periodicalId;
     }
 
     @GetMapping("/show")
@@ -42,7 +43,7 @@ public class CartController {
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
         if(cart == null) {
-            model.addAttribute("message", "Your shopping cart is empty");
+            model.addAttribute("message", SuccessMessageManager.CART_EMPTY);
             return PageManager.CART;
         }
 
@@ -53,7 +54,7 @@ public class CartController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteFromCart(@PathVariable("id") Long periodicalId, HttpSession session, Model model) {
+    public String deleteFromCart(@PathVariable("id") Long periodicalId, HttpSession session) {
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
         if(cart == null) {
@@ -64,7 +65,7 @@ public class CartController {
 
         if(cart.isEmpty()) {
             session.removeAttribute("cart");
-            model.addAttribute("message", "Your cart is empty");
+            session.setAttribute("message", SuccessMessageManager.CART_EMPTY);
         } else {
             session.setAttribute("cart", cart);
         }
@@ -74,8 +75,7 @@ public class CartController {
     @PostMapping("/delete/all")
     public String deleteAllFromCart(HttpSession session, Model model) {
         session.removeAttribute("cart");
-        model.addAttribute("message", "Your cart is empty");
-
+        model.addAttribute("message", SuccessMessageManager.CART_EMPTY);
         return PageManager.CART;
     }
 }
