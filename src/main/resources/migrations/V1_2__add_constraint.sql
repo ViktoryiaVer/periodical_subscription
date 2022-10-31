@@ -1,0 +1,1 @@
+ALTER TABLE periodicals ADD UNIQUE(title);
