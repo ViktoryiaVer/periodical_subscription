@@ -4,7 +4,11 @@ import com.periodicalsubscription.manager.ErrorMessageManager;
 import com.periodicalsubscription.manager.RegExpManager;
 import lombok.Data;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 
 @Data
 public class UserDto {
@@ -20,11 +24,13 @@ public class UserDto {
     private String email;
     @NotBlank(message = ErrorMessageManager.PASSWORD_EMPTY)
     @Pattern(regexp = RegExpManager.PASSWORD, message = ErrorMessageManager.PASSWORD_NOT_VALID)
+    @Size(min = 8, max = 20, message = ErrorMessageManager.PASSWORD_LENGTH)
     private String password;
     @NotBlank(message = ErrorMessageManager.PHONE_EMPTY)
+    @Pattern(regexp = RegExpManager.PHONE, message = ErrorMessageManager.PHONE_NOT_VALID)
+    @Size(min = 10, message = ErrorMessageManager.PHONE_LENGTH)
     private String phoneNumber;
     private String avatarPath;
-    @NotNull(message = ErrorMessageManager.ROLE_NOT_SPECIFIED)
     private RoleDto roleDto;
 
     public enum RoleDto {
@@ -32,5 +38,4 @@ public class UserDto {
         READER,
         GUEST
     }
-    //TODO some validation if avatar is specified
 }
