@@ -27,7 +27,7 @@
             <tr>
                 <td><a href="/payment/${payment.id}">${payment.id}</a></td>
                 <td>
-                    <a href="/user/${payment.userDto.id}"${payment.userDto.email}></a>
+                    <a href="/user/${payment.userDto.id}">${payment.userDto.email}</a>
                 </td>
                 <td>
                     <a href="/subscription/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>

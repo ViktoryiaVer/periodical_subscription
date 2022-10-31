@@ -17,12 +17,17 @@
         <h2 style="text-align: center"> Subscription Detail</h2>
         <h4 id="message"><c:out value="${message}"/></h4>
         <table>
-            <th>Id</th>
-            <th>User</th>
-            <th>Periodicals</th>
-            <th>Status</th>
+            <tr>
+                <th>Id</th>
+                <th>User</th>
+                <th>Periodicals</th>
+                <th>Status</th>
+            </tr>
             <tr>
                 <td><a href="/subscription/${subscription.id}">${subscription.id}</a></td>
+                <td>
+                    <a href="/user/${subscription.userDto.id}">${subscription.userDto.email}</a>
+                </td>
                 <td>
                     <c:forEach var="detail" items="${subscription.subscriptionDetailDtos}">
                         <a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} USD for ${detail.subscriptionDurationInYears} years)
