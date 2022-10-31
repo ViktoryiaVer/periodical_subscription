@@ -13,7 +13,9 @@ public interface PaymentService {
 
     PaymentDto update (PaymentDto dto);
 
-    void delete(PaymentDto dto);
+    void deleteById(Long id);
 
     PaymentDto processPaymentRegistration(Long subscriptionId, String paymentTime, String paymentMethod);
+
+    PaymentDto processPaymentUpdate(Long paymentId, String paymentTime, String paymentMethodDto);
 }
