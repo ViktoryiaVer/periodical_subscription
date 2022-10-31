@@ -25,7 +25,6 @@ public class PageManager {
     public static final String CREATE_PAYMENT = "payment/createPaymentForm";
     public static final String UPDATE_PAYMENT = "payment/updatePaymentForm";
 
-
+    public static final String ERROR = "error";
     public static final String ALREADY_LOGGED_IN = "alreadyLoggedIn";
-
 }
