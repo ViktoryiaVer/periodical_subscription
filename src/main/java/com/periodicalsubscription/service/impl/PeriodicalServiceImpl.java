@@ -1,11 +1,17 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.exceptions.ImageUploadingException;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalDeleteException;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalServiceException;
 import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.dto.PeriodicalDto;
+import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +27,7 @@ import java.util.stream.Collectors;
 public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalRepository periodicalRepository;
     private final PeriodicalCategoryService periodicalCategoryService;
+    private final SubscriptionDetailService subscriptionDetailService;
     private final PeriodicalMapper mapper;
 
     @Override
@@ -32,27 +39,42 @@ public class PeriodicalServiceImpl implements PeriodicalService {
 
     @Override
     public PeriodicalDto findById(Long id) {
-        Periodical periodical = periodicalRepository.findById(id).orElseThrow(RuntimeException::new);
+        Periodical periodical = periodicalRepository.findById(id).orElseThrow(() -> {
+            throw new PeriodicalNotFoundException("Periodical with id  " + id + " could not be found.");
+        });
 
         return mapper.toDto(periodical);
     }
 
     @Override
     public PeriodicalDto save(PeriodicalDto dto) {
-        //TODO some validation
+        if(periodicalRepository.findByTitle(dto.getTitle()) != null) {
+            throw new PeriodicalAlreadyExistsException("Periodical with title " + dto.getTitle() +  " already exists.");
+        }
         return mapper.toDto(periodicalRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
     public PeriodicalDto update(PeriodicalDto dto) {
-        //TODO some validation
+        Periodical existingPeriodical = periodicalRepository.findByTitle(dto.getTitle());
+
+        if(existingPeriodical != null && !existingPeriodical.getId().equals(dto.getId())) {
+            throw new PeriodicalAlreadyExistsException("Periodical with title " + dto.getTitle() +  " already exists.");
+        }
         return mapper.toDto(periodicalRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
-    public void delete(Long id) {
-        //TODO some validation?
+    public void deleteById(Long id) {
+        PeriodicalDto periodicalDto = findById(id);
+        if(subscriptionDetailService.checkIfSubscriptionExistsByPeriodical(periodicalDto)) {
+            throw new PeriodicalDeleteException("Periodical ordered in subscription can't be deleted.");
+        }
         periodicalRepository.deleteById(id);
+
+        if(periodicalRepository.existsById(id)) {
+            throw new PeriodicalServiceException("Error while deleting periodical with id " + id + ".");
+        }
     }
 
     @Override
@@ -70,21 +92,21 @@ public class PeriodicalServiceImpl implements PeriodicalService {
         if(!imageFile.isEmpty()) {
             periodicalDto.setImagePath(getImagePath(imageFile));
         }
+
         periodicalCategoryService.deleteAllCategoriesForPeriodical(periodicalDto);
         return update(periodicalDto);
     }
 
     private String getImagePath(MultipartFile imageFile) {
-        String imageName;
+        String imageName = "";
         try {
             imageName = imageFile.getOriginalFilename();
             String location = "periodicals/";
             File partFile = new File(location + imageName);
             imageFile.transferTo(partFile);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImageUploadingException("Error while uploading image " + imageName + ".", e);
         }
         return imageName;
     }
-
 }
