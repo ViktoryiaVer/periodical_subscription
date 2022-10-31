@@ -3,6 +3,7 @@ package com.periodicalsubscription.service.impl;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.exceptions.subscription.SubscriptionServiceException;
 import com.periodicalsubscription.mapper.SubscriptionMapper;
 import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.SubscriptionRepository;
@@ -37,27 +38,36 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public SubscriptionDto findById(Long id) {
-        Subscription subscription = subscriptionRepository.findById(id).orElseThrow(RuntimeException::new);
-
+        Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> {
+            throw new SubscriptionServiceException("Subscription with id  " + id + "could not be found.");
+        });
         return mapper.toDto(subscription);
     }
 
     @Override
     public SubscriptionDto save(SubscriptionDto dto) {
-        //TODO some validation
-        return mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        SubscriptionDto savedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        if(savedSubscription == null) {
+            throw new SubscriptionServiceException("Error while saving subscription.");
+        }
+        return savedSubscription;
     }
 
     @Override
     public SubscriptionDto update(SubscriptionDto dto) {
-        //TODO some validation?
-        return mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        SubscriptionDto updatedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        if(updatedSubscription == null) {
+            throw new SubscriptionServiceException("Error while updating subscription with id " + dto.getId() + ".");
+        }
+        return updatedSubscription;
     }
 
     @Override
-    public void delete(SubscriptionDto dto) {
-        //TODO some validation?
-        subscriptionRepository.delete(mapper.toEntity(dto));
+    public void deleteById(Long id) {
+        subscriptionRepository.deleteById(id);
+        if(subscriptionRepository.existsById(id)) {
+            throw new SubscriptionServiceException("Error while deleting subscription with id " + id + ".");
+        }
     }
 
     @Override

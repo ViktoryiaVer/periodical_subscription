@@ -1,5 +1,6 @@
 package com.periodicalsubscription.service.api;
 
+import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 
 import java.time.LocalDate;
@@ -14,7 +15,9 @@ public interface SubscriptionDetailService {
 
     SubscriptionDetailDto update (SubscriptionDetailDto dto);
 
-    void delete(SubscriptionDetailDto dto);
+    void deleteById(Long id);
 
-    SubscriptionDetailDto updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id);
+    void updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id);
+
+    boolean checkIfSubscriptionExistsByPeriodical(PeriodicalDto periodicalDto);
 }
