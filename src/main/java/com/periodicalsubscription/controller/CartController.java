@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.manager.PageManager;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class CartController {
     private final SubscriptionService subscriptionService;
 
+    @LogInvocation
     @PostMapping("/add/{id}")
     public String addToCart(@PathVariable("id") Long periodicalId, @RequestParam Integer subscriptionDurationInYears, HttpSession session) {
         @SuppressWarnings("unchecked")
@@ -38,6 +40,7 @@ public class CartController {
         return "redirect:/periodical/" + periodicalId;
     }
 
+    @LogInvocation
     @GetMapping("/show")
     public String getCart(HttpSession session, Model model) {
         @SuppressWarnings("unchecked")
@@ -53,6 +56,7 @@ public class CartController {
         return PageManager.CART;
     }
 
+    @LogInvocation
     @PostMapping("/delete/{id}")
     public String deleteFromCart(@PathVariable("id") Long periodicalId, HttpSession session) {
         @SuppressWarnings("unchecked")
@@ -72,6 +76,7 @@ public class CartController {
         return "redirect:/cart/show";
     }
 
+    @LogInvocation
     @PostMapping("/delete/all")
     public String deleteAllFromCart(HttpSession session, Model model) {
         session.removeAttribute("cart");

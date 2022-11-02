@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
@@ -31,6 +32,7 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final UserService userService;
 
+    @LogInvocation
     @GetMapping(value = "/all")
     public String getAllSubscriptions(Model model) {
         List<SubscriptionDto> subscriptions = subscriptionService.findAll();
@@ -43,6 +45,7 @@ public class SubscriptionController {
         return PageManager.SUBSCRIPTIONS;
     }
 
+    @LogInvocation
     @GetMapping(value = "/user/{id}")
     public String getAllSubscriptionsByUser(@PathVariable("id") Long userId, Model model) {
         UserDto userDto = userService.findById(userId);
@@ -56,6 +59,7 @@ public class SubscriptionController {
         return PageManager.SUBSCRIPTIONS;
     }
 
+    @LogInvocation
     @GetMapping("/{id}")
     public String getSubscription(Model model, @PathVariable Long id) {
         SubscriptionDto subscription = subscriptionService.findById(id);
@@ -64,6 +68,7 @@ public class SubscriptionController {
         return PageManager.SUBSCRIPTION;
     }
 
+    @LogInvocation
     @PostMapping("/create")
     public String createSubscription(HttpSession session, Model model) {
         UserDto userDto = (UserDto) session.getAttribute("user");
@@ -81,6 +86,7 @@ public class SubscriptionController {
         return "redirect:/subscription/" + subscription.getId();
     }
 
+    @LogInvocation
     @PostMapping("/update/{id}")
     public String updateSubscription(@PathVariable Long id, @RequestParam String statusDto, HttpSession session) {
         SubscriptionDto updatedSubscription = subscriptionService.updateSubscriptionStatus(SubscriptionDto.StatusDto.valueOf(statusDto), id);
@@ -89,6 +95,7 @@ public class SubscriptionController {
         return "redirect:/subscription/" + updatedSubscription.getId();
     }
 
+    @LogInvocation
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleSubscriptionNotFoundException(SubscriptionNotFoundException e, Model model) {

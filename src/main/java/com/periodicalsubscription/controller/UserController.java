@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
@@ -30,6 +31,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @LogInvocation
     @GetMapping(value = "/all")
     public String getAllUsers(Model model) {
         List<UserDto> users = userService.findAll();
@@ -42,6 +44,7 @@ public class UserController {
         return PageManager.USERS;
     }
 
+    @LogInvocation
     @GetMapping("/{id}")
     public String getUser(@PathVariable Long id, Model model) {
         UserDto user = userService.findById(id);
@@ -49,6 +52,7 @@ public class UserController {
         return PageManager.USER;
     }
 
+    @LogInvocation
     @GetMapping("/create")
     public String createUserForm(HttpSession session) {
         if(session.getAttribute("user") != null) {
@@ -57,6 +61,7 @@ public class UserController {
         return PageManager.SIGNUP;
     }
 
+    @LogInvocation
     @PostMapping("/create")
     public String createUser(@Valid @ModelAttribute UserDto user, Errors errors, HttpSession session, Model model) {
         if(errors.hasErrors()) {
@@ -72,6 +77,7 @@ public class UserController {
         return "redirect:/user/" + createdUser.getId();
     }
 
+    @LogInvocation
     @GetMapping("/update/{id}")
     public String updateUserForm(@PathVariable Long id, Model model) {
         UserDto user = userService.findById(id);
@@ -79,6 +85,7 @@ public class UserController {
         return PageManager.UPDATE_USER;
     }
 
+    @LogInvocation
     @PostMapping("/update")
     public String updateUser(@Valid @ModelAttribute UserDto user, Errors errors, Model model, HttpSession session) {
         if(errors.hasErrors()) {
@@ -91,6 +98,7 @@ public class UserController {
         return "redirect:/user/" + updatedUser.getId();
     }
 
+    @LogInvocation
     @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, HttpSession session) {
         userService.deleteById(id);
@@ -98,6 +106,7 @@ public class UserController {
         return "redirect:/user/all";
     }
 
+    @LogInvocation
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUserNotFoundException(UserNotFoundException e, Model model) {
@@ -105,6 +114,7 @@ public class UserController {
         return PageManager.ERROR;
     }
 
+    @LogInvocation
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUserAlreadyExistsException(UserAlreadyExistsException e, Model model) {

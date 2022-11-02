@@ -1,5 +1,8 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
+import com.periodicalsubscription.aspect.logging.annotation.LoginEx;
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.exceptions.LoginException;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserDeleteException;
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final SubscriptionService subscriptionService;
 
     @Override
+    @LogInvocationService
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
                 .map(mapper::toDto)
@@ -33,6 +37,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public UserDto findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new UserNotFoundException("User with id " + id + " could not be found.");
@@ -41,6 +47,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public UserDto save(@Valid UserDto dto) {
         if(userRepository.findByEmail(dto.getEmail()) != null) {
             throw new UserAlreadyExistsException("User with email " + dto.getEmail() + " already exists.");
@@ -49,6 +57,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public UserDto update(UserDto dto) {
         User existingUser = userRepository.findByEmail(dto.getEmail());
 
@@ -59,6 +69,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public void deleteById(Long id) {
         UserDto userDto = findById(id);
 
@@ -73,6 +85,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogInvocationService
+    @LoginEx
     public UserDto login(String email, String password) {
         User user = userRepository.findByEmail(email);
 

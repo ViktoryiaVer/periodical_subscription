@@ -1,5 +1,7 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalServiceException;
 import com.periodicalsubscription.exceptions.periodicalcategory.PeriodicalCategoryServiceException;
@@ -24,6 +26,7 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     private final PeriodicalMapper periodicalMapper;
 
     @Override
+    @LogInvocationService
     public List<PeriodicalCategoryDto> findAll() {
         return periodicalCategoryRepository.findAll().stream()
                 .map(mapper::toDto)
@@ -31,6 +34,8 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PeriodicalCategoryDto findById(Long id) {
         PeriodicalCategory category = periodicalCategoryRepository.findById(id).orElseThrow(() -> {
             throw new PeriodicalCategoryServiceException("Periodical category with id " + id + " could not be found.");
@@ -39,6 +44,8 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PeriodicalCategoryDto save(PeriodicalCategoryDto dto) {
         PeriodicalCategoryDto savedPeriodicalCategory = mapper.toDto(periodicalCategoryRepository.save(mapper.toEntity(dto)));
         if(savedPeriodicalCategory == null) {
@@ -48,6 +55,8 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PeriodicalCategoryDto update(PeriodicalCategoryDto dto) {
         PeriodicalCategoryDto updatedPeriodicalCategory = mapper.toDto(periodicalCategoryRepository.save(mapper.toEntity(dto)));
         if(updatedPeriodicalCategory == null) {
@@ -57,6 +66,8 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public void deleteById(Long id) {
         periodicalCategoryRepository.deleteById(id);
         if(periodicalCategoryRepository.existsById(id)) {
@@ -64,8 +75,10 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
         }
     }
 
-    @Transactional
     @Override
+    @LogInvocationService
+    @ServiceEx
+    @Transactional
     public void deleteAllCategoriesForPeriodical(PeriodicalDto dto) {
         periodicalCategoryRepository.deleteAllByPeriodical(periodicalMapper.toEntity(dto));
         if(periodicalCategoryRepository.existsByPeriodical(periodicalMapper.toEntity(dto))) {

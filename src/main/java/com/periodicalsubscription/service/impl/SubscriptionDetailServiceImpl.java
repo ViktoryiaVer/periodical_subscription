@@ -1,5 +1,7 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.subscriptiondetail.SubscriptionDetailNotFoundException;
 import com.periodicalsubscription.exceptions.subscriptiondetail.SubscriptionDetailServiceException;
@@ -25,6 +27,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     private final PeriodicalMapper periodicalMapper;
 
     @Override
+    @LogInvocationService
     public List<SubscriptionDetailDto> findAll() {
         return subscriptionDetailRepository.findAll().stream()
                 .map(mapper::toDto)
@@ -32,6 +35,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public SubscriptionDetailDto findById(Long id) {
         SubscriptionDetail detail = subscriptionDetailRepository.findById(id).orElseThrow(() -> {
             throw new SubscriptionDetailNotFoundException("Subscription detail with id " + id + " could not be found");
@@ -41,6 +46,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public SubscriptionDetailDto save(SubscriptionDetailDto dto) {
         SubscriptionDetailDto savedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
         if(savedDetail == null) {
@@ -50,6 +57,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public SubscriptionDetailDto update(SubscriptionDetailDto dto) {
         SubscriptionDetailDto updatedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
         if(updatedDetail == null) {
@@ -59,6 +68,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public void deleteById(Long id) {
         subscriptionDetailRepository.deleteById(id);
         if (subscriptionDetailRepository.existsById(id)) {
@@ -66,8 +77,9 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
         }
     }
 
-    @Transactional
     @Override
+    @LogInvocationService
+    @Transactional
     public void updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id) {
         LocalDate endDate = startDate.plusYears(subscriptionDuration).minusDays(1);
 
@@ -76,6 +88,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     }
 
     @Override
+    @LogInvocationService
     public boolean checkIfSubscriptionExistsByPeriodical(PeriodicalDto periodicalDto) {
         return subscriptionDetailRepository.existsSubscriptionDetailByPeriodical(periodicalMapper.toEntity(periodicalDto));
     }

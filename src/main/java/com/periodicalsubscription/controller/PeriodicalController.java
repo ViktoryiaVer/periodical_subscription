@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
@@ -31,6 +32,7 @@ import java.util.List;
 public class PeriodicalController {
     private final PeriodicalService periodicalService;
 
+    @LogInvocation
     @GetMapping(value = "/all")
     public String getAllPeriodicals(Model model) {
         List<PeriodicalDto> periodicals = periodicalService.findAll();
@@ -44,6 +46,7 @@ public class PeriodicalController {
         return PageManager.PERIODICALS;
     }
 
+    @LogInvocation
     @GetMapping("/{id}")
     public String getPeriodical(@PathVariable Long id, Model model) {
         PeriodicalDto periodical = periodicalService.findById(id);
@@ -51,11 +54,13 @@ public class PeriodicalController {
         return PageManager.PERIODICAL;
     }
 
+    @LogInvocation
     @GetMapping("/create")
     public String createPeriodicalForm() {
         return PageManager.CREATE_PERIODICAL;
     }
 
+    @LogInvocation
     @PostMapping("/create")
     public String createPeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
         if(errors.hasErrors()) {
@@ -68,6 +73,7 @@ public class PeriodicalController {
         return "redirect:/periodical/" + createdPeriodical.getId();
     }
 
+    @LogInvocation
     @GetMapping("/update/{id}")
     public String updatePeriodicalForm(@PathVariable Long id, Model model) {
         PeriodicalDto periodical = periodicalService.findById(id);
@@ -75,6 +81,7 @@ public class PeriodicalController {
         return PageManager.UPDATE_PERIODICAL;
     }
 
+    @LogInvocation
     @PostMapping("/update")
     public String updatePeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
         if(errors.hasErrors()) {
@@ -87,6 +94,7 @@ public class PeriodicalController {
         return "redirect:/periodical/" + updatedPeriodical.getId();
     }
 
+    @LogInvocation
     @PostMapping("/delete/{id}")
     public String deletePeriodical(@PathVariable Long id, HttpSession session) {
         periodicalService.deleteById(id);
@@ -94,6 +102,7 @@ public class PeriodicalController {
         return "redirect:/periodical/all";
     }
 
+    @LogInvocation
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePeriodicalNotFoundException(PeriodicalNotFoundException e, Model model) {
@@ -101,6 +110,7 @@ public class PeriodicalController {
         return PageManager.ERROR;
     }
 
+    @LogInvocation
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePeriodicalAlreadyExistsException(PeriodicalAlreadyExistsException e, Model model) {

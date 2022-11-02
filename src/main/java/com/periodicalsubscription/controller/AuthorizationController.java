@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.manager.ErrorMessageManager;
 import com.periodicalsubscription.manager.PageManager;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpSession;
 public class AuthorizationController {
     private final UserService userService;
 
+    @LogInvocation
     @GetMapping("/login")
     public String loginForm(HttpSession session) {
         if(session.getAttribute("user") != null) {
@@ -27,6 +29,7 @@ public class AuthorizationController {
         return PageManager.LOGIN;
     }
 
+    @LogInvocation
     @PostMapping("/login")
     public String login(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
         if(email == null || email.isBlank() || password == null || password.isBlank()) {
@@ -41,6 +44,7 @@ public class AuthorizationController {
         return PageManager.HOME;
     }
 
+    @LogInvocation
     @GetMapping("/logout")
     public String logout(HttpSession session, Model model) {
         if(session.getAttribute("user") != null) {

@@ -1,6 +1,9 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.exceptions.ImageUploadingException;
+import com.periodicalsubscription.aspect.logging.annotation.ImageUploadEx;
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
+import com.periodicalsubscription.exceptions.ImageUploadException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalDeleteException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
@@ -31,6 +34,7 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalMapper mapper;
 
     @Override
+    @LogInvocationService
     public List<PeriodicalDto> findAll() {
         return periodicalRepository.findAllDistinctFetchCategories().stream()
                 .map(mapper::toDto)
@@ -38,6 +42,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PeriodicalDto findById(Long id) {
         Periodical periodical = periodicalRepository.findById(id).orElseThrow(() -> {
             throw new PeriodicalNotFoundException("Periodical with id  " + id + " could not be found.");
@@ -47,6 +53,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PeriodicalDto save(PeriodicalDto dto) {
         if(periodicalRepository.findByTitle(dto.getTitle()) != null) {
             throw new PeriodicalAlreadyExistsException("Periodical with title " + dto.getTitle() +  " already exists.");
@@ -55,6 +63,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PeriodicalDto update(PeriodicalDto dto) {
         Periodical existingPeriodical = periodicalRepository.findByTitle(dto.getTitle());
 
@@ -65,6 +75,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public void deleteById(Long id) {
         PeriodicalDto periodicalDto = findById(id);
         if(subscriptionDetailService.checkIfSubscriptionExistsByPeriodical(periodicalDto)) {
@@ -78,14 +90,16 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     }
 
     @Override
+    @LogInvocationService
     public PeriodicalDto processPeriodicalCreation(PeriodicalDto periodicalDto, MultipartFile imageFile) {
         periodicalDto.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
         periodicalDto.setImagePath(getImagePath(imageFile));
         return save(periodicalDto);
     }
 
-    @Transactional
     @Override
+    @LogInvocationService
+    @Transactional
     public PeriodicalDto processPeriodicalUpdate(PeriodicalDto periodicalDto, MultipartFile imageFile) {
         periodicalDto.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
 
@@ -97,6 +111,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
         return update(periodicalDto);
     }
 
+    @LogInvocationService
+    @ImageUploadEx
     private String getImagePath(MultipartFile imageFile) {
         String imageName = "";
         try {
@@ -105,7 +121,7 @@ public class PeriodicalServiceImpl implements PeriodicalService {
             File partFile = new File(location + imageName);
             imageFile.transferTo(partFile);
         } catch (IOException e) {
-            throw new ImageUploadingException("Error while uploading image " + imageName + ".", e);
+            throw new ImageUploadException("Error while uploading image " + imageName + ".", e);
         }
         return imageName;
     }
