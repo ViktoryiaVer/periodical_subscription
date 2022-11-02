@@ -13,12 +13,7 @@ CREATE TABLE  IF NOT EXISTS users (
 );
 
 /*DROP TABLE IF EXISTS periodicals;
-DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS periodicals_categories  */
-/*CREATE TABLE  IF NOT EXISTS categories (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL
-);*/
 
 CREATE TABLE  IF NOT EXISTS periodicals (
     id BIGSERIAL PRIMARY KEY,
