@@ -26,23 +26,23 @@
         </div>
     </c:if>
     <form id="sform" action="/user/update/" method="post">
-        <input name="id" type="hidden" value="${user.id}"/>
+        <input name="id" type="hidden" value="${requestScope.user.id}"/>
         <div class="form-group">
             <label for="firstName">First name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" value="${user.firstName}" pattern="^[A-Za-z-А-Яа-я]+" required>
+            <input type="text" class="form-control" id="firstName" name="firstName" value="${requestScope.user.firstName}" pattern="^[A-Za-z-А-Яа-я]+" required>
         </div>
         <div class="form-group">
             <label for="lastName">Last name</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" value="${user.lastName}" pattern="^[A-Za-z-А-Яа-я]+" required>
+            <input type="text" class="form-control" id="lastName" name="lastName" value="${requestScope.user.lastName}" pattern="^[A-Za-z-А-Яа-я]+" required>
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="${user.email}" required>
+            <input type="email" class="form-control" id="email" name="email" value="${requestScope.user.email}" required>
         </div>
-        <input name="password" type="hidden" value="${user.password}"/>
+        <input name="password" type="hidden" value="${requestScope.user.password}"/>
         <div class="form-group">
             <label for="phoneNumber">Phone number</label>
-            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${user.phoneNumber}" min="10" required>
+            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${requestScope.user.phoneNumber}" min="10" required>
         </div>
 
         <c:if test="${sessionScope.user.roleDto == 'READER'}">

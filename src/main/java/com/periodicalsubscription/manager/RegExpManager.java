@@ -5,6 +5,6 @@ public class RegExpManager {
     public static final String PASSWORD = "^(?=.*[\\d])"
             + "(?=.*[a-z])(?=.*[A-Z])"
             + "(?=.*[@#$%^&+=!])"
-            + "(?=\\S+$)";
+            + "(?=\\S+$).{8,20}$";
     public static final String PHONE = "\\+[0-9]{10,}";
 }

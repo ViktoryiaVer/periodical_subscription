@@ -90,6 +90,7 @@ public class UserController {
     public String updateUser(@Valid @ModelAttribute UserDto user, Errors errors, Model model, HttpSession session) {
         if(errors.hasErrors()) {
             model.addAttribute("errors", errors.getFieldErrors());
+            model.addAttribute("user", user);
             return PageManager.UPDATE_USER;
         }
 
