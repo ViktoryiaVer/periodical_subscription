@@ -3,6 +3,7 @@ package com.periodicalsubscription.dto;
 import com.periodicalsubscription.manager.ErrorMessageManager;
 import com.periodicalsubscription.manager.RegExpManager;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -25,6 +26,7 @@ public class UserDto {
     @NotBlank(message = ErrorMessageManager.PASSWORD_EMPTY)
     @Pattern(regexp = RegExpManager.PASSWORD, message = ErrorMessageManager.PASSWORD_NOT_VALID)
     @Size(min = 8, max = 20, message = ErrorMessageManager.PASSWORD_LENGTH)
+    @ToString.Exclude
     private String password;
     @NotBlank(message = ErrorMessageManager.PHONE_EMPTY)
     @Pattern(regexp = RegExpManager.PHONE, message = ErrorMessageManager.PHONE_NOT_VALID)

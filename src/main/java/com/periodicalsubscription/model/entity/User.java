@@ -37,6 +37,7 @@ public class User {
     @Column
     private String email;
     @Column
+    @ToString.Exclude
     private String password;
     @Column(name = "phone_number")
     private String phoneNumber;
