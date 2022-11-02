@@ -20,16 +20,7 @@ VALUES
     ('Reader', 'Reader', 'reader@mail.ru', 'reader', '+3758888888', 'READER');
 
 /*TRUNCATE TABLE periodicals CASCADE;
-TRUNCATE TABLE categories CASCADE;
 TRUNCATE TABLE periodicals_categories CASCADE;*/
-/*INSERT INTO categories (name)
-VALUES
-    ('ART_AND_ARCHITECTURE'),
-    ('SCIENCE'),
-    ('BUSINESS_AND_FINANCE'),
-    ('NEWS_AND_POLITICS'),
-    ('CULTURE_AND_LITERATURE'),
-    ('TRAVEL_AND_OUTDOOR');*/
 
 INSERT INTO periodicals (title, publisher, description, publication_date, issues_amount_in_year, price, language, image, type, status)
 VALUES
@@ -144,13 +135,6 @@ VALUES
 (6, (SELECT pd.id FROM periodicals pd WHERE pd.title = 'BirdWatching'), 1, 26.42);
 
 --TRUNCATE TABLE payments;
-
-/*INSERT INTO payment_methods (name)
-VALUES
-('CASH'),
-('CHECK'),
-('CREDIT_OR_DEBIT_CARD'),
-('ONLINE_PAYMENT_SERVICE');*/
 INSERT INTO payments (user_id, subscription_id, payment_time, payment_method)
 VALUES
 ((SELECT u.id FROM users u WHERE u.email = 'Newman1Ervin@online.de'), 2, '2022-09-10 15:00', 'CREDIT_OR_DEBIT_CARD'),

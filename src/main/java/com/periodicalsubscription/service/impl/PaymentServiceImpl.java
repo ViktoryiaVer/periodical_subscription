@@ -1,6 +1,10 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.dto.SubscriptionDto;
+import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
+import com.periodicalsubscription.exceptions.payment.PaymentServiceException;
 import com.periodicalsubscription.mapper.PaymentMapper;
 import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
@@ -25,6 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final SubscriptionDetailService subscriptionDetailService;
 
     @Override
+    @LogInvocationService
     public List<PaymentDto> findAll() {
         return paymentRepository.findAll().stream()
                 .map(mapper::toDto)
@@ -32,32 +37,50 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PaymentDto findById(Long id) {
-        Payment payment = paymentRepository.findById(id).orElseThrow(RuntimeException::new);
-
+        Payment payment = paymentRepository.findById(id).orElseThrow(() -> {
+            throw new PaymentNotFoundException("Payment with id  " + id + " could not be found.");
+        });
         return mapper.toDto(payment);
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PaymentDto save(PaymentDto dto) {
-        //TODO some validation
-        return mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
+        PaymentDto savedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
+        if(savedPayment == null) {
+            throw new PaymentServiceException("Error while saving payment.");
+        }
+        return savedPayment;
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public PaymentDto update(PaymentDto dto) {
-        //TODO some validation
-        return mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
+        PaymentDto updatedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
+        if(updatedPayment == null) {
+            throw new PaymentServiceException("Error while updating payment with id " + dto.getId() + ".");
+        }
+        return updatedPayment;
     }
 
     @Override
-    public void delete(PaymentDto dto) {
-        //TODO some validation?
-        paymentRepository.delete(mapper.toEntity(dto));
+    @LogInvocationService
+    @ServiceEx
+    public void deleteById(Long id) {
+        paymentRepository.deleteById(id);
+        if(paymentRepository.existsById(id)) {
+            throw new PaymentServiceException("Error while deleting payment with id " + id + ".");
+        }
     }
 
+    @Override
+    @LogInvocationService
     @Transactional
-    @Override
     public PaymentDto processPaymentRegistration(Long subscriptionId, String paymentTime, String paymentMethod) {
         PaymentDto paymentDto = createPaymentDto(subscriptionId, paymentTime, paymentMethod);
         PaymentDto savedPayment = save(paymentDto);
@@ -67,6 +90,16 @@ public class PaymentServiceImpl implements PaymentService {
         return savedPayment;
     }
 
+    @Override
+    @LogInvocationService
+    public PaymentDto processPaymentUpdate(Long paymentId, String paymentTime, String paymentMethodDto) {
+        PaymentDto foundPayment = findById(paymentId);
+        foundPayment.setPaymentTime(LocalDateTime.parse(paymentTime));
+        foundPayment.setPaymentMethodDto(PaymentDto.PaymentMethodDto.valueOf(paymentMethodDto));
+        return update(foundPayment);
+    }
+
+    @LogInvocationService
     private PaymentDto createPaymentDto(Long subscriptionId, String paymentTime, String paymentMethod) {
         PaymentDto paymentDto = new  PaymentDto();
         SubscriptionDto subscriptionDto = subscriptionService.findById(subscriptionId);

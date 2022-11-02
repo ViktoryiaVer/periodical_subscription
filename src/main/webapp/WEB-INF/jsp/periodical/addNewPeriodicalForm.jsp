@@ -15,6 +15,16 @@
     <body>
     <jsp:include page="../navbar.jsp"/>
     <h2>Add periodical</h2>
+    <c:if test="${errors != null}">
+        <div style="color: red">
+            <p>INVALID INPUT:</p>
+            <ul>
+                <c:forEach var="error" items="${errors}">
+                    <li>${error.defaultMessage}</li>
+                </c:forEach>
+            </ul>
+        </div>
+    </c:if>
     <form id="pform" enctype="multipart/form-data" action="/periodical/create/" method="post">
         <div class="form-group">
             <label for="title">Title</label>

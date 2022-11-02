@@ -1,5 +1,6 @@
 package com.periodicalsubscription.model.repository;
 
+import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.model.entity.SubscriptionDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,4 +18,6 @@ public interface SubscriptionDetailRepository extends JpaRepository<Subscription
     @Modifying
     @Query("update SubscriptionDetail s set s.subscriptionEndDate = :date where s.id = :id")
     void updateSubscriptionEndDate(LocalDate date, Long id);
+
+    boolean existsSubscriptionDetailByPeriodical(Periodical periodical);
 }

@@ -11,4 +11,6 @@ import java.util.List;
 public interface PeriodicalRepository extends JpaRepository<Periodical, Long>  {
     @Query("select distinct p from Periodical p join fetch p.categories")
     List<Periodical> findAllDistinctFetchCategories();
+
+    Periodical findByTitle(String title);
 }

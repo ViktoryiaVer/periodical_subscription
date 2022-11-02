@@ -15,7 +15,7 @@ public interface SubscriptionService {
 
     SubscriptionDto update (SubscriptionDto dto);
 
-    void delete(SubscriptionDto dto);
+    void deleteById(Long id);
 
     SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart);
 

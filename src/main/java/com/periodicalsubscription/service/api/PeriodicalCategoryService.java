@@ -14,7 +14,7 @@ public interface PeriodicalCategoryService {
 
     PeriodicalCategoryDto update(PeriodicalCategoryDto dto);
 
-    void delete(PeriodicalCategoryDto dto);
+    void deleteById(Long id);
 
     void deleteAllCategoriesForPeriodical(PeriodicalDto dto);
 }

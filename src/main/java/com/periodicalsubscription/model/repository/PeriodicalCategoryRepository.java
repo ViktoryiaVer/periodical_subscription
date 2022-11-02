@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PeriodicalCategoryRepository extends JpaRepository<PeriodicalCategory, Long> {
     void deleteAllByPeriodical(Periodical periodical);
+
+    boolean existsByPeriodical(Periodical periodical);
 }

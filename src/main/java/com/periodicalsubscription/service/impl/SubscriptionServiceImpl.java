@@ -1,8 +1,11 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.exceptions.subscription.SubscriptionServiceException;
 import com.periodicalsubscription.mapper.SubscriptionMapper;
 import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.SubscriptionRepository;
@@ -29,6 +32,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserMapper userMapper;
 
     @Override
+    @LogInvocationService
     public List<SubscriptionDto> findAll() {
         return subscriptionRepository.findAll().stream()
                 .map(mapper::toDto)
@@ -36,37 +40,56 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public SubscriptionDto findById(Long id) {
-        Subscription subscription = subscriptionRepository.findById(id).orElseThrow(RuntimeException::new);
-
+        Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> {
+            throw new SubscriptionServiceException("Subscription with id  " + id + "could not be found.");
+        });
         return mapper.toDto(subscription);
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public SubscriptionDto save(SubscriptionDto dto) {
-        //TODO some validation
-        return mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        SubscriptionDto savedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        if(savedSubscription == null) {
+            throw new SubscriptionServiceException("Error while saving subscription.");
+        }
+        return savedSubscription;
     }
 
     @Override
+    @LogInvocationService
+    @ServiceEx
     public SubscriptionDto update(SubscriptionDto dto) {
-        //TODO some validation?
-        return mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        SubscriptionDto updatedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
+        if(updatedSubscription == null) {
+            throw new SubscriptionServiceException("Error while updating subscription with id " + dto.getId() + ".");
+        }
+        return updatedSubscription;
     }
 
     @Override
-    public void delete(SubscriptionDto dto) {
-        //TODO some validation?
-        subscriptionRepository.delete(mapper.toEntity(dto));
+    @LogInvocationService
+    @ServiceEx
+    public void deleteById(Long id) {
+        subscriptionRepository.deleteById(id);
+        if(subscriptionRepository.existsById(id)) {
+            throw new SubscriptionServiceException("Error while deleting subscription with id " + id + ".");
+        }
     }
 
     @Override
+    @LogInvocationService
     public SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart) {
         SubscriptionDto subscription = processSubscriptionInCart(userDto, cart);
         return save(subscription);
     }
 
     @Override
+    @LogInvocationService
     public SubscriptionDto processSubscriptionInCart(UserDto userDto, Map<Long, Integer> cart) {
         SubscriptionDto subscription = new SubscriptionDto();
         subscription.setUserDto(userDto);
@@ -87,6 +110,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscription;
     }
 
+    @LogInvocationService
     private BigDecimal calculateTotalCost(List<SubscriptionDetailDto> details) {
         BigDecimal totalCost = BigDecimal.ZERO;
         for (SubscriptionDetailDto detail : details) {
@@ -96,19 +120,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return totalCost;
     }
 
-    @Transactional
     @Override
+    @LogInvocationService
+    @Transactional
     public SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id) {
         subscriptionRepository.updateSubscriptionStatus(Subscription.Status.valueOf(status.toString()), id);
         return findById(id);
     }
 
     @Override
+    @LogInvocationService
     public boolean checkIfSubscriptionExistsByUSer(UserDto userDto) {
         return subscriptionRepository.existsSubscriptionByUser(userMapper.toEntity(userDto));
     }
 
     @Override
+    @LogInvocationService
     public List<SubscriptionDto> findAllSubscriptionsByUser(UserDto userDto) {
         return subscriptionRepository.findAllByUser(userMapper.toEntity(userDto)).stream()
                 .map(mapper::toDto)

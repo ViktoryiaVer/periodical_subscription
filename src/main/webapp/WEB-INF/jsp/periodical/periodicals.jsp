@@ -17,30 +17,29 @@
         <h2 style="text-align: center"> All periodicals</h2>
         <h4 id="message"><c:out value="${message}"/></h4>
         <c:if test="${sessionScope.user.roleDto == 'ADMIN'}">
-            <td>
-                <form action="/periodical/create">
-                    <button class="btn btn-light" type="submit" title="Add periodical">Add</button>
-                </form>
-            </td>
+            <form action="/periodical/create">
+                <button class="btn btn-light" type="submit" title="Add periodical">Add</button>
+            </form>
         </c:if>
-        <table>
-            <th>#</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Category</th>
-            <c:forEach var="periodical" items="${periodicals}" varStatus="counter">
-                <tr>
-                    <td>${counter.count}</td>
-                    <td><a href="/periodical/${periodical.id}">${periodical.title}</a></td>
-                    <td>${periodical.price}</td>
-                    <td>
-                        <c:forEach var="category" items="${periodical.categoryDtos}">
-                            ${category.categoryDto.toString().toLowerCase()}
-                        </c:forEach>
-                    </td>
-                </tr>
-                <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
-            </c:forEach>
-        </table>
+        <c:if test="${periodicals.size() > 0}">
+            <table>
+                <th>#</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Category</th>
+                <c:forEach var="periodical" items="${periodicals}" varStatus="counter">
+                    <tr>
+                        <td>${counter.count}</td>
+                        <td><a href="/periodical/${periodical.id}">${periodical.title}</a></td>
+                        <td>${periodical.price}</td>
+                        <td>
+                            <c:forEach var="category" items="${periodical.categoryDtos}">
+                                ${category.categoryDto.toString().toLowerCase()}
+                            </c:forEach>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </c:if>
     </body>
 </html>

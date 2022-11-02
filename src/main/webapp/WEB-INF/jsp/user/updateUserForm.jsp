@@ -15,6 +15,16 @@
     <body>
     <jsp:include page="../navbar.jsp"/>
     <h2>Update user</h2>
+    <c:if test="${errors != null}">
+        <div style="color: red">
+            <p>INVALID INPUT:</p>
+            <ul>
+                <c:forEach var="error" items="${errors}">
+                    <li>${error.defaultMessage}</li>
+                </c:forEach>
+            </ul>
+        </div>
+    </c:if>
     <form id="sform" action="/user/update/" method="post">
         <input name="id" type="hidden" value="${user.id}"/>
         <div class="form-group">
@@ -32,7 +42,7 @@
         <input name="password" type="hidden" value="${user.password}"/>
         <div class="form-group">
             <label for="phoneNumber">Phone number</label>
-            <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" value="${user.phoneNumber}" required>
+            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${user.phoneNumber}" min="10" required>
         </div>
 
         <c:if test="${sessionScope.user.roleDto == 'READER'}">

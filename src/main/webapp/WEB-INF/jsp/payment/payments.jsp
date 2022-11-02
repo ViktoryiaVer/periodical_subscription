@@ -16,26 +16,28 @@
         <jsp:include page="../navbar.jsp"/>
         <h2 style="text-align: center"> All payments</h2>
         <h4 id="message"><c:out value="${message}"/></h4>
-        <table>
-            <th>Id</th>
-            <th>User</th>
-            <th>Subscription number</th>
-            <c:forEach var="payment" items="${payments}">
-                <tr>
-                    <td><a href="/payment/${payment.id}">${payment.id}</a></td>
-                    <td>
-                        <a href="/user/${payment.userDto.id}">${payment.userDto.email}</a>
-                    </td>
-                    <td>
-                        <a href="/subscription/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
-                    </td>
-                    <td>
-                        <form action="/payment/update/${payment.id}">
-                            <button class="btn btn-light" type="submit" title="Update payment">Update</button>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
+        <c:if test="${payments.size() > 0}">
+            <table>
+                <th>Id</th>
+                <th>User</th>
+                <th>Subscription number</th>
+                <c:forEach var="payment" items="${payments}">
+                    <tr>
+                        <td><a href="/payment/${payment.id}">${payment.id}</a></td>
+                        <td>
+                            <a href="/user/${payment.userDto.id}">${payment.userDto.email}</a>
+                        </td>
+                        <td>
+                            <a href="/subscription/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
+                        </td>
+                        <td>
+                            <form action="/payment/update/${payment.id}">
+                                <button class="btn btn-light" type="submit" title="Update payment">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </c:if>
     </body>
 </html>

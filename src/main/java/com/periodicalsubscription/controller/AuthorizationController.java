@@ -1,7 +1,10 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.manager.ErrorMessageManager;
 import com.periodicalsubscription.manager.PageManager;
+import com.periodicalsubscription.manager.SuccessMessageManager;
 import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import javax.servlet.http.HttpSession;
 public class AuthorizationController {
     private final UserService userService;
 
+    @LogInvocation
     @GetMapping("/login")
     public String loginForm(HttpSession session) {
         if(session.getAttribute("user") != null) {
@@ -25,25 +29,29 @@ public class AuthorizationController {
         return PageManager.LOGIN;
     }
 
+    @LogInvocation
     @PostMapping("/login")
     public String login(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) {
-        //TODO rewrite for validator
         if(email == null || email.isBlank() || password == null || password.isBlank()) {
-            throw new RuntimeException("Email or password is not specified");
+            model.addAttribute("message", ErrorMessageManager.LOGIN_DATA_NOT_SPECIFIED);
+            return PageManager.LOGIN;
         }
+
         UserDto userDto = userService.login(email, password);
+
         session.setAttribute("user", userDto);
-        model.addAttribute("message", "You were logged in successfully");
+        model.addAttribute("message", SuccessMessageManager.USER_LOGGED_IN);
         return PageManager.HOME;
     }
 
+    @LogInvocation
     @GetMapping("/logout")
     public String logout(HttpSession session, Model model) {
         if(session.getAttribute("user") != null) {
             session.removeAttribute("user");
         }
 
-        model.addAttribute("message", "You were logged out successfully");
+        model.addAttribute("message", SuccessMessageManager.USER_LOGGED_OUT);
         return PageManager.HOME;
     }
 }

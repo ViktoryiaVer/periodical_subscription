@@ -16,16 +16,18 @@
         <jsp:include page="../navbar.jsp"/>
         <h2 style="text-align: center"> All users</h2>
         <h4 id="message"><c:out value="${message}"/></h4>
-        <table>
-            <th>Id</th>
-            <th>Email</th>
-            <c:forEach var="user" items="${users}">
-                <tr>
-                    <td>${user.id}</td>
-                    <td><a href="/user/${user.id}">${user.email}</a></td>
-                </tr>
-                <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
-            </c:forEach>
-        </table>
+        <c:if test="${users.size() > 0}">
+            <table>
+                <th>Id</th>
+                <th>Email</th>
+                <c:forEach var="user" items="${users}">
+                    <tr>
+                        <td>${user.id}</td>
+                        <td><a href="/user/${user.id}">${user.email}</a></td>
+                    </tr>
+                    <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
+                </c:forEach>
+            </table>
+        </c:if>
     </body>
 </html>
