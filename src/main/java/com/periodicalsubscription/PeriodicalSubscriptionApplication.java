@@ -1,6 +1,7 @@
 package com.periodicalsubscription;
 
 import com.periodicalsubscription.filter.AuthorizationFilter;
+import com.periodicalsubscription.interceptor.LoggingInterceptor;
 import com.periodicalsubscription.interceptor.MessageInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,8 +32,14 @@ public class PeriodicalSubscriptionApplication implements WebMvcConfigurer {
 		return new MessageInterceptor();
 	}
 
+	@Bean
+	public LoggingInterceptor loggingInterceptor() {
+		return new LoggingInterceptor();
+	}
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(messageInterceptor());
+		registry.addInterceptor(loggingInterceptor()).addPathPatterns("/**");
 	}
 }
