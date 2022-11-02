@@ -86,6 +86,7 @@ public class PeriodicalController {
     public String updatePeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
         if(errors.hasErrors()) {
             model.addAttribute("errors", errors);
+            model.addAttribute("periodical", periodical);
             return PageManager.UPDATE_PERIODICAL;
         }
 
