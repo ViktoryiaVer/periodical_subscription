@@ -1,6 +1,6 @@
-package com.periodicalsubscription.manager;
+package com.periodicalsubscription.constant;
 
-public class ErrorMessageManager {
+public class ErrorMessageConstant {
     //validation for user
     public static final String FIRST_NAME_EMPTY = "User's first name is not specified or empty";
     public static final String FIRST_NAME_NOT_VALID = "User's first name is not valid";

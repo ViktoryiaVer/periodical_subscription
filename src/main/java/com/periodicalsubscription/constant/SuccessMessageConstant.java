@@ -1,6 +1,6 @@
-package com.periodicalsubscription.manager;
+package com.periodicalsubscription.constant;
 
-public class SuccessMessageManager {
+public class SuccessMessageConstant {
     public static final String USER_CREATED = "You were registered successfully";
     public static final String USER_LOGGED_IN = "You were logged in successfully";
     public static final String USER_LOGGED_OUT = "You were logged out successfully";
