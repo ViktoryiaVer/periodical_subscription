@@ -1,6 +1,6 @@
 package com.periodicalsubscription.dto;
 
-import com.periodicalsubscription.manager.ErrorMessageManager;
+import com.periodicalsubscription.constant.ErrorMessageConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,23 +18,23 @@ import java.util.List;
 @Data
 public class PeriodicalDto {
     private Long id;
-    @NotBlank(message = ErrorMessageManager.PERIODICAL_TITLE_EMPTY)
+    @NotBlank(message = ErrorMessageConstant.PERIODICAL_TITLE_EMPTY)
     private String title;
-    @NotBlank(message = ErrorMessageManager.PERIODICAL_PUBLISHER_EMPTY)
+    @NotBlank(message = ErrorMessageConstant.PERIODICAL_PUBLISHER_EMPTY)
     private String publisher;
-    @NotBlank(message = ErrorMessageManager.PERIODICAL_DESCRIPTION_EMPTY)
+    @NotBlank(message = ErrorMessageConstant.PERIODICAL_DESCRIPTION_EMPTY)
     private String description;
-    @NotNull(message = ErrorMessageManager.PERIODICAL_PUBLICATION_DATE_EMPTY)
+    @NotNull(message = ErrorMessageConstant.PERIODICAL_PUBLICATION_DATE_EMPTY)
     private LocalDate publicationDate;
-    @NotNull(message = ErrorMessageManager.PERIODICAL_ISSUES_AMOUNT_EMPTY)
-    @Digits(integer = 3, fraction = 0, message = ErrorMessageManager.PERIODICAL_ISSUES_AMOUNT_NOT_VALID)
+    @NotNull(message = ErrorMessageConstant.PERIODICAL_ISSUES_AMOUNT_EMPTY)
+    @Digits(integer = 3, fraction = 0, message = ErrorMessageConstant.PERIODICAL_ISSUES_AMOUNT_NOT_VALID)
     private Integer issuesAmountInYear;
-    @NotNull(message = ErrorMessageManager.PERIODICAL_PRICE_EMPTY)
-    @DecimalMin(value = "0.0", inclusive = false, message = ErrorMessageManager.PERIODICAL_PRICE_MIN)
-    @DecimalMax(value = "10000.00", inclusive = false, message = ErrorMessageManager.PERIODICAL_PRICE_MAX)
-    @Digits(integer = 4, fraction = 2, message = ErrorMessageManager.PERIODICAL_PRICE_INVALID)
+    @NotNull(message = ErrorMessageConstant.PERIODICAL_PRICE_EMPTY)
+    @DecimalMin(value = "0.0", inclusive = false, message = ErrorMessageConstant.PERIODICAL_PRICE_MIN)
+    @DecimalMax(value = "10000.00", inclusive = false, message = ErrorMessageConstant.PERIODICAL_PRICE_MAX)
+    @Digits(integer = 4, fraction = 2, message = ErrorMessageConstant.PERIODICAL_PRICE_INVALID)
     private BigDecimal price;
-    @NotBlank(message = ErrorMessageManager.PERIODICAL_LANGUAGE_EMPTY)
+    @NotBlank(message = ErrorMessageConstant.PERIODICAL_LANGUAGE_EMPTY)
     private String language;
     private String imagePath;
     private TypeDto typeDto;

@@ -23,7 +23,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     @LogInvocation
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        if(session == null || session.getAttribute("user") == null) {
+        if (session == null || session.getAttribute("user") == null) {
             request.setAttribute("message", "You need to login to see this content");
             response.sendRedirect("/login");
             return;
