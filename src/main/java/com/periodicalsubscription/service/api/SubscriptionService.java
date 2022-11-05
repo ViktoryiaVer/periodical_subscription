@@ -2,12 +2,13 @@ package com.periodicalsubscription.service.api;
 
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Map;
 
 public interface SubscriptionService {
-    List<SubscriptionDto> findAll();
+    Page<SubscriptionDto> findAll(Pageable pageable);
 
     SubscriptionDto findById(Long id);
 
@@ -25,5 +26,5 @@ public interface SubscriptionService {
 
     boolean checkIfSubscriptionExistsByUSer(UserDto userDto);
 
-    List<SubscriptionDto> findAllSubscriptionsByUser(UserDto userDto);
+    Page<SubscriptionDto> findAllSubscriptionsByUserId(Long id, Pageable pageable);
 }

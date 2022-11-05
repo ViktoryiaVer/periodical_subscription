@@ -12,12 +12,12 @@ import com.periodicalsubscription.model.entity.SubscriptionDetail;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +28,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
 
     @Override
     @LogInvocationService
-    public List<SubscriptionDetailDto> findAll() {
-        return subscriptionDetailRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<SubscriptionDetailDto> findAll(Pageable pageable) {
+        return subscriptionDetailRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     @ServiceEx
     public SubscriptionDetailDto save(SubscriptionDetailDto dto) {
         SubscriptionDetailDto savedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
-        if(savedDetail == null) {
+        if (savedDetail == null) {
             throw new SubscriptionDetailServiceException("Error while saving subscription detail.");
         }
         return savedDetail;
@@ -61,7 +59,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     @ServiceEx
     public SubscriptionDetailDto update(SubscriptionDetailDto dto) {
         SubscriptionDetailDto updatedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
-        if(updatedDetail == null) {
+        if (updatedDetail == null) {
             throw new SubscriptionDetailServiceException("Error while updating subscription detail with id " + dto.getId() + ".");
         }
         return updatedDetail;

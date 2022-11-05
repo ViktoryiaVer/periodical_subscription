@@ -14,6 +14,8 @@ import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +34,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
-    public List<SubscriptionDto> findAll() {
-        return subscriptionRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<SubscriptionDto> findAll(Pageable pageable) {
+        return subscriptionRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @ServiceEx
     public SubscriptionDto save(SubscriptionDto dto) {
         SubscriptionDto savedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
-        if(savedSubscription == null) {
+        if (savedSubscription == null) {
             throw new SubscriptionServiceException("Error while saving subscription.");
         }
         return savedSubscription;
@@ -65,7 +64,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @ServiceEx
     public SubscriptionDto update(SubscriptionDto dto) {
         SubscriptionDto updatedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
-        if(updatedSubscription == null) {
+        if (updatedSubscription == null) {
             throw new SubscriptionServiceException("Error while updating subscription with id " + dto.getId() + ".");
         }
         return updatedSubscription;
@@ -76,7 +75,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @ServiceEx
     public void deleteById(Long id) {
         subscriptionRepository.deleteById(id);
-        if(subscriptionRepository.existsById(id)) {
+        if (subscriptionRepository.existsById(id)) {
             throw new SubscriptionServiceException("Error while deleting subscription with id " + id + ".");
         }
     }
@@ -136,9 +135,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
-    public List<SubscriptionDto> findAllSubscriptionsByUser(UserDto userDto) {
-        return subscriptionRepository.findAllByUser(userMapper.toEntity(userDto)).stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<SubscriptionDto> findAllSubscriptionsByUserId(Long id, Pageable pageable) {
+        return subscriptionRepository.findAllByUserId(id, pageable).map(mapper::toDto);
     }
 }
