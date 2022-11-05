@@ -13,12 +13,12 @@ import com.periodicalsubscription.dto.PaymentDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +30,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @LogInvocationService
-    public List<PaymentDto> findAll() {
-        return paymentRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<PaymentDto> findAll(Pageable pageable) {
+        return paymentRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -51,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public PaymentDto save(PaymentDto dto) {
         PaymentDto savedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
-        if(savedPayment == null) {
+        if (savedPayment == null) {
             throw new PaymentServiceException("Error while saving payment.");
         }
         return savedPayment;
@@ -62,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public PaymentDto update(PaymentDto dto) {
         PaymentDto updatedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
-        if(updatedPayment == null) {
+        if (updatedPayment == null) {
             throw new PaymentServiceException("Error while updating payment with id " + dto.getId() + ".");
         }
         return updatedPayment;
@@ -73,7 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public void deleteById(Long id) {
         paymentRepository.deleteById(id);
-        if(paymentRepository.existsById(id)) {
+        if (paymentRepository.existsById(id)) {
             throw new PaymentServiceException("Error while deleting payment with id " + id + ".");
         }
     }
@@ -101,7 +99,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @LogInvocationService
     private PaymentDto createPaymentDto(Long subscriptionId, String paymentTime, String paymentMethod) {
-        PaymentDto paymentDto = new  PaymentDto();
+        PaymentDto paymentDto = new PaymentDto();
         SubscriptionDto subscriptionDto = subscriptionService.findById(subscriptionId);
         paymentDto.setUserDto(subscriptionDto.getUserDto());
         paymentDto.setSubscriptionDto(subscriptionDto);

@@ -38,6 +38,7 @@
                     </tr>
                 </c:forEach>
             </table>
+            <jsp:include page="../pagination.jsp"/>
         </c:if>
     </body>
 </html>

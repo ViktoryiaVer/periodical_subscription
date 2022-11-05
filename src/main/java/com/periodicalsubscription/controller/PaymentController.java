@@ -1,13 +1,15 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
+import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.PaymentDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
-import com.periodicalsubscription.manager.ErrorMessageManager;
-import com.periodicalsubscription.manager.PageManager;
-import com.periodicalsubscription.manager.SuccessMessageManager;
+import com.periodicalsubscription.constant.ErrorMessageConstant;
+import com.periodicalsubscription.constant.PageConstant;
+import com.periodicalsubscription.constant.SuccessMessageConstant;
 import com.periodicalsubscription.service.api.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,18 +29,22 @@ import java.util.List;
 @RequestMapping("/payment")
 public class PaymentController {
     private final PaymentService paymentService;
+    private final PagingUtil pagingUtil;
 
     @LogInvocation
     @GetMapping("/all")
-    public String getAllPayments(Model model) {
-        List<PaymentDto> payments = paymentService.findAll();
+    public String getAllPayments(@RequestParam(defaultValue = "1") Integer page,
+                                 @RequestParam(value = "page_size", defaultValue = "10") Integer pageSize, Model model) {
+        Page<PaymentDto> paymentPage = paymentService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payment/all");
+        List<PaymentDto> payments = paymentPage.toList();
 
-        if(payments.isEmpty()) {
-            model.addAttribute("message", ErrorMessageManager.PAYMENTS_NOT_FOUND);
-            return PageManager.PAYMENTS;
+        if (payments.isEmpty()) {
+            model.addAttribute("message", ErrorMessageConstant.PAYMENTS_NOT_FOUND);
+            return PageConstant.PAYMENTS;
         }
         model.addAttribute("payments", payments);
-        return PageManager.PAYMENTS;
+        return PageConstant.PAYMENTS;
     }
 
     @LogInvocation
@@ -46,21 +52,21 @@ public class PaymentController {
     public String getPayment(@PathVariable Long id, Model model) {
         PaymentDto payment = paymentService.findById(id);
         model.addAttribute("payment", payment);
-        return PageManager.PAYMENT;
+        return PageConstant.PAYMENT;
     }
 
     @LogInvocation
     @GetMapping("/register/{id}")
     public String createPaymentForm(@PathVariable("id") Long subscriptionId, Model model) {
         model.addAttribute("subscriptionId", subscriptionId);
-        return PageManager.CREATE_PAYMENT;
+        return PageConstant.CREATE_PAYMENT;
     }
 
     @LogInvocation
     @PostMapping("/register")
     public String createPayment(@RequestParam Long subscriptionId, @RequestParam String paymentTime, @RequestParam String paymentMethodDto, HttpSession session) {
         PaymentDto paymentDto = paymentService.processPaymentRegistration(subscriptionId, paymentTime, paymentMethodDto);
-        session.setAttribute("message", SuccessMessageManager.PAYMENT_REGISTERED);
+        session.setAttribute("message", SuccessMessageConstant.PAYMENT_REGISTERED);
         return "redirect:/payment/" + paymentDto.getId();
     }
 
@@ -69,14 +75,14 @@ public class PaymentController {
     public String updatePaymentForm(@PathVariable Long id, Model model) {
         PaymentDto paymentDto = paymentService.findById(id);
         model.addAttribute("payment", paymentDto);
-        return PageManager.UPDATE_PAYMENT;
+        return PageConstant.UPDATE_PAYMENT;
     }
 
     @LogInvocation
     @PostMapping("/update")
     public String updatePayment(@RequestParam Long paymentId, String paymentTime, String paymentMethodDto, HttpSession session) {
         PaymentDto updatedPayment = paymentService.processPaymentUpdate(paymentId, paymentTime, paymentMethodDto);
-        session.setAttribute("message", SuccessMessageManager.PAYMENT_UPDATED);
+        session.setAttribute("message", SuccessMessageConstant.PAYMENT_UPDATED);
         return "redirect:/payment/" + updatedPayment.getId();
     }
 
@@ -85,6 +91,6 @@ public class PaymentController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePaymentNotFoundException(PaymentNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + " Please, enter correct payment id or check payments list.");
-        return PageManager.ERROR;
+        return PageConstant.ERROR;
     }
 }
