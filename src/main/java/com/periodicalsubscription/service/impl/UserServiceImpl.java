@@ -15,11 +15,11 @@ import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LogInvocationService
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<UserDto> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @LogInvocationService
     @ServiceEx
     public UserDto save(@Valid UserDto dto) {
-        if(userRepository.findByEmail(dto.getEmail()) != null) {
+        if (userRepository.findByEmail(dto.getEmail()) != null) {
             throw new UserAlreadyExistsException("User with email " + dto.getEmail() + " already exists.");
         }
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
@@ -62,7 +60,7 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto dto) {
         User existingUser = userRepository.findByEmail(dto.getEmail());
 
-        if(existingUser != null && !existingUser.getId().equals(dto.getId())) {
+        if (existingUser != null && !existingUser.getId().equals(dto.getId())) {
             throw new UserAlreadyExistsException("User with email " + dto.getEmail() + " already exists.");
         }
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
@@ -74,12 +72,12 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long id) {
         UserDto userDto = findById(id);
 
-        if(subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
+        if (subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
             throw new UserDeleteException("User with subscriptions can't be deleted.");
         }
         userRepository.deleteById(id);
 
-        if(userRepository.existsById(id)) {
+        if (userRepository.existsById(id)) {
             throw new UserServiceException("Error while deleting user with id " + id + ".");
         }
     }
@@ -90,7 +88,7 @@ public class UserServiceImpl implements UserService {
     public UserDto login(String email, String password) {
         User user = userRepository.findByEmail(email);
 
-        if(user == null || !password.equals(user.getPassword())) {
+        if (user == null || !password.equals(user.getPassword())) {
             throw new LoginException("Wrong email or password.");
         }
         return mapper.toDto(user);

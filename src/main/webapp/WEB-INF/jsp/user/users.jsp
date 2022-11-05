@@ -28,6 +28,7 @@
                     <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
                 </c:forEach>
             </table>
+            <jsp:include page="../pagination.jsp"/>
         </c:if>
     </body>
 </html>
