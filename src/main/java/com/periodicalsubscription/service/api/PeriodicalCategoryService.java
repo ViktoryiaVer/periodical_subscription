@@ -2,11 +2,11 @@ package com.periodicalsubscription.service.api;
 
 import com.periodicalsubscription.dto.PeriodicalCategoryDto;
 import com.periodicalsubscription.dto.PeriodicalDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PeriodicalCategoryService {
-    List<PeriodicalCategoryDto> findAll();
+    Page<PeriodicalCategoryDto> findAll(Pageable pageable);
 
     PeriodicalCategoryDto findById(Long id);
 
