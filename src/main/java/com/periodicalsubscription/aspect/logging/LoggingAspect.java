@@ -32,22 +32,24 @@ public class LoggingAspect {
 
     @AfterThrowing(value = "@annotation(com.periodicalsubscription.aspect.logging.annotation.LoginEx)", throwing = "e")
     public void afterThrowingLoginException(JoinPoint jp, LoginException e) {
-            String className = jp.getSignature().getDeclaringTypeName();
-            String methodName = jp.getSignature().getName();
-            log.error("Class " + className + " method " + methodName + " error. Exception is " + e);
+        String className = jp.getSignature().getDeclaringTypeName();
+        String methodName = jp.getSignature().getName();
+        log.error("Class " + className + " method " + methodName + " error. Exception is " + e);
     }
 
     @AfterThrowing(value = "@annotation(com.periodicalsubscription.aspect.logging.annotation.ServiceEx)", throwing = "e")
     public void afterThrowingServiceException(JoinPoint jp, ServiceException e) {
         String className = jp.getSignature().getDeclaringTypeName();
         String methodName = jp.getSignature().getName();
-        log.error("Class " + className + " method " + methodName + " error. Exception is " + e);
+        Object[] args = jp.getArgs();
+        log.error("Class " + className + " method " + methodName + " error with args " + Arrays.toString(args) + ". Exception is " + e);
     }
 
     @AfterThrowing(value = "@annotation(com.periodicalsubscription.aspect.logging.annotation.ImageUploadEx)", throwing = "e")
     public void afterThrowingImageUploadException(JoinPoint jp, ImageUploadException e) {
         String className = jp.getSignature().getDeclaringTypeName();
         String methodName = jp.getSignature().getName();
-        log.error("Class " + className + " method " + methodName + " error. Exception is " + e);
+        Object[] args = jp.getArgs();
+        log.error("Class " + className + " method " + methodName + " error with args " + Arrays.toString(args) + ". Exception is " + e);
     }
 }
