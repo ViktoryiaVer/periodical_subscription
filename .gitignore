@@ -4,8 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# Log file
+### Log file ###
 *.log
+/logs/spring.log.*
 
 ### STS ###
 .apt_generated
