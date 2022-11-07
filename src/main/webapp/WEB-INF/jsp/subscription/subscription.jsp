@@ -1,11 +1,12 @@
 <%@ page pageEncoding="UTF-8" contentType= "text/html; charset=UTF-8" isELIgnored ="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Subscription Detail</title>
+        <title><spring:message code="msg.main.subscriptions.detail"/></title>
         <link rel="stylesheet" href="/css/styles.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
               rel="stylesheet"
@@ -14,14 +15,14 @@
     </head>
     <body>
         <jsp:include page="../navbar.jsp"/>
-        <h2 style="text-align: center"> Subscription Detail</h2>
+        <h2 style="text-align: center"><spring:message code="msg.main.subscriptions.detail"/></h2>
         <h4 id="message"><c:out value="${message}"/></h4>
         <table>
             <tr>
-                <th>Id</th>
-                <th>User</th>
-                <th>Periodicals</th>
-                <th>Status</th>
+                <th><spring:message code="msg.general.id"/></th>
+                <th><spring:message code="msg.general.user"/></th>
+                <th><spring:message code="msg.general.periodicals"/></th>
+                <th><spring:message code="msg.general.status"/></th>
             </tr>
             <tr>
                 <td><a href="/subscription/${subscription.id}">${subscription.id}</a></td>
@@ -30,15 +31,16 @@
                 </td>
                 <td>
                     <c:forEach var="detail" items="${subscription.subscriptionDetailDtos}">
-                        <a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} USD for ${detail.subscriptionDurationInYears} years)
+                        <a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} <spring:message code="msg.general.usd"/> x ${detail.subscriptionDurationInYears}
+                        <spring:message code="msg.subscription.years"/>)
                         <br>
                             <c:if test="${subscription.statusDto == 'PAYED'}">
-                                Subscription start date: ${detail.subscriptionStartDate}
+                                <spring:message code="msg.subscription.start.date"/>: ${detail.subscriptionStartDate}
                                 <br>
-                                Subscription end date: ${detail.subscriptionEndDate}
+                                <spring:message code="msg.subscription.end.date"/>: ${detail.subscriptionEndDate}
                             </c:if>
                     </c:forEach>
-                    <h6>TOTAL COST: ${subscription.totalCost} USD</h6>
+                    <h6><spring:message code="msg.general.total.cost"/>: ${subscription.totalCost} <spring:message code="msg.general.usd"/></h6>
                 </td>
                 <td>
                     ${subscription.statusDto}
@@ -47,17 +49,17 @@
                     <c:if test="${subscription.statusDto == 'PENDING'}">
                         <td>
                             <form action="/subscription/update/${subscription.id}" method="post">
-                                <button class="btn btn-light" type="submit" name="statusDto" value="AWAITING_PAYMENT" title="Confirm subscription">Confirm</button>
+                                <button class="btn btn-light" type="submit" name="statusDto" value="AWAITING_PAYMENT" title="<spring:message code="msg.subscription.confirm.title"/>"><spring:message code="msg.subscription.confirm"/></button>
                             </form>
                             <form action="/subscription/update/${subscription.id}" method="post">
-                                <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="Reject subscription">Reject</button>
+                                <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="<spring:message code="msg.subscription.reject.title"/>"><spring:message code="msg.subscription.reject"/></button>
                             </form>
                         </td>
                     </c:if>
                     <c:if test="${subscription.statusDto == 'AWAITING_PAYMENT'}">
                         <td>
                             <form action="/payment/register/${subscription.id}">
-                                <button class="btn btn-light" type="submit" title="Register payment">Register payment</button>
+                                <button class="btn btn-light" type="submit" title="<spring:message code="msg.payment.register"/>"><spring:message code="msg.payment.register"/></button>
                             </form>
                         </td>
                     </c:if>
@@ -66,7 +68,7 @@
                 <c:if test="${sessionScope.user.roleDto == 'READER' && subscription.statusDto != 'CANCELED'}">
                     <td>
                         <form action="/subscription/update/${subscription.id}" method="post">
-                            <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="Cancel subscription">Cancel</button>
+                            <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="<spring:message code="msg.subscription.cancel.title"/>"><spring:message code="msg.subscription.cancel"/></button>
                         </form>
                     </td>
                 </c:if>

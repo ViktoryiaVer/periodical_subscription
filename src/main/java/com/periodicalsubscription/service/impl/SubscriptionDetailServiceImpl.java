@@ -12,6 +12,8 @@ import com.periodicalsubscription.model.entity.SubscriptionDetail;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.dto.SubscriptionDetailDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     private final SubscriptionDetailRepository subscriptionDetailRepository;
     private final SubscriptionDetailMapper mapper;
     private final PeriodicalMapper periodicalMapper;
+    private final MessageSource messageSource;
 
     @Override
     @LogInvocationService
@@ -37,7 +40,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     @ServiceEx
     public SubscriptionDetailDto findById(Long id) {
         SubscriptionDetail detail = subscriptionDetailRepository.findById(id).orElseThrow(() -> {
-            throw new SubscriptionDetailNotFoundException("Subscription detail with id " + id + " could not be found");
+            throw new SubscriptionDetailNotFoundException(messageSource.getMessage("msg.error.subscription.detail.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
         });
 
         return mapper.toDto(detail);
@@ -49,7 +53,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     public SubscriptionDetailDto save(SubscriptionDetailDto dto) {
         SubscriptionDetailDto savedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
         if (savedDetail == null) {
-            throw new SubscriptionDetailServiceException("Error while saving subscription detail.");
+            throw new SubscriptionDetailServiceException(messageSource.getMessage("msg.error.subscription.detail.service.save", null,
+                    LocaleContextHolder.getLocale()));
         }
         return savedDetail;
     }
@@ -60,7 +65,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     public SubscriptionDetailDto update(SubscriptionDetailDto dto) {
         SubscriptionDetailDto updatedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
         if (updatedDetail == null) {
-            throw new SubscriptionDetailServiceException("Error while updating subscription detail with id " + dto.getId() + ".");
+            throw new SubscriptionDetailServiceException(messageSource.getMessage("msg.error.subscription.detail.service.update", null,
+                    LocaleContextHolder.getLocale()));
         }
         return updatedDetail;
     }
@@ -71,7 +77,8 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     public void deleteById(Long id) {
         subscriptionDetailRepository.deleteById(id);
         if (subscriptionDetailRepository.existsById(id)) {
-            throw new SubscriptionDetailServiceException("Error while deleting subscription detail with id " + id + ".");
+            throw new SubscriptionDetailServiceException(messageSource.getMessage("msg.error.subscription.detail.service.delete", null,
+                    LocaleContextHolder.getLocale()));
         }
     }
 

@@ -5,11 +5,11 @@ import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
-import com.periodicalsubscription.constant.ErrorMessageConstant;
 import com.periodicalsubscription.constant.PageConstant;
-import com.periodicalsubscription.constant.SuccessMessageConstant;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -32,6 +32,7 @@ import java.util.Map;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final PagingUtil pagingUtil;
+    private final MessageSource messageSource;
 
     @LogInvocation
     @GetMapping(value = "/all")
@@ -42,7 +43,8 @@ public class SubscriptionController {
         List<SubscriptionDto> subscriptions = subscriptionPage.toList();
 
         if (subscriptions.isEmpty()) {
-            model.addAttribute("message", ErrorMessageConstant.SUBSCRIPTIONS_NOT_FOUND);
+            model.addAttribute("message", messageSource.getMessage("msg.error.subscriptions.not.found", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.SUBSCRIPTIONS;
         }
         model.addAttribute("subscriptions", subscriptions);
@@ -58,7 +60,8 @@ public class SubscriptionController {
         List<SubscriptionDto> subscriptions = subscriptionPage.toList();
 
         if (subscriptions.isEmpty()) {
-            model.addAttribute("message", ErrorMessageConstant.SUBSCRIPTIONS_USER_NOT_FOUND);
+            model.addAttribute("message", messageSource.getMessage("msg.error.subscriptions.user.not.found", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.SUBSCRIPTIONS;
         }
         model.addAttribute("subscriptions", subscriptions);
@@ -79,7 +82,8 @@ public class SubscriptionController {
     public String createSubscription(HttpSession session, Model model) {
         UserDto userDto = (UserDto) session.getAttribute("user");
         if (userDto == null) {
-            model.addAttribute("message", ErrorMessageConstant.LOGIN_REQUIRED_SUBSCRIPTION);
+            model.addAttribute("message", messageSource.getMessage("msg.error.login.required.subscription", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.LOGIN;
         }
 
@@ -88,7 +92,8 @@ public class SubscriptionController {
         SubscriptionDto subscription = subscriptionService.createSubscriptionFromCart(userDto, cart);
         session.removeAttribute("cart");
 
-        session.setAttribute("message", SuccessMessageConstant.SUBSCRIPTION_CREATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.subscription.created", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/subscription/" + subscription.getId();
     }
 
@@ -97,7 +102,8 @@ public class SubscriptionController {
     public String updateSubscription(@PathVariable Long id, @RequestParam String statusDto, HttpSession session) {
         SubscriptionDto updatedSubscription = subscriptionService.updateSubscriptionStatus(SubscriptionDto.StatusDto.valueOf(statusDto), id);
 
-        session.setAttribute("message", SuccessMessageConstant.SUBSCRIPTION_STATUS_UPDATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.subscription.status.updated", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/subscription/" + updatedSubscription.getId();
     }
 
@@ -105,7 +111,8 @@ public class SubscriptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleSubscriptionNotFoundException(SubscriptionNotFoundException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, enter correct subscription id or check subscriptions list.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.subscription.not.found", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 }

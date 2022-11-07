@@ -14,6 +14,8 @@ import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final PeriodicalService periodicalService;
     private final SubscriptionMapper mapper;
     private final UserMapper userMapper;
+    private final MessageSource messageSource;
 
     @Override
     @LogInvocationService
@@ -43,7 +46,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @ServiceEx
     public SubscriptionDto findById(Long id) {
         Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> {
-            throw new SubscriptionServiceException("Subscription with id  " + id + "could not be found.");
+            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
         });
         return mapper.toDto(subscription);
     }
@@ -54,9 +58,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public SubscriptionDto save(SubscriptionDto dto) {
         SubscriptionDto savedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
         if (savedSubscription == null) {
-            throw new SubscriptionServiceException("Error while saving subscription.");
+            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.save", null,
+                    LocaleContextHolder.getLocale()));
         }
         return savedSubscription;
+
     }
 
     @Override
@@ -65,7 +71,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public SubscriptionDto update(SubscriptionDto dto) {
         SubscriptionDto updatedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
         if (updatedSubscription == null) {
-            throw new SubscriptionServiceException("Error while updating subscription with id " + dto.getId() + ".");
+            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.update", null,
+                    LocaleContextHolder.getLocale()));
         }
         return updatedSubscription;
     }
@@ -76,7 +83,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public void deleteById(Long id) {
         subscriptionRepository.deleteById(id);
         if (subscriptionRepository.existsById(id)) {
-            throw new SubscriptionServiceException("Error while deleting subscription with id " + id + ".");
+            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.delete", null,
+                    LocaleContextHolder.getLocale()));
         }
     }
 

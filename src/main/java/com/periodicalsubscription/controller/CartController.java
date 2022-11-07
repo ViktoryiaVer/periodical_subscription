@@ -4,9 +4,10 @@ import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.constant.PageConstant;
-import com.periodicalsubscription.constant.SuccessMessageConstant;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RequestMapping("/cart")
 public class CartController {
     private final SubscriptionService subscriptionService;
+    private final MessageSource messageSource;
 
     @LogInvocation
     @PostMapping("/add/{id}")
@@ -36,7 +38,8 @@ public class CartController {
 
         cart.put(periodicalId, subscriptionDurationInYears);
         session.setAttribute("cart", cart);
-        session.setAttribute("message", SuccessMessageConstant.CART_ADDED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.cart.added", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/periodical/" + periodicalId;
     }
 
@@ -46,7 +49,8 @@ public class CartController {
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
         if (cart == null) {
-            model.addAttribute("message", SuccessMessageConstant.CART_EMPTY);
+            model.addAttribute("message", messageSource.getMessage("msg.success.cart.empty", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.CART;
         }
 
@@ -69,7 +73,8 @@ public class CartController {
 
         if (cart.isEmpty()) {
             session.removeAttribute("cart");
-            session.setAttribute("message", SuccessMessageConstant.CART_EMPTY);
+            session.setAttribute("message", messageSource.getMessage("msg.success.cart.empty", null,
+                    LocaleContextHolder.getLocale()));
         } else {
             session.setAttribute("cart", cart);
         }
@@ -80,7 +85,8 @@ public class CartController {
     @PostMapping("/delete/all")
     public String deleteAllFromCart(HttpSession session, Model model) {
         session.removeAttribute("cart");
-        model.addAttribute("message", SuccessMessageConstant.CART_EMPTY);
+        model.addAttribute("message", messageSource.getMessage("msg.success.cart.empty", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.CART;
     }
 }
