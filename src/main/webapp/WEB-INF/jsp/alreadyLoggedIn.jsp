@@ -1,11 +1,12 @@
 <%@ page pageEncoding="UTF-8" contentType= "text/html; charset=UTF-8" isELIgnored ="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Login</title>
+        <title><spring:message code="msg.main.login"/></title>
         <link rel="stylesheet" href="/css/styles.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
               rel="stylesheet"
@@ -14,6 +15,6 @@
     </head>
     <body>
         <jsp:include page="navbar.jsp"/>
-        <h2>You are already logged in.</h2>
+        <h2><spring:message code="msg.main.login.already"/></h2>
     </body>
 </html>
