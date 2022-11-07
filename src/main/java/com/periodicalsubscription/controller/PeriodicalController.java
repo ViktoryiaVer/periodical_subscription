@@ -5,11 +5,11 @@ import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
-import com.periodicalsubscription.constant.ErrorMessageConstant;
 import com.periodicalsubscription.constant.PageConstant;
-import com.periodicalsubscription.constant.SuccessMessageConstant;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -35,6 +35,7 @@ import java.util.List;
 public class PeriodicalController {
     private final PeriodicalService periodicalService;
     private final PagingUtil pagingUtil;
+    private final MessageSource messageSource;
 
     @LogInvocation
     @GetMapping(value = "/all")
@@ -45,7 +46,8 @@ public class PeriodicalController {
         List<PeriodicalDto> periodicals = periodicalPage.toList();
 
         if (periodicals.isEmpty()) {
-            model.addAttribute("message", ErrorMessageConstant.PERIODICALS_NOT_FOUND);
+            model.addAttribute("message", messageSource.getMessage("msg.error.periodicals.not.found", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.PERIODICALS;
         }
 
@@ -76,7 +78,8 @@ public class PeriodicalController {
         }
 
         PeriodicalDto createdPeriodical = periodicalService.processPeriodicalCreation(periodical, imageFile);
-        session.setAttribute("message", SuccessMessageConstant.PERIODICAL_CREATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.periodical.created", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/periodical/" + createdPeriodical.getId();
     }
 
@@ -98,7 +101,8 @@ public class PeriodicalController {
         }
 
         PeriodicalDto updatedPeriodical = periodicalService.processPeriodicalUpdate(periodical, imageFile);
-        session.setAttribute("message", SuccessMessageConstant.PERIODICAL_UPDATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.periodical.updated", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/periodical/" + updatedPeriodical.getId();
     }
 
@@ -106,7 +110,8 @@ public class PeriodicalController {
     @PostMapping("/delete/{id}")
     public String deletePeriodical(@PathVariable Long id, HttpSession session) {
         periodicalService.deleteById(id);
-        session.setAttribute("message", SuccessMessageConstant.PERIODICAL_DELETED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.periodical.deleted", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/periodical/all";
     }
 
@@ -114,7 +119,8 @@ public class PeriodicalController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePeriodicalNotFoundException(PeriodicalNotFoundException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, enter correct periodical id or contact the administrator.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.periodical.not.found", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 
@@ -122,7 +128,8 @@ public class PeriodicalController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePeriodicalAlreadyExistsException(PeriodicalAlreadyExistsException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, check periodical title and edit the catalog if needed.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.periodical.title.exists", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 }

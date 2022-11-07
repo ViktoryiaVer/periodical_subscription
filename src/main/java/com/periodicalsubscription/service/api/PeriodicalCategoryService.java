@@ -10,10 +10,6 @@ public interface PeriodicalCategoryService {
 
     PeriodicalCategoryDto findById(Long id);
 
-    PeriodicalCategoryDto save(PeriodicalCategoryDto dto);
-
-    PeriodicalCategoryDto update(PeriodicalCategoryDto dto);
-
     void deleteById(Long id);
 
     void deleteAllCategoriesForPeriodical(PeriodicalDto dto);
