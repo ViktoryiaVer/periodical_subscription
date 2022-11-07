@@ -1,11 +1,12 @@
 <%@ page pageEncoding="UTF-8" contentType= "text/html; charset=UTF-8" isELIgnored ="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>All payments</title>
+        <title><spring:message code="msg.main.payments.all"/></title>
         <link rel="stylesheet" href="/css/styles.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
               rel="stylesheet"
@@ -14,13 +15,13 @@
     </head>
     <body>
         <jsp:include page="../navbar.jsp"/>
-        <h2 style="text-align: center"> All payments</h2>
+        <h2 style="text-align: center"><spring:message code="msg.main.payments.all"/></h2>
         <h4 id="message"><c:out value="${message}"/></h4>
         <c:if test="${payments.size() > 0}">
             <table>
-                <th>Id</th>
-                <th>User</th>
-                <th>Subscription number</th>
+                <th><spring:message code="msg.general.id"/></th>
+                <th><spring:message code="msg.general.user"/></th>
+                <th><spring:message code="msg.payment.subscription.number"/></th>
                 <c:forEach var="payment" items="${payments}">
                     <tr>
                         <td><a href="/payment/${payment.id}">${payment.id}</a></td>
@@ -32,12 +33,13 @@
                         </td>
                         <td>
                             <form action="/payment/update/${payment.id}">
-                                <button class="btn btn-light" type="submit" title="Update payment">Update</button>
+                                <button class="btn btn-light" type="submit" title="<spring:message code="msg.payment.update"/>"><spring:message code="msg.general.update"/></button>
                             </form>
                         </td>
                     </tr>
                 </c:forEach>
             </table>
+            <jsp:include page="../pagination.jsp"/>
         </c:if>
     </body>
 </html>

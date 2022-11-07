@@ -1,6 +1,6 @@
 package com.periodicalsubscription.converter;
 
-import com.periodicalsubscription.dto.PeriodicalCategoryDto;
+import com.periodicalsubscription.service.dto.PeriodicalCategoryDto;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;

@@ -1,9 +1,11 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.dto.UserDto;
-import java.util.List;
+import com.periodicalsubscription.service.dto.UserDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface UserService {
-    List<UserDto> findAll();
+    Page<UserDto> findAll(Pageable pageable);
 
     UserDto findById(Long id);
 

@@ -13,13 +13,15 @@ import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
-import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +29,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
     private final SubscriptionService subscriptionService;
+    private final MessageSource messageSource;
 
     @Override
     @LogInvocationService
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<UserDto> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -41,7 +42,8 @@ public class UserServiceImpl implements UserService {
     @ServiceEx
     public UserDto findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> {
-            throw new UserNotFoundException("User with id " + id + " could not be found.");
+            throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
         });
         return mapper.toDto(user);
     }
@@ -50,8 +52,9 @@ public class UserServiceImpl implements UserService {
     @LogInvocationService
     @ServiceEx
     public UserDto save(@Valid UserDto dto) {
-        if(userRepository.findByEmail(dto.getEmail()) != null) {
-            throw new UserAlreadyExistsException("User with email " + dto.getEmail() + " already exists.");
+        if (userRepository.findByEmail(dto.getEmail()) != null) {
+            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.email.exists", null,
+                    LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
     }
@@ -62,8 +65,9 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto dto) {
         User existingUser = userRepository.findByEmail(dto.getEmail());
 
-        if(existingUser != null && !existingUser.getId().equals(dto.getId())) {
-            throw new UserAlreadyExistsException("User with email " + dto.getEmail() + " already exists.");
+        if (existingUser != null && !existingUser.getId().equals(dto.getId())) {
+            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.email.exists", null,
+                    LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
     }
@@ -74,13 +78,15 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long id) {
         UserDto userDto = findById(id);
 
-        if(subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
-            throw new UserDeleteException("User with subscriptions can't be deleted.");
+        if (subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
+            throw new UserDeleteException(messageSource.getMessage("msg.error.user.delete.subscription", null,
+                    LocaleContextHolder.getLocale()));
         }
         userRepository.deleteById(id);
 
-        if(userRepository.existsById(id)) {
-            throw new UserServiceException("Error while deleting user with id " + id + ".");
+        if (userRepository.existsById(id)) {
+            throw new UserServiceException(messageSource.getMessage("msg.error.user.service.delete", null,
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -90,8 +96,9 @@ public class UserServiceImpl implements UserService {
     public UserDto login(String email, String password) {
         User user = userRepository.findByEmail(email);
 
-        if(user == null || !password.equals(user.getPassword())) {
-            throw new LoginException("Wrong email or password.");
+        if (user == null || !password.equals(user.getPassword())) {
+            throw new LoginException(messageSource.getMessage("msg.error.login", null,
+                    LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(user);
     }

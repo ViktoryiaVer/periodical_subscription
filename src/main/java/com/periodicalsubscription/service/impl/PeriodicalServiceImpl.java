@@ -13,17 +13,19 @@ import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
-import com.periodicalsubscription.dto.PeriodicalDto;
+import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +34,12 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     private final PeriodicalCategoryService periodicalCategoryService;
     private final SubscriptionDetailService subscriptionDetailService;
     private final PeriodicalMapper mapper;
+    private final MessageSource messageSource;
 
     @Override
     @LogInvocationService
-    public List<PeriodicalDto> findAll() {
-        return periodicalRepository.findAllDistinctFetchCategories().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<PeriodicalDto> findAll(Pageable pageable) {
+        return periodicalRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -46,7 +47,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @ServiceEx
     public PeriodicalDto findById(Long id) {
         Periodical periodical = periodicalRepository.findById(id).orElseThrow(() -> {
-            throw new PeriodicalNotFoundException("Periodical with id  " + id + " could not be found.");
+            throw new PeriodicalNotFoundException(messageSource.getMessage("msg.error.periodical.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
         });
 
         return mapper.toDto(periodical);
@@ -56,8 +58,9 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @LogInvocationService
     @ServiceEx
     public PeriodicalDto save(PeriodicalDto dto) {
-        if(periodicalRepository.findByTitle(dto.getTitle()) != null) {
-            throw new PeriodicalAlreadyExistsException("Periodical with title " + dto.getTitle() +  " already exists.");
+        if (periodicalRepository.findByTitle(dto.getTitle()) != null) {
+            throw new PeriodicalAlreadyExistsException(messageSource.getMessage("msg.error.periodical.title.exists", null,
+                    LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(periodicalRepository.save(mapper.toEntity(dto)));
     }
@@ -68,8 +71,9 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     public PeriodicalDto update(PeriodicalDto dto) {
         Periodical existingPeriodical = periodicalRepository.findByTitle(dto.getTitle());
 
-        if(existingPeriodical != null && !existingPeriodical.getId().equals(dto.getId())) {
-            throw new PeriodicalAlreadyExistsException("Periodical with title " + dto.getTitle() +  " already exists.");
+        if (existingPeriodical != null && !existingPeriodical.getId().equals(dto.getId())) {
+            throw new PeriodicalAlreadyExistsException(messageSource.getMessage("msg.error.periodical.title.exists", null,
+                    LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(periodicalRepository.save(mapper.toEntity(dto)));
     }
@@ -79,13 +83,15 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @ServiceEx
     public void deleteById(Long id) {
         PeriodicalDto periodicalDto = findById(id);
-        if(subscriptionDetailService.checkIfSubscriptionExistsByPeriodical(periodicalDto)) {
-            throw new PeriodicalDeleteException("Periodical ordered in subscription can't be deleted.");
+        if (subscriptionDetailService.checkIfSubscriptionExistsByPeriodical(periodicalDto)) {
+            throw new PeriodicalDeleteException(messageSource.getMessage("msg.error.periodical.delete.subscription", null,
+                    LocaleContextHolder.getLocale()));
         }
         periodicalRepository.deleteById(id);
 
-        if(periodicalRepository.existsById(id)) {
-            throw new PeriodicalServiceException("Error while deleting periodical with id " + id + ".");
+        if (periodicalRepository.existsById(id)) {
+            throw new PeriodicalServiceException(messageSource.getMessage("msg.error.periodical.service.delete", null,
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -103,7 +109,7 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     public PeriodicalDto processPeriodicalUpdate(PeriodicalDto periodicalDto, MultipartFile imageFile) {
         periodicalDto.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
 
-        if(!imageFile.isEmpty()) {
+        if (!imageFile.isEmpty()) {
             periodicalDto.setImagePath(getImagePath(imageFile));
         }
 
@@ -114,14 +120,15 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @LogInvocationService
     @ImageUploadEx
     private String getImagePath(MultipartFile imageFile) {
-        String imageName = "";
+        String imageName;
         try {
             imageName = imageFile.getOriginalFilename();
             String location = "periodicals/";
             File partFile = new File(location + imageName);
             imageFile.transferTo(partFile);
         } catch (IOException e) {
-            throw new ImageUploadException("Error while uploading image " + imageName + ".", e);
+            throw new ImageUploadException(messageSource.getMessage("msg.error.image.upload", null,
+                    LocaleContextHolder.getLocale()));
         }
         return imageName;
     }

@@ -1,4 +1,4 @@
-package com.periodicalsubscription.dto;
+package com.periodicalsubscription.service.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

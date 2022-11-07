@@ -2,23 +2,25 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
-import com.periodicalsubscription.dto.SubscriptionDto;
+import com.periodicalsubscription.service.dto.SubscriptionDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.exceptions.payment.PaymentServiceException;
 import com.periodicalsubscription.mapper.PaymentMapper;
 import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.service.api.PaymentService;
-import com.periodicalsubscription.dto.PaymentDto;
+import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +29,12 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper mapper;
     private final SubscriptionService subscriptionService;
     private final SubscriptionDetailService subscriptionDetailService;
+    private final MessageSource messageSource;
 
     @Override
     @LogInvocationService
-    public List<PaymentDto> findAll() {
-        return paymentRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<PaymentDto> findAll(Pageable pageable) {
+        return paymentRepository.findAll(pageable).map(mapper::toDto);
     }
 
     @Override
@@ -41,7 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public PaymentDto findById(Long id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> {
-            throw new PaymentNotFoundException("Payment with id  " + id + " could not be found.");
+            throw new PaymentNotFoundException(messageSource.getMessage("msg.error.payment.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
         });
         return mapper.toDto(payment);
     }
@@ -51,8 +53,9 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public PaymentDto save(PaymentDto dto) {
         PaymentDto savedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
-        if(savedPayment == null) {
-            throw new PaymentServiceException("Error while saving payment.");
+        if (savedPayment == null) {
+            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.save", null,
+                    LocaleContextHolder.getLocale()));
         }
         return savedPayment;
     }
@@ -62,8 +65,9 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public PaymentDto update(PaymentDto dto) {
         PaymentDto updatedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
-        if(updatedPayment == null) {
-            throw new PaymentServiceException("Error while updating payment with id " + dto.getId() + ".");
+        if (updatedPayment == null) {
+            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.update", null,
+                    LocaleContextHolder.getLocale()));
         }
         return updatedPayment;
     }
@@ -73,8 +77,9 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public void deleteById(Long id) {
         paymentRepository.deleteById(id);
-        if(paymentRepository.existsById(id)) {
-            throw new PaymentServiceException("Error while deleting payment with id " + id + ".");
+        if (paymentRepository.existsById(id)) {
+            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.delete", null,
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -101,7 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @LogInvocationService
     private PaymentDto createPaymentDto(Long subscriptionId, String paymentTime, String paymentMethod) {
-        PaymentDto paymentDto = new  PaymentDto();
+        PaymentDto paymentDto = new PaymentDto();
         SubscriptionDto subscriptionDto = subscriptionService.findById(subscriptionId);
         paymentDto.setUserDto(subscriptionDto.getUserDto());
         paymentDto.setSubscriptionDto(subscriptionDto);

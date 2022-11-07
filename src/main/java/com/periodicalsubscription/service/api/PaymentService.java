@@ -1,11 +1,11 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.dto.PaymentDto;
-
-import java.util.List;
+import com.periodicalsubscription.service.dto.PaymentDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PaymentService {
-    List<PaymentDto> findAll();
+    Page<PaymentDto> findAll(Pageable pageable);
 
     PaymentDto findById(Long id);
 

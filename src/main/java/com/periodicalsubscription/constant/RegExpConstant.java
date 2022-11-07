@@ -1,6 +1,6 @@
-package com.periodicalsubscription.manager;
+package com.periodicalsubscription.constant;
 
-public class RegExpManager {
+public class RegExpConstant {
     public static final String NAME = "^[A-Za-z-А-Яа-я]+";
     public static final String PASSWORD = "^(?=.*[\\d])"
             + "(?=.*[a-z])(?=.*[A-Z])"

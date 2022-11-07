@@ -30,3 +30,8 @@ nav li a:hover {
     font-style: italic;
     color: deepskyblue;
 }
+
+#page-size-form {
+    width: 10%;
+    padding: 5px;
+}

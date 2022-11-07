@@ -1,15 +1,17 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
-import com.periodicalsubscription.dto.SubscriptionDto;
-import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.constant.PagingConstant;
+import com.periodicalsubscription.controller.util.PagingUtil;
+import com.periodicalsubscription.service.dto.SubscriptionDto;
+import com.periodicalsubscription.service.dto.UserDto;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
-import com.periodicalsubscription.manager.ErrorMessageManager;
-import com.periodicalsubscription.manager.PageManager;
-import com.periodicalsubscription.manager.SuccessMessageManager;
+import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.SubscriptionService;
-import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,33 +32,41 @@ import java.util.Map;
 @RequestMapping("/subscription")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
-    private final UserService userService;
+    private final PagingUtil pagingUtil;
+    private final MessageSource messageSource;
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllSubscriptions(Model model) {
-        List<SubscriptionDto> subscriptions = subscriptionService.findAll();
+    public String getAllSubscriptions(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                                      @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
+        Page<SubscriptionDto> subscriptionPage = subscriptionService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscription/all");
+        List<SubscriptionDto> subscriptions = subscriptionPage.toList();
 
-        if(subscriptions.isEmpty()) {
-            model.addAttribute("message", ErrorMessageManager.SUBSCRIPTIONS_NOT_FOUND);
-            return PageManager.SUBSCRIPTIONS;
+        if (subscriptions.isEmpty()) {
+            model.addAttribute("message", messageSource.getMessage("msg.error.subscriptions.not.found", null,
+                    LocaleContextHolder.getLocale()));
+            return PageConstant.SUBSCRIPTIONS;
         }
         model.addAttribute("subscriptions", subscriptions);
-        return PageManager.SUBSCRIPTIONS;
+        return PageConstant.SUBSCRIPTIONS;
     }
 
     @LogInvocation
     @GetMapping(value = "/user/{id}")
-    public String getAllSubscriptionsByUser(@PathVariable("id") Long userId, Model model) {
-        UserDto userDto = userService.findById(userId);
-        List<SubscriptionDto> subscriptions = subscriptionService.findAllSubscriptionsByUser(userDto);
+    public String getAllSubscriptionsByUser(@PathVariable("id") Long userId, @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                                            @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
+        Page<SubscriptionDto> subscriptionPage = subscriptionService.findAllSubscriptionsByUserId(userId, pagingUtil.getPageableFromRequest(page, pageSize, "id"));
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscription/user/" + userId);
+        List<SubscriptionDto> subscriptions = subscriptionPage.toList();
 
-        if(subscriptions.isEmpty()) {
-            model.addAttribute("message", ErrorMessageManager.SUBSCRIPTIONS_USER_NOT_FOUND);
-            return PageManager.SUBSCRIPTIONS;
+        if (subscriptions.isEmpty()) {
+            model.addAttribute("message", messageSource.getMessage("msg.error.subscriptions.user.not.found", null,
+                    LocaleContextHolder.getLocale()));
+            return PageConstant.SUBSCRIPTIONS;
         }
         model.addAttribute("subscriptions", subscriptions);
-        return PageManager.SUBSCRIPTIONS;
+        return PageConstant.SUBSCRIPTIONS;
     }
 
     @LogInvocation
@@ -65,16 +75,17 @@ public class SubscriptionController {
         SubscriptionDto subscription = subscriptionService.findById(id);
 
         model.addAttribute("subscription", subscription);
-        return PageManager.SUBSCRIPTION;
+        return PageConstant.SUBSCRIPTION;
     }
 
     @LogInvocation
     @PostMapping("/create")
     public String createSubscription(HttpSession session, Model model) {
         UserDto userDto = (UserDto) session.getAttribute("user");
-        if(userDto == null) {
-            model.addAttribute("message", ErrorMessageManager.LOGIN_REQUIRED_SUBSCRIPTION);
-            return PageManager.LOGIN;
+        if (userDto == null) {
+            model.addAttribute("message", messageSource.getMessage("msg.error.login.required.subscription", null,
+                    LocaleContextHolder.getLocale()));
+            return PageConstant.LOGIN;
         }
 
         @SuppressWarnings("unchecked")
@@ -82,7 +93,8 @@ public class SubscriptionController {
         SubscriptionDto subscription = subscriptionService.createSubscriptionFromCart(userDto, cart);
         session.removeAttribute("cart");
 
-        session.setAttribute("message", SuccessMessageManager.SUBSCRIPTION_CREATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.subscription.created", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/subscription/" + subscription.getId();
     }
 
@@ -91,7 +103,8 @@ public class SubscriptionController {
     public String updateSubscription(@PathVariable Long id, @RequestParam String statusDto, HttpSession session) {
         SubscriptionDto updatedSubscription = subscriptionService.updateSubscriptionStatus(SubscriptionDto.StatusDto.valueOf(statusDto), id);
 
-        session.setAttribute("message", SuccessMessageManager.SUBSCRIPTION_STATUS_UPDATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.subscription.status.updated", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/subscription/" + updatedSubscription.getId();
     }
 
@@ -99,7 +112,8 @@ public class SubscriptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleSubscriptionNotFoundException(SubscriptionNotFoundException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, enter correct subscription id or check subscriptions list.");
-        return PageManager.ERROR;
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.subscription.not.found", null,
+                LocaleContextHolder.getLocale()));
+        return PageConstant.ERROR;
     }
 }

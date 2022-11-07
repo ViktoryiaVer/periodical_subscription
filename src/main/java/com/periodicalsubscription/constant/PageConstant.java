@@ -1,6 +1,6 @@
-package com.periodicalsubscription.manager;
+package com.periodicalsubscription.constant;
 
-public class PageManager {
+public class PageConstant {
     public static final String HOME = "index";
 
     public static final String LOGIN = "user/loginForm";

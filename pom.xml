@@ -6,15 +6,19 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.7.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com</groupId>
 	<artifactId>periodical_subscription</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>periodical_subscription</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Project for online periodical subscription</description>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
+		<javax.jstl.version>1.2</javax.jstl.version>
+		<mapstruct.version>1.5.2.Final</mapstruct.version>
+		<lombok.version>1.18.24</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -47,17 +51,16 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
-			<version>1.2</version>
+			<version>${javax.jstl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-jasper</artifactId>
-			<version>9.0.65</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
-			<version>1.5.2.Final</version>
+			<version>${mapstruct.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -109,25 +112,24 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>11</source> <!-- depending on your project. In this example, Java 11 is used -->
-					<target>11</target> <!-- depending on your project. In this example, Java 11 is used -->
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
-							<version>1.5.2.Final</version>
+							<version>${mapstruct.version}</version>
 						</path>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.24</version>
+							<version>${lombok.version}</version>
 						</path>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok-mapstruct-binding</artifactId>
 							<version>0.2.0</version>
 						</path>
-
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
