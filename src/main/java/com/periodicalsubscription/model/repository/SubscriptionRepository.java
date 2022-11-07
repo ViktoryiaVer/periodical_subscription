@@ -1,5 +1,6 @@
 package com.periodicalsubscription.model.repository;
 
+import com.periodicalsubscription.constant.HqlConstant;
 import com.periodicalsubscription.model.entity.Subscription;
 import com.periodicalsubscription.model.entity.User;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
     @Modifying
-    @Query("update Subscription s set s.status = :status where s.id = :id")
+    @Query(HqlConstant.HQL_UPDATE_SUBSCRIPTION_STATUS)
     void updateSubscriptionStatus(Subscription.Status status, Long id);
 
     boolean existsSubscriptionByUser(User user);
