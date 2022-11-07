@@ -13,6 +13,8 @@ import com.periodicalsubscription.dto.PaymentDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper mapper;
     private final SubscriptionService subscriptionService;
     private final SubscriptionDetailService subscriptionDetailService;
+    private final MessageSource messageSource;
 
     @Override
     @LogInvocationService
@@ -39,7 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
     @ServiceEx
     public PaymentDto findById(Long id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> {
-            throw new PaymentNotFoundException("Payment with id  " + id + " could not be found.");
+            throw new PaymentNotFoundException(messageSource.getMessage("msg.error.payment.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
         });
         return mapper.toDto(payment);
     }
@@ -50,7 +54,8 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentDto save(PaymentDto dto) {
         PaymentDto savedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
         if (savedPayment == null) {
-            throw new PaymentServiceException("Error while saving payment.");
+            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.save", null,
+                    LocaleContextHolder.getLocale()));
         }
         return savedPayment;
     }
@@ -61,7 +66,8 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentDto update(PaymentDto dto) {
         PaymentDto updatedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
         if (updatedPayment == null) {
-            throw new PaymentServiceException("Error while updating payment with id " + dto.getId() + ".");
+            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.update", null,
+                    LocaleContextHolder.getLocale()));
         }
         return updatedPayment;
     }
@@ -72,7 +78,8 @@ public class PaymentServiceImpl implements PaymentService {
     public void deleteById(Long id) {
         paymentRepository.deleteById(id);
         if (paymentRepository.existsById(id)) {
-            throw new PaymentServiceException("Error while deleting payment with id " + id + ".");
+            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.delete", null,
+                    LocaleContextHolder.getLocale()));
         }
     }
 

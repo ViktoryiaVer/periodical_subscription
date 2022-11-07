@@ -4,11 +4,11 @@ import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.PaymentDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
-import com.periodicalsubscription.constant.ErrorMessageConstant;
 import com.periodicalsubscription.constant.PageConstant;
-import com.periodicalsubscription.constant.SuccessMessageConstant;
 import com.periodicalsubscription.service.api.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -30,6 +30,7 @@ import java.util.List;
 public class PaymentController {
     private final PaymentService paymentService;
     private final PagingUtil pagingUtil;
+    private final MessageSource messageSource;
 
     @LogInvocation
     @GetMapping("/all")
@@ -40,7 +41,8 @@ public class PaymentController {
         List<PaymentDto> payments = paymentPage.toList();
 
         if (payments.isEmpty()) {
-            model.addAttribute("message", ErrorMessageConstant.PAYMENTS_NOT_FOUND);
+            model.addAttribute("message", messageSource.getMessage("msg.error.payments.not.found", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.PAYMENTS;
         }
         model.addAttribute("payments", payments);
@@ -66,7 +68,8 @@ public class PaymentController {
     @PostMapping("/register")
     public String createPayment(@RequestParam Long subscriptionId, @RequestParam String paymentTime, @RequestParam String paymentMethodDto, HttpSession session) {
         PaymentDto paymentDto = paymentService.processPaymentRegistration(subscriptionId, paymentTime, paymentMethodDto);
-        session.setAttribute("message", SuccessMessageConstant.PAYMENT_REGISTERED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.payment.registered", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/payment/" + paymentDto.getId();
     }
 
@@ -82,7 +85,8 @@ public class PaymentController {
     @PostMapping("/update")
     public String updatePayment(@RequestParam Long paymentId, String paymentTime, String paymentMethodDto, HttpSession session) {
         PaymentDto updatedPayment = paymentService.processPaymentUpdate(paymentId, paymentTime, paymentMethodDto);
-        session.setAttribute("message", SuccessMessageConstant.PAYMENT_UPDATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.payment.updated", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/payment/" + updatedPayment.getId();
     }
 
@@ -90,7 +94,8 @@ public class PaymentController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handlePaymentNotFoundException(PaymentNotFoundException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, enter correct payment id or check payments list.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.payment.not.found", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 }
