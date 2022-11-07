@@ -1,6 +1,7 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
+import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
@@ -38,8 +39,8 @@ public class UserController {
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllUsers(@RequestParam(defaultValue = "1") Integer page,
-                              @RequestParam(value = "page_size", defaultValue = "10") Integer pageSize, Model model) {
+    public String getAllUsers(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                              @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Page<UserDto> userPage = userService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
         pagingUtil.setAttributesForPagingDisplay(model, pageSize, userPage, "/user/all");
         List<UserDto> users = userPage.toList();

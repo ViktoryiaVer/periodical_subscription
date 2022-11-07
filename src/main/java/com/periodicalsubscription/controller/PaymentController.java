@@ -1,6 +1,7 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
+import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.PaymentDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
@@ -34,8 +35,8 @@ public class PaymentController {
 
     @LogInvocation
     @GetMapping("/all")
-    public String getAllPayments(@RequestParam(defaultValue = "1") Integer page,
-                                 @RequestParam(value = "page_size", defaultValue = "10") Integer pageSize, Model model) {
+    public String getAllPayments(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                                 @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Page<PaymentDto> paymentPage = paymentService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
         pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payment/all");
         List<PaymentDto> payments = paymentPage.toList();

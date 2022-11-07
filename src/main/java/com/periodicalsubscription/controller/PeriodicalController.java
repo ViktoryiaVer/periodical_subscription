@@ -1,6 +1,7 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
+import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
@@ -39,8 +40,8 @@ public class PeriodicalController {
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllPeriodicals(@RequestParam(defaultValue = "1") Integer page,
-                                    @RequestParam(value = "page_size", defaultValue = "10") Integer pageSize, Model model) {
+    public String getAllPeriodicals(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                                    @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Page<PeriodicalDto> periodicalPage = periodicalService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "title"));
         pagingUtil.setAttributesForPagingDisplay(model, pageSize, periodicalPage, "/periodical/all");
         List<PeriodicalDto> periodicals = periodicalPage.toList();

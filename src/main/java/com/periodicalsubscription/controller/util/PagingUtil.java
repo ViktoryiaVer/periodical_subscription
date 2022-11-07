@@ -1,6 +1,7 @@
 package com.periodicalsubscription.controller.util;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
+import com.periodicalsubscription.constant.PagingConstant;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +21,13 @@ public class PagingUtil {
 
     @LogInvocation
     private Integer getCorrectPage(Integer rawPage) {
-        return rawPage <= 0 ? 1 : rawPage;
+        return rawPage <= 0 ? PagingConstant.FIRST_PAGE : rawPage;
     }
 
     @LogInvocation
     private Integer getCorrectPageSize(Integer rawPageSize) {
-        int pageSize = rawPageSize <= 0 ? 10 : rawPageSize;
-        pageSize = Math.min(pageSize, 50);
+        int pageSize = rawPageSize <= 0 ? PagingConstant.DEFAULT_PAGE_SIZE : rawPageSize;
+        pageSize = Math.min(pageSize, PagingConstant.MAX_PAGE_SIZE);
         return pageSize;
     }
 

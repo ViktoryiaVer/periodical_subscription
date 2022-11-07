@@ -1,6 +1,7 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
+import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.SubscriptionDto;
 import com.periodicalsubscription.dto.UserDto;
@@ -36,8 +37,8 @@ public class SubscriptionController {
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllSubscriptions(@RequestParam(defaultValue = "1") Integer page,
-                                      @RequestParam(value = "page_size", defaultValue = "10") Integer pageSize, Model model) {
+    public String getAllSubscriptions(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                                      @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Page<SubscriptionDto> subscriptionPage = subscriptionService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
         pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscription/all");
         List<SubscriptionDto> subscriptions = subscriptionPage.toList();
@@ -53,8 +54,8 @@ public class SubscriptionController {
 
     @LogInvocation
     @GetMapping(value = "/user/{id}")
-    public String getAllSubscriptionsByUser(@PathVariable("id") Long userId, @RequestParam(defaultValue = "1") Integer page,
-                                            @RequestParam(value = "page_size", defaultValue = "10") Integer pageSize, Model model) {
+    public String getAllSubscriptionsByUser(@PathVariable("id") Long userId, @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+                                            @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Page<SubscriptionDto> subscriptionPage = subscriptionService.findAllSubscriptionsByUserId(userId, pagingUtil.getPageableFromRequest(page, pageSize, "id"));
         pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscription/user/" + userId);
         List<SubscriptionDto> subscriptions = subscriptionPage.toList();
