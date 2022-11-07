@@ -1,6 +1,6 @@
 package com.periodicalsubscription.mapper;
 
-import com.periodicalsubscription.dto.PeriodicalCategoryDto;
+import com.periodicalsubscription.service.dto.PeriodicalCategoryDto;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

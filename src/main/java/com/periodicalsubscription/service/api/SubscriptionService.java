@@ -1,7 +1,7 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.dto.SubscriptionDto;
-import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.service.dto.SubscriptionDto;
+import com.periodicalsubscription.service.dto.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

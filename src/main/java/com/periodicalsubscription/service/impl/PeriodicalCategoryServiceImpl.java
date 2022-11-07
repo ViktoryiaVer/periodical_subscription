@@ -2,7 +2,7 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
-import com.periodicalsubscription.dto.PeriodicalDto;
+import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalServiceException;
 import com.periodicalsubscription.exceptions.periodicalcategory.PeriodicalCategoryServiceException;
 import com.periodicalsubscription.mapper.PeriodicalCategoryMapper;
@@ -10,7 +10,7 @@ import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalCategoryRepository;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
-import com.periodicalsubscription.dto.PeriodicalCategoryDto;
+import com.periodicalsubscription.service.dto.PeriodicalCategoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

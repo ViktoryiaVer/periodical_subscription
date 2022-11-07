@@ -3,7 +3,7 @@ package com.periodicalsubscription.controller;
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
-import com.periodicalsubscription.dto.PaymentDto;
+import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.PaymentService;

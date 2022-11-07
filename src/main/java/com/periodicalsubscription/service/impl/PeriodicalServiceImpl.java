@@ -13,7 +13,7 @@ import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
-import com.periodicalsubscription.dto.PeriodicalDto;
+import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;

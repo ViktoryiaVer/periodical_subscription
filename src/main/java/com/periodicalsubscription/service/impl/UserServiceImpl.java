@@ -13,7 +13,7 @@ import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
-import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

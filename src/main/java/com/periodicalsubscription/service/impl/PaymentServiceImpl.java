@@ -2,14 +2,14 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
-import com.periodicalsubscription.dto.SubscriptionDto;
+import com.periodicalsubscription.service.dto.SubscriptionDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.exceptions.payment.PaymentServiceException;
 import com.periodicalsubscription.mapper.PaymentMapper;
 import com.periodicalsubscription.model.repository.PaymentRepository;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.service.api.PaymentService;
-import com.periodicalsubscription.dto.PaymentDto;
+import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import lombok.RequiredArgsConstructor;

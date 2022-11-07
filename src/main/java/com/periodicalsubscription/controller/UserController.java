@@ -3,7 +3,7 @@ package com.periodicalsubscription.controller;
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
-import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserDto;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
 import com.periodicalsubscription.constant.PageConstant;

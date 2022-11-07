@@ -1,7 +1,7 @@
 package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
-import com.periodicalsubscription.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserDto;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
