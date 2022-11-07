@@ -5,11 +5,11 @@ import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.dto.UserDto;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
-import com.periodicalsubscription.constant.ErrorMessageConstant;
 import com.periodicalsubscription.constant.PageConstant;
-import com.periodicalsubscription.constant.SuccessMessageConstant;
 import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -34,6 +34,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final PagingUtil pagingUtil;
+    private final MessageSource messageSource;
 
     @LogInvocation
     @GetMapping(value = "/all")
@@ -44,7 +45,8 @@ public class UserController {
         List<UserDto> users = userPage.toList();
 
         if (users.isEmpty()) {
-            model.addAttribute("message", ErrorMessageConstant.USERS_NOT_FOUND);
+            model.addAttribute("message", messageSource.getMessage("msg.error.users.not.found", null,
+                    LocaleContextHolder.getLocale()));
             return PageConstant.USERS;
         }
         model.addAttribute("users", users);
@@ -80,7 +82,8 @@ public class UserController {
         UserDto createdUser = userService.save(user);
 
         session.setAttribute("user", createdUser);
-        session.setAttribute("message", SuccessMessageConstant.USER_CREATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.user.created", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/user/" + createdUser.getId();
     }
 
@@ -102,7 +105,8 @@ public class UserController {
         }
 
         UserDto updatedUser = userService.update(user);
-        session.setAttribute("message", SuccessMessageConstant.USER_UPDATED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.user.updated", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/user/" + updatedUser.getId();
     }
 
@@ -110,7 +114,8 @@ public class UserController {
     @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, HttpSession session) {
         userService.deleteById(id);
-        session.setAttribute("message", SuccessMessageConstant.USER_DELETED);
+        session.setAttribute("message", messageSource.getMessage("msg.success.user.deleted", null,
+                LocaleContextHolder.getLocale()));
         return "redirect:/user/all";
     }
 
@@ -118,7 +123,8 @@ public class UserController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUserNotFoundException(UserNotFoundException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, enter correct user id or sign up.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.user.not.found", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 
@@ -126,7 +132,8 @@ public class UserController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUserAlreadyExistsException(UserAlreadyExistsException e, Model model) {
-        model.addAttribute("message", e.getMessage() + " Please, specify a unique email address.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.user.email.exists", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 }

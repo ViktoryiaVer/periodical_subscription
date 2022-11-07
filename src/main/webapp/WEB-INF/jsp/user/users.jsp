@@ -1,11 +1,12 @@
 <%@ page pageEncoding="UTF-8" contentType= "text/html; charset=UTF-8" isELIgnored ="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>All users</title>
+        <title><spring:message code="msg.main.users.all"/></title>
         <link rel="stylesheet" href="/css/styles.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
               rel="stylesheet"
@@ -14,18 +15,17 @@
     </head>
     <body>
         <jsp:include page="../navbar.jsp"/>
-        <h2 style="text-align: center"> All users</h2>
+        <h2 style="text-align: center"><spring:message code="msg.main.users.all"/></h2>
         <h4 id="message"><c:out value="${message}"/></h4>
         <c:if test="${users.size() > 0}">
             <table>
-                <th>Id</th>
-                <th>Email</th>
+                <th><spring:message code="msg.general.id"/></th>
+                <th><spring:message code="msg.general.email"/></th>
                 <c:forEach var="user" items="${users}">
                     <tr>
                         <td>${user.id}</td>
                         <td><a href="/user/${user.id}">${user.email}</a></td>
                     </tr>
-                    <%--<c:out value="${user.firstName} ${user.lastName}" />--%>
                 </c:forEach>
             </table>
             <jsp:include page="../pagination.jsp"/>
