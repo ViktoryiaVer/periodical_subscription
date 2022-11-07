@@ -5,7 +5,10 @@ import com.periodicalsubscription.exceptions.ImageUploadException;
 import com.periodicalsubscription.exceptions.LoginException;
 import com.periodicalsubscription.exceptions.ServiceException;
 import com.periodicalsubscription.constant.PageConstant;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,9 +19,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.Arrays;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 @Log4j2
 public class ExceptionController {
-
+    private final MessageSource messageSource;
     @LogInvocation
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -31,7 +35,8 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler
     public String handleLoginException(LoginException e, Model model) {
-        model.addAttribute("message", e.getMessage() + ". Please, enter correct data.");
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.enter.correct", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.LOGIN;
     }
 
@@ -47,7 +52,8 @@ public class ExceptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleFormatException(MethodArgumentTypeMismatchException e, Model model) {
-        model.addAttribute("message", "Wrong format for URL address, please, use correct format.");
+        model.addAttribute("message", messageSource.getMessage("msg.error.wrong.url.format", null,
+                LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
 
@@ -55,7 +61,8 @@ public class ExceptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(RuntimeException e, Model model) {
-        model.addAttribute("message", "Something went wrong. Please, check data accuracy or contact the administrator. ");
+        model.addAttribute("message",  messageSource.getMessage("msg.error.something.wrong", null,
+                LocaleContextHolder.getLocale()));
         log.error("Error while running application: " + e + "\n" + Arrays.toString(e.getStackTrace()));
         return PageConstant.ERROR;
     }
