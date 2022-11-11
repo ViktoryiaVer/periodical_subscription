@@ -17,6 +17,26 @@
         <jsp:include page="../navbar.jsp"/>
         <h2 style="text-align: center"><spring:message code="msg.main.payments.all"/></h2>
         <h4 id="message"><c:out value="${message}"/></h4>
+        <form id="search" action="/payment/all">
+            <div class="input-group" style="float:right; width:30%">
+                <input type="search" class="form-control rounded" placeholder="<spring:message code="msg.payment.search"/>" aria-label="Search" aria-describedby="search-addon" name="keyword"/>
+                <button type="submit" class="btn btn-outline-dark" ><spring:message code="msg.general.search"/></button>
+            </div>
+        </form>
+        <form id="filter-form" action="/payment/all">
+            <select id="paymentMethod" class="form-select form-select-sm" aria-label=".form-select-sm example" name="paymentMethod">
+                <option hidden disabled selected value><spring:message code="msg.payment.select.payment.method"/></option>
+                <option value="CASH" ${paymentFilter.paymentMethod == 'CASH' ? 'selected' : ''}><spring:message code="msg.payment.cash"/></option>
+                <option value="CHECK" ${paymentFilter.paymentMethod == 'CHECK' ? 'selected' : ''}><spring:message code="msg.payment.check"/></option>
+                <option value="CREDIT_OR_DEBIT_CARD" ${paymentFilter.paymentMethod == 'CREDIT_OR_DEBIT_CARD' ? 'selected' : ''}><spring:message code="msg.payment.credit.debit"/></option>
+                <option value="ONLINE_PAYMENT_SERVICE" ${paymentFilter.paymentMethod == 'ONLINE_PAYMENT_SERVICE' ? 'selected' : ''}><spring:message code="msg.payment.online"/></option>
+            </select>
+            <div class="form-group">
+                <label for="paymentDate"><spring:message code="msg.payment.date.specify"/></label>
+                <input type="date" class="form-control" id="paymentDate" name="paymentDate"/>
+            </div>
+            <button type="submit" class="btn btn-light"><spring:message code="msg.general.filter"/></button>
+        </form>
         <c:if test="${payments.size() > 0}">
             <table>
                 <th><spring:message code="msg.general.id"/></th>

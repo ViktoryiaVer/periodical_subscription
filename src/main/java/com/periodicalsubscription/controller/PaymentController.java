@@ -7,10 +7,12 @@ import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.PaymentService;
+import com.periodicalsubscription.service.dto.filter.PaymentFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,9 +37,11 @@ public class PaymentController {
 
     @LogInvocation
     @GetMapping("/all")
-    public String getAllPayments(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+    public String getAllPayments(PaymentFilterDto filterDto, @RequestParam(required = false) String keyword,
+                                 @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                                  @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Page<PaymentDto> paymentPage = paymentService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
+        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PAYMENT);
+        Page<PaymentDto> paymentPage = getPaymentDtoPage(filterDto, keyword, model, pageable);
         pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payment/all");
         List<PaymentDto> payments = paymentPage.toList();
 
@@ -48,6 +52,21 @@ public class PaymentController {
         }
         model.addAttribute("payments", payments);
         return PageConstant.PAYMENTS;
+    }
+
+    @LogInvocation
+    private Page<PaymentDto> getPaymentDtoPage(PaymentFilterDto filterDto, String keyword, Model model, Pageable pageable) {
+        Page<PaymentDto> paymentPage;
+        if (keyword != null) {
+            paymentPage = paymentService.searchForPaymentByKeyword(keyword, pageable);
+            model.addAttribute("search", keyword);
+        } else if (filterDto.getPaymentMethod() != null || filterDto.getPaymentDate() != null) {
+            paymentPage = paymentService.filterPayment(filterDto, pageable);
+            model.addAttribute("paymentFilter", filterDto);
+        } else {
+            paymentPage = paymentService.findAll(pageable);
+        }
+        return paymentPage;
     }
 
     @LogInvocation
@@ -93,7 +112,7 @@ public class PaymentController {
 
     @LogInvocation
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handlePaymentNotFoundException(PaymentNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.payment.not.found", null,
                 LocaleContextHolder.getLocale()));
