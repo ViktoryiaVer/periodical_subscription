@@ -11,15 +11,18 @@ import com.periodicalsubscription.exceptions.periodical.PeriodicalServiceExcepti
 import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
+import com.periodicalsubscription.model.specification.PeriodicalSpecifications;
 import com.periodicalsubscription.service.api.PeriodicalCategoryService;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
+import com.periodicalsubscription.service.dto.filter.PeriodicalFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,6 +118,27 @@ public class PeriodicalServiceImpl implements PeriodicalService {
 
         periodicalCategoryService.deleteAllCategoriesForPeriodical(periodicalDto);
         return update(periodicalDto);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<PeriodicalDto> filterPeriodical(PeriodicalFilterDto filterDto, Pageable pageable) {
+        Specification<Periodical> specification = Specification
+                .where(filterDto.getCategory() == null  || filterDto.getCategory().isEmpty() ? null : PeriodicalSpecifications.hasCategory(filterDto.getCategory()))
+                .and(filterDto.getType() == null || filterDto.getType().isEmpty()  ? null : PeriodicalSpecifications.hastType(filterDto.getType()));
+        return periodicalRepository.findAll(specification, pageable).map(mapper::toDto);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<PeriodicalDto> searchForPeriodicalByKeyword(String keyword, Pageable pageable) {
+        Specification<Periodical> specification = PeriodicalSpecifications.hasIdLike(keyword)
+                .or(PeriodicalSpecifications.hasTitleLike(keyword))
+                .or(PeriodicalSpecifications.hasPublisherLike(keyword))
+                .or(PeriodicalSpecifications.hasDescriptionLike(keyword))
+                .or(PeriodicalSpecifications.hasLanguageLike(keyword))
+                .or(PeriodicalSpecifications.hasPriceLike(keyword));
+        return periodicalRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 
     @LogInvocationService

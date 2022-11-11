@@ -1,6 +1,7 @@
 package com.periodicalsubscription.service.api;
 
 import com.periodicalsubscription.service.dto.PeriodicalDto;
+import com.periodicalsubscription.service.dto.filter.PeriodicalFilterDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,7 @@ public interface PeriodicalService {
 
     PeriodicalDto save(PeriodicalDto dto);
 
-    PeriodicalDto update (PeriodicalDto dto);
+    PeriodicalDto update(PeriodicalDto dto);
 
     void deleteById(Long id);
 
@@ -20,4 +21,7 @@ public interface PeriodicalService {
 
     PeriodicalDto processPeriodicalUpdate(PeriodicalDto periodicalDto, MultipartFile imageFile);
 
+    Page<PeriodicalDto> filterPeriodical(PeriodicalFilterDto filterDto, Pageable pageable);
+
+    Page<PeriodicalDto> searchForPeriodicalByKeyword(String keyword, Pageable pageable);
 }

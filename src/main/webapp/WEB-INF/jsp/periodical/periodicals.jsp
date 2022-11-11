@@ -22,6 +22,30 @@
                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.periodical.add.title"/>"><spring:message code="msg.periodical.add"/></button>
             </form>
         </c:if>
+        <form id="search" action="/periodical/all">
+            <div class="input-group" style="float:right; width:30%">
+                <input type="search" class="form-control rounded" placeholder="<spring:message code="msg.periodical.search"/>" aria-label="Search" aria-describedby="search-addon" name="keyword"/>
+                <button type="submit" class="btn btn-outline-dark" ><spring:message code="msg.general.search"/></button>
+            </div>
+        </form>
+        <form id="filter-form" action="/periodical/all">
+            <select id="category" class="form-select form-select-sm" aria-label=".form-select-sm example" name="category">
+                <option hidden disabled selected value><spring:message code="msg.periodical.select.category"/></option>
+                <option value="ART_AND_ARCHITECTURE" ${periodicalFilter.category == 'ART_AND_ARCHITECTURE' ? 'selected' : ''}><spring:message code="msg.periodical.art.architecture"/></option>
+                <option value="SCIENCE" ${periodicalFilter.category == 'SCIENCE' ? 'selected' : ''}><spring:message code="msg.periodical.science"/></option>
+                <option value="BUSINESS_AND_FINANCE" ${periodicalFilter.category == 'BUSINESS_AND_FINANCE' ? 'selected' : ''}><spring:message code="msg.periodical.business"/></option>
+                <option value="NEWS_AND_POLITICS" ${periodicalFilter.category == 'NEWS_AND_POLITICS' ? 'selected' : ''}><spring:message code="msg.periodical.news.politics"/></option>
+                <option value="CULTURE_AND_LITERATURE" ${periodicalFilter.category== 'CULTURE_AND_LITERATURE' ? 'selected' : ''}><spring:message code="msg.periodical.culture.literature"/></option>
+                <option value="TRAVEL_AND_OUTDOOR" ${periodicalFilter.category == 'TRAVEL_AND_OUTDOOR' ? 'selected' : ''}><spring:message code="msg.periodical.travel.outdoor"/></option>
+            </select>
+            <select id="type" class="form-select form-select-sm" aria-label=".form-select-sm example" name="type">
+                <option hidden disabled selected value><spring:message code="msg.periodical.select.type"/></option>
+                <option value="MAGAZINE" ${periodicalFilter.type == 'MAGAZINE' ? 'selected' : ''}><spring:message code="msg.periodical.magazine"/></option>
+                <option value="JOURNAL" ${periodicalFilter.type == 'JOURNAL' ? 'selected' : ''}><spring:message code="msg.periodical.journal"/></option>
+                <option value="NEWSPAPER" ${periodicalFilter.type== 'NEWSPAPER' ? 'selected' : ''}><spring:message code="msg.periodical.newspaper"/></option>
+            </select>
+            <button type="submit" class="btn btn-light"><spring:message code="msg.general.filter"/></button>
+        </form>
         <c:if test="${periodicals.size() > 0}">
             <table>
                 <tr>
