@@ -11,6 +11,7 @@ import com.periodicalsubscription.exceptions.user.UserServiceException;
 import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
+import com.periodicalsubscription.model.specification.UserSpecifications;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.service.dto.UserDto;
@@ -19,8 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
 import javax.validation.Valid;
 
 @Service
@@ -101,5 +102,16 @@ public class UserServiceImpl implements UserService {
                     LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(user);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<UserDto> searchForUserByKeyword(String keyword, Pageable pageable) {
+        Specification<User> specification = UserSpecifications.hasIdLike(keyword)
+                .or(UserSpecifications.hasFirstNameLike(keyword))
+                .or(UserSpecifications.hasLastNameLike(keyword))
+                .or(UserSpecifications.hasEmailLike(keyword))
+                .or(UserSpecifications.hasPhoneNumberLike(keyword));
+        return userRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 }
