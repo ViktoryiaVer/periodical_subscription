@@ -14,7 +14,7 @@ public interface SubscriptionService {
 
     SubscriptionDto save(SubscriptionDto dto);
 
-    SubscriptionDto update (SubscriptionDto dto);
+    SubscriptionDto update(SubscriptionDto dto);
 
     void deleteById(Long id);
 
@@ -27,4 +27,8 @@ public interface SubscriptionService {
     boolean checkIfSubscriptionExistsByUSer(UserDto userDto);
 
     Page<SubscriptionDto> findAllSubscriptionsByUserId(Long id, Pageable pageable);
+
+    Page<SubscriptionDto> filterSubscription(String type, Pageable pageable);
+
+    Page<SubscriptionDto> searchForSubscriptionByKeyword(String keyword, Pageable pageable);
 }
