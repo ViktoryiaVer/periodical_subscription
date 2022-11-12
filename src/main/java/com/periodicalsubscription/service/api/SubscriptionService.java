@@ -24,6 +24,8 @@ public interface SubscriptionService {
 
     SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id);
 
+    void checkIfSubscriptionCanBeCompleted(Long id);
+
     boolean checkIfSubscriptionExistsByUSer(UserDto userDto);
 
     Page<SubscriptionDto> findAllSubscriptionsByUserId(Long id, Pageable pageable);

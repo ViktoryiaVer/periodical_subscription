@@ -2,6 +2,7 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
+import com.periodicalsubscription.exceptions.subscription.SubscriptionCompletedStatusException;
 import com.periodicalsubscription.model.specification.SubscriptionSpecifications;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,8 +138,21 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @LogInvocationService
     @Transactional
     public SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id) {
+        if (status.equals(SubscriptionDto.StatusDto.COMPLETED)) {
+            checkIfSubscriptionCanBeCompleted(id);
+        }
         subscriptionRepository.updateSubscriptionStatus(Subscription.Status.valueOf(status.toString()), id);
         return findById(id);
+    }
+
+    @Override
+    public void checkIfSubscriptionCanBeCompleted(Long id) {
+        SubscriptionDto subscriptionDto = findById(id);
+        subscriptionDto.getSubscriptionDetailDtos().forEach(detail -> {
+            if (detail.getSubscriptionEndDate().compareTo(LocalDate.now()) > 0) {
+                throw new SubscriptionCompletedStatusException(messageSource.getMessage("msg.error.subscription.completed.status", null, LocaleContextHolder.getLocale()));
+            }
+        });
     }
 
     @Override

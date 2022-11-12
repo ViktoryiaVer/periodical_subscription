@@ -34,7 +34,7 @@
                         <a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} <spring:message code="msg.general.usd"/> x ${detail.subscriptionDurationInYears}
                         <spring:message code="msg.subscription.years"/>)
                         <br>
-                            <c:if test="${subscription.statusDto == 'PAYED'}">
+                            <c:if test="${subscription.statusDto == 'PAYED' || subscription.statusDto == 'COMPLETED'}">
                                 <spring:message code="msg.subscription.start.date"/>: ${detail.subscriptionStartDate}
                                 <br>
                                 <spring:message code="msg.subscription.end.date"/>: ${detail.subscriptionEndDate}
@@ -60,6 +60,13 @@
                         <td>
                             <form action="/payment/register/${subscription.id}">
                                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.payment.register"/>"><spring:message code="msg.payment.register"/></button>
+                            </form>
+                        </td>
+                    </c:if>
+                    <c:if test="${subscription.statusDto == 'PAYED'}">
+                        <td>
+                            <form action="/subscription/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="COMPLETED"><spring:message code="msg.subscription.mark.completed"/></button>
                             </form>
                         </td>
                     </c:if>
