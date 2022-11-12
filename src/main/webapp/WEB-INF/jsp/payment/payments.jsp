@@ -17,13 +17,13 @@
         <jsp:include page="../navbar.jsp"/>
         <h2 style="text-align: center"><spring:message code="msg.main.payments.all"/></h2>
         <h4 id="message"><c:out value="${message}"/></h4>
-        <form id="search" action="/payment/all">
+        <form id="search" action="/payments/all">
             <div class="input-group" style="float:right; width:30%">
                 <input type="search" class="form-control rounded" placeholder="<spring:message code="msg.payment.search"/>" aria-label="Search" aria-describedby="search-addon" name="keyword"/>
                 <button type="submit" class="btn btn-outline-dark" ><spring:message code="msg.general.search"/></button>
             </div>
         </form>
-        <form id="filter-form" action="/payment/all">
+        <form id="filter-form" action="/payments/all">
             <select id="paymentMethod" class="form-select form-select-sm" aria-label=".form-select-sm example" name="paymentMethod">
                 <option hidden disabled selected value><spring:message code="msg.payment.select.payment.method"/></option>
                 <option value="CASH" ${paymentFilter.paymentMethod == 'CASH' ? 'selected' : ''}><spring:message code="msg.payment.cash"/></option>
@@ -44,15 +44,15 @@
                 <th><spring:message code="msg.payment.subscription.number"/></th>
                 <c:forEach var="payment" items="${payments}">
                     <tr>
-                        <td><a href="/payment/${payment.id}">${payment.id}</a></td>
+                        <td><a href="/payments/${payment.id}">${payment.id}</a></td>
                         <td>
-                            <a href="/user/${payment.userDto.id}">${payment.userDto.email}</a>
+                            <a href="/users/${payment.userDto.id}">${payment.userDto.email}</a>
                         </td>
                         <td>
-                            <a href="/subscription/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
+                            <a href="/subscriptions/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
                         </td>
                         <td>
-                            <form action="/payment/update/${payment.id}">
+                            <form action="/payments/update/${payment.id}">
                                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.payment.update"/>"><spring:message code="msg.general.update"/></button>
                             </form>
                         </td>

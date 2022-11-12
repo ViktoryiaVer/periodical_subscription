@@ -26,7 +26,7 @@
                 </ul>
             </div>
         </c:if>
-        <form id="sform" action="/periodical/update/" enctype="multipart/form-data" method="post">
+        <form id="sform" action="/periodicals/update/" enctype="multipart/form-data" method="post">
             <input name="id" type="hidden" value="${periodical.id}"/>
             <div class="form-group">
                 <label for="title"><spring:message code="msg.periodical.title"/></label>

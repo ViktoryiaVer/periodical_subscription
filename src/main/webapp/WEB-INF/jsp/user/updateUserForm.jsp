@@ -26,7 +26,7 @@
             </ul>
         </div>
     </c:if>
-    <form id="sform" action="/user/update/" method="post">
+    <form id="sform" action="/users/update/" method="post">
         <input name="id" type="hidden" value="${requestScope.user.id}"/>
         <div class="form-group">
             <label for="firstName"><spring:message code="msg.general.first.name"/></label>

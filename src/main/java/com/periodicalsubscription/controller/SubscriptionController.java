@@ -30,7 +30,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/subscription")
+@RequestMapping("/subscriptions")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final PagingUtil pagingUtil;
@@ -43,7 +43,7 @@ public class SubscriptionController {
                                       @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_SUBSCRIPTION);
         Page<SubscriptionDto> subscriptionPage = getSubscriptionDtoPage(keyword, status, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscription/all");
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscriptions/all");
         List<SubscriptionDto> subscriptions = subscriptionPage.toList();
 
         if (subscriptions.isEmpty()) {
@@ -114,7 +114,7 @@ public class SubscriptionController {
 
         session.setAttribute("message", messageSource.getMessage("msg.success.subscription.created", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/subscription/" + subscription.getId();
+        return "redirect:/subscriptions/" + subscription.getId();
     }
 
     @LogInvocation
@@ -124,7 +124,7 @@ public class SubscriptionController {
 
         session.setAttribute("message", messageSource.getMessage("msg.success.subscription.status.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/subscription/" + updatedSubscription.getId();
+        return "redirect:/subscriptions/" + updatedSubscription.getId();
     }
 
     @LogInvocation

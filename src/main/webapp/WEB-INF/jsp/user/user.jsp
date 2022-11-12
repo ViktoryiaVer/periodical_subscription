@@ -58,13 +58,13 @@
                         <td>${user.roleDto.toString().toLowerCase()}</td>
                     </c:if>
                     <td>
-                        <form action="/user/update/${user.id}">
+                        <form action="/users/update/${user.id}">
                             <button class="btn btn-light" type="submit"><spring:message code="msg.general.update"/></button>
                         </form>
                     </td>
                     <c:if test="${sessionScope.user.roleDto == 'ADMIN'}">
                         <td>
-                            <form action="/user/delete/${user.id}" method="post">
+                            <form action="/users/delete/${user.id}" method="post">
                                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.user.delete"/>"><spring:message code="msg.general.delete"/></button>
                             </form>
                     </c:if>

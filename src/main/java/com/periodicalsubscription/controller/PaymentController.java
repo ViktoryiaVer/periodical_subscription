@@ -29,7 +29,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/payment")
+@RequestMapping("/payments")
 public class PaymentController {
     private final PaymentService paymentService;
     private final PagingUtil pagingUtil;
@@ -42,7 +42,7 @@ public class PaymentController {
                                  @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PAYMENT);
         Page<PaymentDto> paymentPage = getPaymentDtoPage(filterDto, keyword, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payment/all");
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payments/all");
         List<PaymentDto> payments = paymentPage.toList();
 
         if (payments.isEmpty()) {
@@ -90,7 +90,7 @@ public class PaymentController {
         PaymentDto paymentDto = paymentService.processPaymentRegistration(subscriptionId, paymentTime, paymentMethodDto);
         session.setAttribute("message", messageSource.getMessage("msg.success.payment.registered", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/payment/" + paymentDto.getId();
+        return "redirect:/payments/" + paymentDto.getId();
     }
 
     @LogInvocation
@@ -107,7 +107,7 @@ public class PaymentController {
         PaymentDto updatedPayment = paymentService.processPaymentUpdate(paymentId, paymentTime, paymentMethodDto);
         session.setAttribute("message", messageSource.getMessage("msg.success.payment.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/payment/" + updatedPayment.getId();
+        return "redirect:/payments/" + updatedPayment.getId();
     }
 
     @LogInvocation

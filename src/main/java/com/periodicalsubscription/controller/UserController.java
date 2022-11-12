@@ -32,7 +32,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final PagingUtil pagingUtil;
@@ -44,7 +44,7 @@ public class UserController {
                               @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_USER);
         Page<UserDto> userPage = getUserDtoPage(keyword, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, userPage, "/user/all");
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, userPage, "/users/all");
         List<UserDto> users = userPage.toList();
 
         if (users.isEmpty()) {
@@ -99,7 +99,7 @@ public class UserController {
         session.setAttribute("user", createdUser);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.created", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/user/" + createdUser.getId();
+        return "redirect:/users/" + createdUser.getId();
     }
 
     @LogInvocation
@@ -122,7 +122,7 @@ public class UserController {
         UserDto updatedUser = userService.update(user);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/user/" + updatedUser.getId();
+        return "redirect:/users/" + updatedUser.getId();
     }
 
     @LogInvocation
@@ -131,7 +131,7 @@ public class UserController {
         userService.deleteById(id);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.deleted", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/user/all";
+        return "redirect:/users/all";
     }
 
     @LogInvocation

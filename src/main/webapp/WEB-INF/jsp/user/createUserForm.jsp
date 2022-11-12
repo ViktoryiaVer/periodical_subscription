@@ -26,7 +26,7 @@
             </ul>
         </div>
     </c:if>
-    <form id="sform" action="/user/create/" method="post">
+    <form id="sform" action="/users/create/" method="post">
         <div class="form-group">
             <label for="firstName"><spring:message code="msg.general.first.name"/></label>
             <input type="text" class="form-control" id="firstName" name="firstName" placeholder="<spring:message code="msg.signup.enter.first.name"/>" pattern="^[A-Za-z-А-Яа-я]+" >

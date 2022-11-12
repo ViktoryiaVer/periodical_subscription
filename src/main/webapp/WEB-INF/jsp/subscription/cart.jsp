@@ -30,7 +30,7 @@
                 </tr>
                 <c:forEach var="detail" items="${cart.subscriptionDetailDtos}">
                     <tr>
-                        <td><a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a></td>
+                        <td><a href="/periodicals/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a></td>
                         <td>${detail.periodicalCurrentPrice} <spring:message code="msg.general.usd"/></td>
                         <td> x ${detail.subscriptionDurationInYears} <spring:message code="msg.subscription.years"/></td>
                         <td>
@@ -49,7 +49,7 @@
                     </td>
                 </tr>
             </table>
-            <form action="/subscription/create" method="post">
+            <form action="/subscriptions/create" method="post">
                 <button type="submit" class="btn btn-primary"><spring:message code="msg.cart.complete"/></button>
             </form>
         </c:if>

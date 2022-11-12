@@ -34,7 +34,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/periodical")
+@RequestMapping("/periodicals")
 public class PeriodicalController {
     private final PeriodicalService periodicalService;
     private final PagingUtil pagingUtil;
@@ -47,7 +47,7 @@ public class PeriodicalController {
                                     @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
         Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PERIODICAL);
         Page<PeriodicalDto> periodicalPage = getPeriodicalDtoPage(filterDto, keyword, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, periodicalPage, "/periodical/all");
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, periodicalPage, "/periodicals/all");
         List<PeriodicalDto> periodicals = periodicalPage.toList();
 
         if (periodicals.isEmpty()) {
@@ -100,7 +100,7 @@ public class PeriodicalController {
         PeriodicalDto createdPeriodical = periodicalService.processPeriodicalCreation(periodical, imageFile);
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.created", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/" + createdPeriodical.getId();
+        return "redirect:/periodicals/" + createdPeriodical.getId();
     }
 
     @LogInvocation
@@ -123,7 +123,7 @@ public class PeriodicalController {
         PeriodicalDto updatedPeriodical = periodicalService.processPeriodicalUpdate(periodical, imageFile);
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/" + updatedPeriodical.getId();
+        return "redirect:/periodicals/" + updatedPeriodical.getId();
     }
 
     @LogInvocation
@@ -133,7 +133,7 @@ public class PeriodicalController {
 
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.status.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/" + updatedPeriodical.getId();
+        return "redirect:/periodicals/" + updatedPeriodical.getId();
     }
 
     @LogInvocation
@@ -142,7 +142,7 @@ public class PeriodicalController {
         periodicalService.deleteById(id);
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.deleted", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/all";
+        return "redirect:/periodicals/all";
     }
 
     @LogInvocation

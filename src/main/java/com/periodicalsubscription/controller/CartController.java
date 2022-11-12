@@ -46,7 +46,7 @@ public class CartController {
         session.setAttribute("cart", cart);
         session.setAttribute("message", messageSource.getMessage("msg.success.cart.added", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/" + periodicalId;
+        return "redirect:/periodicals/" + periodicalId;
     }
 
     @LogInvocation
