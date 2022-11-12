@@ -38,7 +38,7 @@
             </div>
             <div class="form-group">
                 <label for="description"><spring:message code="msg.periodical.description"/></label>
-                <input type="text" class="form-control" id="description" name="description" value="${periodical.description}" required>
+                <textarea class="form-control" id="description" name="description" required>${periodical.description}</textarea>
             </div>
             <div class="form-group">
                 <label for="publicationDate"><spring:message code="msg.periodical.publication.date"/></label>

@@ -8,6 +8,7 @@ import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsE
 import com.periodicalsubscription.exceptions.periodical.PeriodicalDeleteException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalServiceException;
+import com.periodicalsubscription.exceptions.periodical.PeriodicalUnavailableException;
 import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.model.repository.PeriodicalRepository;
 import com.periodicalsubscription.model.entity.Periodical;
@@ -128,8 +129,8 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @LogInvocationService
     public Page<PeriodicalDto> filterPeriodical(PeriodicalFilterDto filterDto, Pageable pageable) {
         Specification<Periodical> specification = Specification
-                .where(filterDto.getCategory() == null  || filterDto.getCategory().isEmpty() ? null : PeriodicalSpecifications.hasCategory(filterDto.getCategory()))
-                .and(filterDto.getType() == null || filterDto.getType().isEmpty()  ? null : PeriodicalSpecifications.hastType(filterDto.getType()));
+                .where(filterDto.getCategory() == null || filterDto.getCategory().isEmpty() ? null : PeriodicalSpecifications.hasCategory(filterDto.getCategory()))
+                .and(filterDto.getType() == null || filterDto.getType().isEmpty() ? null : PeriodicalSpecifications.hastType(filterDto.getType()));
         return periodicalRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 
@@ -143,6 +144,22 @@ public class PeriodicalServiceImpl implements PeriodicalService {
                 .or(PeriodicalSpecifications.hasLanguageLike(keyword))
                 .or(PeriodicalSpecifications.hasPriceLike(keyword));
         return periodicalRepository.findAll(specification, pageable).map(mapper::toDto);
+    }
+
+    @Override
+    @LogInvocationService
+    @Transactional
+    public PeriodicalDto updatePeriodicalStatus(PeriodicalDto.StatusDto status, Long id) {
+        periodicalRepository.updateSubscriptionStatus(Periodical.Status.valueOf(status.toString()), id);
+        return findById(id);
+    }
+
+    @Override
+    public void checkIfPeriodicalIsUnavailable(Long id) {
+        boolean isUnavailable = periodicalRepository.existsPeriodicalByStatusEqualsAndId(Periodical.Status.UNAVAILABLE, id);
+        if (isUnavailable) {
+            throw new PeriodicalUnavailableException(messageSource.getMessage("msg.error.periodical.unavailable", null, LocaleContextHolder.getLocale()));
+        }
     }
 
     @LogInvocationService

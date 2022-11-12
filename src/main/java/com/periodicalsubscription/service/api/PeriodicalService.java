@@ -24,4 +24,8 @@ public interface PeriodicalService {
     Page<PeriodicalDto> filterPeriodical(PeriodicalFilterDto filterDto, Pageable pageable);
 
     Page<PeriodicalDto> searchForPeriodicalByKeyword(String keyword, Pageable pageable);
+
+    PeriodicalDto updatePeriodicalStatus(PeriodicalDto.StatusDto status, Long id);
+
+    void checkIfPeriodicalIsUnavailable(Long id);
 }

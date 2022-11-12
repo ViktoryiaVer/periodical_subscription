@@ -37,7 +37,7 @@
         </div>
         <div class="form-group">
             <label for="description"><spring:message code="msg.periodical.description"/></label>
-            <input type="text" class="form-control" id="description" name="description" placeholder="<spring:message code="msg.periodical.add.specify.description"/>" required>
+            <textarea class="form-control" id="description" name="description" placeholder="<spring:message code="msg.periodical.add.specify.description"/>" required></textarea>
         </div>
         <div class="form-group">
             <label for="publicationDate"><spring:message code="msg.periodical.publication.date"/></label>

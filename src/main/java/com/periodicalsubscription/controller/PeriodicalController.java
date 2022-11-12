@@ -127,6 +127,16 @@ public class PeriodicalController {
     }
 
     @LogInvocation
+    @PostMapping("/update/{id}/status")
+    public String updatePeriodicalStatus(@PathVariable Long id, @RequestParam String statusDto, HttpSession session) {
+        PeriodicalDto updatedPeriodical = periodicalService.updatePeriodicalStatus(PeriodicalDto.StatusDto.valueOf(statusDto), id);
+
+        session.setAttribute("message", messageSource.getMessage("msg.success.periodical.status.updated", null,
+                LocaleContextHolder.getLocale()));
+        return "redirect:/periodical/" + updatedPeriodical.getId();
+    }
+
+    @LogInvocation
     @PostMapping("/delete/{id}")
     public String deletePeriodical(@PathVariable Long id, HttpSession session) {
         periodicalService.deleteById(id);

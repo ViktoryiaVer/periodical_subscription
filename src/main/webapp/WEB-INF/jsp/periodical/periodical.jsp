@@ -22,11 +22,19 @@
             <form action="/periodical/update/${periodical.id}">
                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.periodical.update"/>"><spring:message code="msg.general.update"/></button>
             </form>
-        </c:if>
-        <c:if test="${sessionScope.user.roleDto == 'ADMIN'}">
             <form action="/periodical/delete/${periodical.id}" method="post">
                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.periodical.delete"/>"><spring:message code="msg.general.delete"/></button>
             </form>
+            <c:if test="${periodical.statusDto == 'AVAILABLE'}">
+                <form action="/periodical/update/${periodical.id}/status" method="post">
+                    <button class="btn btn-light" type="submit" title="<spring:message code="msg.periodical.mark.unavailable.title"/>" name="statusDto" value="UNAVAILABLE"><spring:message code="msg.periodical.mark.unavailable"/></button>
+                </form>
+            </c:if>
+            <c:if test="${periodical.statusDto == 'UNAVAILABLE'}">
+                <form action="/periodical/update/${periodical.id}/status" method="post">
+                    <button class="btn btn-light" type="submit" name="statusDto" value="AVAILABLE"><spring:message code="msg.periodical.mark.available"/></button>
+                </form>
+            </c:if>
         </c:if>
         <table>
             <tr>
