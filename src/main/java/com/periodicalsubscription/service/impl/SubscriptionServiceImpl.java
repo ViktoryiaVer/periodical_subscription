@@ -83,6 +83,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         subscriptionRepository.deleteById(id);
         if (subscriptionRepository.existsById(id)) {
@@ -93,6 +94,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
+    @Transactional
     public SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart) {
         SubscriptionDto subscription = processSubscriptionInCart(userDto, cart);
         return save(subscription);
@@ -157,7 +159,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionDto.setStatusDto(SubscriptionDto.StatusDto.valueOf(type));
         return subscriptionRepository.findAll(Example.of(mapper.toEntity(subscriptionDto), ExampleMatcher.matchingAny()), pageable)
                 .map(mapper::toDto);
-
     }
 
     @Override
@@ -171,5 +172,4 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .or(SubscriptionSpecifications.hasUserEmailLike(keyword));
         return subscriptionRepository.findAll(specification, pageable).map(mapper::toDto);
     }
-
 }

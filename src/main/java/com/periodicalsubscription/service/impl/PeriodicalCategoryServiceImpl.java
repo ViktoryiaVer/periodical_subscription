@@ -47,6 +47,7 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         periodicalCategoryRepository.deleteById(id);
         if (periodicalCategoryRepository.existsById(id)) {

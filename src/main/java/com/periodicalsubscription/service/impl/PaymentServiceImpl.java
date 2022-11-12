@@ -78,6 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         paymentRepository.deleteById(id);
         if (paymentRepository.existsById(id)) {

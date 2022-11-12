@@ -60,8 +60,9 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public PeriodicalDto save(PeriodicalDto dto) {
-        if (periodicalRepository.findByTitle(dto.getTitle()) != null) {
+        if (periodicalRepository.existsByTitle(dto.getTitle())) {
             throw new PeriodicalAlreadyExistsException(messageSource.getMessage("msg.error.periodical.title.exists", null,
                     LocaleContextHolder.getLocale()));
         }
@@ -71,8 +72,9 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public PeriodicalDto update(PeriodicalDto dto) {
-        Periodical existingPeriodical = periodicalRepository.findByTitle(dto.getTitle());
+        Periodical existingPeriodical = periodicalRepository.findByTitle(dto.getTitle()).orElse(null);
 
         if (existingPeriodical != null && !existingPeriodical.getId().equals(dto.getId())) {
             throw new PeriodicalAlreadyExistsException(messageSource.getMessage("msg.error.periodical.title.exists", null,
@@ -84,6 +86,7 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         PeriodicalDto periodicalDto = findById(id);
         if (subscriptionDetailService.checkIfSubscriptionExistsByPeriodical(periodicalDto)) {
@@ -100,6 +103,7 @@ public class PeriodicalServiceImpl implements PeriodicalService {
 
     @Override
     @LogInvocationService
+    @Transactional
     public PeriodicalDto processPeriodicalCreation(PeriodicalDto periodicalDto, MultipartFile imageFile) {
         periodicalDto.setStatusDto(PeriodicalDto.StatusDto.AVAILABLE);
         periodicalDto.setImagePath(getImagePath(imageFile));
