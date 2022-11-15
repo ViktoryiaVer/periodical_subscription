@@ -54,6 +54,10 @@ public class AuthorizationController {
             session.removeAttribute("user");
         }
 
+        if(session.getAttribute("cart") != null) {
+            session.removeAttribute("cart");
+        }
+
         model.addAttribute("message", messageSource.getMessage("msg.success.user.logged.out", null,
                 LocaleContextHolder.getLocale()));
         return PageConstant.HOME;

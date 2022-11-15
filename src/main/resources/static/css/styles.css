@@ -35,3 +35,8 @@ nav li a:hover {
     width: 10%;
     padding: 5px;
 }
+
+#filter-form {
+    width: 30%;
+    padding: 5px;
+}

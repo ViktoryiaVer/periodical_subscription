@@ -1,0 +1,1 @@
+UPDATE subscription_details SET subscription_start_date = '2021-08-10', subscription_end_date = '2022-08-09' WHERE subscription_id = 6;

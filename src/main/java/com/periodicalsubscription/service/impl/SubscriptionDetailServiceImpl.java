@@ -74,6 +74,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         subscriptionDetailRepository.deleteById(id);
         if (subscriptionDetailRepository.existsById(id)) {

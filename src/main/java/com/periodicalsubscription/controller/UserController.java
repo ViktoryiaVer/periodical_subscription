@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +32,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final PagingUtil pagingUtil;
@@ -39,10 +40,11 @@ public class UserController {
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllUsers(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+    public String getAllUsers(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                               @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Page<UserDto> userPage = userService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, userPage, "/user/all");
+        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_USER);
+        Page<UserDto> userPage = getUserDtoPage(keyword, model, pageable);
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, userPage, "/users/all");
         List<UserDto> users = userPage.toList();
 
         if (users.isEmpty()) {
@@ -52,6 +54,18 @@ public class UserController {
         }
         model.addAttribute("users", users);
         return PageConstant.USERS;
+    }
+
+    @LogInvocation
+    private Page<UserDto> getUserDtoPage(String keyword, Model model, Pageable pageable) {
+        Page<UserDto> userPage;
+        if (keyword != null) {
+            userPage = userService.searchForUserByKeyword(keyword, pageable);
+            model.addAttribute("search", keyword);
+        } else {
+            userPage = userService.findAll(pageable);
+        }
+        return userPage;
     }
 
     @LogInvocation
@@ -85,7 +99,7 @@ public class UserController {
         session.setAttribute("user", createdUser);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.created", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/user/" + createdUser.getId();
+        return "redirect:/users/" + createdUser.getId();
     }
 
     @LogInvocation
@@ -108,7 +122,7 @@ public class UserController {
         UserDto updatedUser = userService.update(user);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/user/" + updatedUser.getId();
+        return "redirect:/users/" + updatedUser.getId();
     }
 
     @LogInvocation
@@ -117,12 +131,12 @@ public class UserController {
         userService.deleteById(id);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.deleted", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/user/all";
+        return "redirect:/users/all";
     }
 
     @LogInvocation
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleUserNotFoundException(UserNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.user.not.found", null,
                 LocaleContextHolder.getLocale()));

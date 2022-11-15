@@ -11,9 +11,11 @@ public interface UserService {
 
     UserDto save(UserDto dto);
 
-    UserDto update (UserDto dto);
+    UserDto update(UserDto dto);
 
     void deleteById(Long id);
 
     UserDto login(String email, String password);
+
+    Page<UserDto> searchForUserByKeyword(String keyword, Pageable pageable);
 }

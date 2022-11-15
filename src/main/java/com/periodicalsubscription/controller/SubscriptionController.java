@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/subscription")
+@RequestMapping("/subscriptions")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final PagingUtil pagingUtil;
@@ -37,10 +38,12 @@ public class SubscriptionController {
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllSubscriptions(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+    public String getAllSubscriptions(@RequestParam(required = false) String keyword, @RequestParam(required = false) String status,
+                                      @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                                       @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Page<SubscriptionDto> subscriptionPage = subscriptionService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscription/all");
+        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_SUBSCRIPTION);
+        Page<SubscriptionDto> subscriptionPage = getSubscriptionDtoPage(keyword, status, model, pageable);
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, subscriptionPage, "/subscriptions/all");
         List<SubscriptionDto> subscriptions = subscriptionPage.toList();
 
         if (subscriptions.isEmpty()) {
@@ -48,8 +51,24 @@ public class SubscriptionController {
                     LocaleContextHolder.getLocale()));
             return PageConstant.SUBSCRIPTIONS;
         }
+
         model.addAttribute("subscriptions", subscriptions);
         return PageConstant.SUBSCRIPTIONS;
+    }
+
+    @LogInvocation
+    private Page<SubscriptionDto> getSubscriptionDtoPage(String keyword, String status, Model model, Pageable pageable) {
+        Page<SubscriptionDto> subscriptionPage;
+        if (keyword != null) {
+            subscriptionPage = subscriptionService.searchForSubscriptionByKeyword(keyword, pageable);
+            model.addAttribute("search", keyword);
+        } else if (status != null) {
+            subscriptionPage = subscriptionService.filterSubscription(status, pageable);
+            model.addAttribute("subscriptionFilter", status);
+        } else {
+            subscriptionPage = subscriptionService.findAll(pageable);
+        }
+        return subscriptionPage;
     }
 
     @LogInvocation
@@ -95,7 +114,7 @@ public class SubscriptionController {
 
         session.setAttribute("message", messageSource.getMessage("msg.success.subscription.created", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/subscription/" + subscription.getId();
+        return "redirect:/subscriptions/" + subscription.getId();
     }
 
     @LogInvocation
@@ -105,12 +124,12 @@ public class SubscriptionController {
 
         session.setAttribute("message", messageSource.getMessage("msg.success.subscription.status.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/subscription/" + updatedSubscription.getId();
+        return "redirect:/subscriptions/" + updatedSubscription.getId();
     }
 
     @LogInvocation
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleSubscriptionNotFoundException(SubscriptionNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.subscription.not.found", null,
                 LocaleContextHolder.getLocale()));

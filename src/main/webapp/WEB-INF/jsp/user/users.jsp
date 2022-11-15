@@ -17,6 +17,12 @@
         <jsp:include page="../navbar.jsp"/>
         <h2 style="text-align: center"><spring:message code="msg.main.users.all"/></h2>
         <h4 id="message"><c:out value="${message}"/></h4>
+        <form id="search" action="/users/all">
+            <div class="input-group" style="float:right; width:30%">
+                <input type="search" class="form-control rounded" placeholder="<spring:message code="msg.user.search"/>" aria-label="Search" aria-describedby="search-addon" name="keyword"/>
+                <button type="submit" class="btn btn-outline-dark" ><spring:message code="msg.general.search"/></button>
+            </div>
+        </form>
         <c:if test="${users.size() > 0}">
             <table>
                 <th><spring:message code="msg.general.id"/></th>
@@ -24,7 +30,7 @@
                 <c:forEach var="user" items="${users}">
                     <tr>
                         <td>${user.id}</td>
-                        <td><a href="/user/${user.id}">${user.email}</a></td>
+                        <td><a href="/users/${user.id}">${user.email}</a></td>
                     </tr>
                 </c:forEach>
             </table>

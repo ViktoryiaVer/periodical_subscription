@@ -7,10 +7,12 @@ import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.PaymentService;
+import com.periodicalsubscription.service.dto.filter.PaymentFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +29,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/payment")
+@RequestMapping("/payments")
 public class PaymentController {
     private final PaymentService paymentService;
     private final PagingUtil pagingUtil;
@@ -35,10 +37,12 @@ public class PaymentController {
 
     @LogInvocation
     @GetMapping("/all")
-    public String getAllPayments(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+    public String getAllPayments(PaymentFilterDto filterDto, @RequestParam(required = false) String keyword,
+                                 @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                                  @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Page<PaymentDto> paymentPage = paymentService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "id"));
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payment/all");
+        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PAYMENT);
+        Page<PaymentDto> paymentPage = getPaymentDtoPage(filterDto, keyword, model, pageable);
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payments/all");
         List<PaymentDto> payments = paymentPage.toList();
 
         if (payments.isEmpty()) {
@@ -48,6 +52,21 @@ public class PaymentController {
         }
         model.addAttribute("payments", payments);
         return PageConstant.PAYMENTS;
+    }
+
+    @LogInvocation
+    private Page<PaymentDto> getPaymentDtoPage(PaymentFilterDto filterDto, String keyword, Model model, Pageable pageable) {
+        Page<PaymentDto> paymentPage;
+        if (keyword != null) {
+            paymentPage = paymentService.searchForPaymentByKeyword(keyword, pageable);
+            model.addAttribute("search", keyword);
+        } else if (filterDto.getPaymentMethod() != null || filterDto.getPaymentDate() != null) {
+            paymentPage = paymentService.filterPayment(filterDto, pageable);
+            model.addAttribute("paymentFilter", filterDto);
+        } else {
+            paymentPage = paymentService.findAll(pageable);
+        }
+        return paymentPage;
     }
 
     @LogInvocation
@@ -71,7 +90,7 @@ public class PaymentController {
         PaymentDto paymentDto = paymentService.processPaymentRegistration(subscriptionId, paymentTime, paymentMethodDto);
         session.setAttribute("message", messageSource.getMessage("msg.success.payment.registered", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/payment/" + paymentDto.getId();
+        return "redirect:/payments/" + paymentDto.getId();
     }
 
     @LogInvocation
@@ -88,12 +107,12 @@ public class PaymentController {
         PaymentDto updatedPayment = paymentService.processPaymentUpdate(paymentId, paymentTime, paymentMethodDto);
         session.setAttribute("message", messageSource.getMessage("msg.success.payment.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/payment/" + updatedPayment.getId();
+        return "redirect:/payments/" + updatedPayment.getId();
     }
 
     @LogInvocation
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handlePaymentNotFoundException(PaymentNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.payment.not.found", null,
                 LocaleContextHolder.getLocale()));

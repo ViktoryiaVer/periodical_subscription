@@ -26,12 +26,12 @@
                 <th><spring:message code="msg.payment.method"/></th>
             </tr>
             <tr>
-                <td><a href="/payment/${payment.id}">${payment.id}</a></td>
+                <td><a href="/payments/${payment.id}">${payment.id}</a></td>
                 <td>
-                    <a href="/user/${payment.userDto.id}">${payment.userDto.email}</a>
+                    <a href="/users/${payment.userDto.id}">${payment.userDto.email}</a>
                 </td>
                 <td>
-                    <a href="/subscription/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
+                    <a href="/subscriptions/${payment.subscriptionDto.id}"> ${payment.subscriptionDto.id}</a>
                 </td>
                 <td>
                     ${payment.paymentTime}
@@ -40,7 +40,7 @@
                     ${payment.paymentMethodDto.toString().toLowerCase()}
                 </td>
                 <td>
-                    <form action="/payment/update/${payment.id}">
+                    <form action="/payments/update/${payment.id}">
                         <button class="btn btn-light" type="submit" title="<spring:message code="msg.payment.update"/>"><spring:message code="msg.general.update"/></button>
                     </form>
                 </td>

@@ -2,6 +2,7 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
+import com.periodicalsubscription.model.specification.PaymentSpecifications;
 import com.periodicalsubscription.service.dto.SubscriptionDto;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.exceptions.payment.PaymentServiceException;
@@ -12,11 +13,13 @@ import com.periodicalsubscription.service.api.PaymentService;
 import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.service.api.SubscriptionDetailService;
 import com.periodicalsubscription.service.api.SubscriptionService;
+import com.periodicalsubscription.service.dto.filter.PaymentFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,6 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         paymentRepository.deleteById(id);
         if (paymentRepository.existsById(id)) {
@@ -102,6 +106,25 @@ public class PaymentServiceImpl implements PaymentService {
         foundPayment.setPaymentTime(LocalDateTime.parse(paymentTime));
         foundPayment.setPaymentMethodDto(PaymentDto.PaymentMethodDto.valueOf(paymentMethodDto));
         return update(foundPayment);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<PaymentDto> filterPayment(PaymentFilterDto filterDto, Pageable pageable) {
+        Specification<Payment> specification = Specification
+                .where(filterDto.getPaymentMethod() == null  || filterDto.getPaymentMethod().isEmpty() ? null : PaymentSpecifications.hasPaymentMethod(filterDto.getPaymentMethod()))
+                .and(filterDto.getPaymentDate() == null || filterDto.getPaymentDate().isEmpty()  ? null : PaymentSpecifications.hasPaymentDate(filterDto.getPaymentDate()));
+        return paymentRepository.findAll(specification, pageable).map(mapper::toDto);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<PaymentDto> searchForPaymentByKeyword(String keyword, Pageable pageable) {
+        Specification<Payment> specification = PaymentSpecifications.hasIdLike(keyword)
+                .or(PaymentSpecifications.hasSubscriptionIdLike(keyword))
+                .or(PaymentSpecifications.hasUserIdLike(keyword))
+                .or(PaymentSpecifications.hasUserEmailLike(keyword));
+        return paymentRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 
     @LogInvocationService

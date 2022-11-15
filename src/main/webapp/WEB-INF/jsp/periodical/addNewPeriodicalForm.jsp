@@ -26,7 +26,7 @@
             </ul>
         </div>
     </c:if>
-    <form id="pform" enctype="multipart/form-data" action="/periodical/create/" method="post">
+    <form id="pform" enctype="multipart/form-data" action="/periodicals/create/" method="post">
         <div class="form-group">
             <label for="title"><spring:message code="msg.periodical.title"/></label>
             <input type="text" class="form-control" id="title" name="title" placeholder="<spring:message code="msg.periodical.add.specify.title"/>" required>
@@ -37,7 +37,7 @@
         </div>
         <div class="form-group">
             <label for="description"><spring:message code="msg.periodical.description"/></label>
-            <input type="text" class="form-control" id="description" name="description" placeholder="<spring:message code="msg.periodical.add.specify.description"/>" required>
+            <textarea class="form-control" id="description" name="description" placeholder="<spring:message code="msg.periodical.add.specify.description"/>" required></textarea>
         </div>
         <div class="form-group">
             <label for="publicationDate"><spring:message code="msg.periodical.publication.date"/></label>

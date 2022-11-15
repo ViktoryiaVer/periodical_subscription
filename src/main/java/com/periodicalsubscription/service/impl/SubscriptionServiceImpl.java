@@ -2,6 +2,8 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
+import com.periodicalsubscription.exceptions.subscription.SubscriptionCompletedStatusException;
+import com.periodicalsubscription.model.specification.SubscriptionSpecifications;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
 import com.periodicalsubscription.service.dto.UserDto;
@@ -16,12 +18,16 @@ import com.periodicalsubscription.service.dto.SubscriptionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +68,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     LocaleContextHolder.getLocale()));
         }
         return savedSubscription;
-
     }
 
     @Override
@@ -80,6 +85,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         subscriptionRepository.deleteById(id);
         if (subscriptionRepository.existsById(id)) {
@@ -90,6 +96,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
+    @Transactional
     public SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart) {
         SubscriptionDto subscription = processSubscriptionInCart(userDto, cart);
         return save(subscription);
@@ -131,8 +138,21 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @LogInvocationService
     @Transactional
     public SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id) {
+        if (status.equals(SubscriptionDto.StatusDto.COMPLETED)) {
+            checkIfSubscriptionCanBeCompleted(id);
+        }
         subscriptionRepository.updateSubscriptionStatus(Subscription.Status.valueOf(status.toString()), id);
         return findById(id);
+    }
+
+    @Override
+    public void checkIfSubscriptionCanBeCompleted(Long id) {
+        SubscriptionDto subscriptionDto = findById(id);
+        subscriptionDto.getSubscriptionDetailDtos().forEach(detail -> {
+            if (detail.getSubscriptionEndDate().compareTo(LocalDate.now()) > 0) {
+                throw new SubscriptionCompletedStatusException(messageSource.getMessage("msg.error.subscription.completed.status", null, LocaleContextHolder.getLocale()));
+            }
+        });
     }
 
     @Override
@@ -145,5 +165,26 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @LogInvocationService
     public Page<SubscriptionDto> findAllSubscriptionsByUserId(Long id, Pageable pageable) {
         return subscriptionRepository.findAllByUserId(id, pageable).map(mapper::toDto);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<SubscriptionDto> filterSubscription(String type, Pageable pageable) {
+        SubscriptionDto subscriptionDto = new SubscriptionDto();
+        subscriptionDto.setStatusDto(SubscriptionDto.StatusDto.valueOf(type));
+        return subscriptionRepository.findAll(Example.of(mapper.toEntity(subscriptionDto), ExampleMatcher.matchingAny()), pageable)
+                .map(mapper::toDto);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<SubscriptionDto> searchForSubscriptionByKeyword(String keyword, Pageable pageable) {
+        Specification<Subscription> specification = SubscriptionSpecifications.hasIdLike(keyword)
+                .or(SubscriptionSpecifications.hasTotalCostLike(keyword))
+                .or(SubscriptionSpecifications.hasPeriodicalIdLike(keyword))
+                .or(SubscriptionSpecifications.hasPeriodicalTitleLike(keyword))
+                .or(SubscriptionSpecifications.hasUserIdLike(keyword))
+                .or(SubscriptionSpecifications.hasUserEmailLike(keyword));
+        return subscriptionRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 }

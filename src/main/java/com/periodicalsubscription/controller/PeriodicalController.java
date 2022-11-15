@@ -8,10 +8,12 @@ import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsE
 import com.periodicalsubscription.exceptions.periodical.PeriodicalNotFoundException;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.PeriodicalService;
+import com.periodicalsubscription.service.dto.filter.PeriodicalFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +34,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/periodical")
+@RequestMapping("/periodicals")
 public class PeriodicalController {
     private final PeriodicalService periodicalService;
     private final PagingUtil pagingUtil;
@@ -40,10 +42,12 @@ public class PeriodicalController {
 
     @LogInvocation
     @GetMapping(value = "/all")
-    public String getAllPeriodicals(@RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
+    public String getAllPeriodicals(PeriodicalFilterDto filterDto, @RequestParam(required = false) String keyword,
+                                    @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                                     @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Page<PeriodicalDto> periodicalPage = periodicalService.findAll(pagingUtil.getPageableFromRequest(page, pageSize, "title"));
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, periodicalPage, "/periodical/all");
+        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PERIODICAL);
+        Page<PeriodicalDto> periodicalPage = getPeriodicalDtoPage(filterDto, keyword, model, pageable);
+        pagingUtil.setAttributesForPagingDisplay(model, pageSize, periodicalPage, "/periodicals/all");
         List<PeriodicalDto> periodicals = periodicalPage.toList();
 
         if (periodicals.isEmpty()) {
@@ -54,6 +58,21 @@ public class PeriodicalController {
 
         model.addAttribute("periodicals", periodicals);
         return PageConstant.PERIODICALS;
+    }
+
+    @LogInvocation
+    private Page<PeriodicalDto> getPeriodicalDtoPage(PeriodicalFilterDto filterDto, String keyword, Model model, Pageable pageable) {
+        Page<PeriodicalDto> periodicalPage;
+        if (keyword != null) {
+            periodicalPage = periodicalService.searchForPeriodicalByKeyword(keyword, pageable);
+            model.addAttribute("search", keyword);
+        } else if (filterDto.getCategory() != null || filterDto.getType() != null) {
+            periodicalPage = periodicalService.filterPeriodical(filterDto, pageable);
+            model.addAttribute("periodicalFilter", filterDto);
+        } else {
+            periodicalPage = periodicalService.findAll(pageable);
+        }
+        return periodicalPage;
     }
 
     @LogInvocation
@@ -81,7 +100,7 @@ public class PeriodicalController {
         PeriodicalDto createdPeriodical = periodicalService.processPeriodicalCreation(periodical, imageFile);
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.created", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/" + createdPeriodical.getId();
+        return "redirect:/periodicals/" + createdPeriodical.getId();
     }
 
     @LogInvocation
@@ -104,7 +123,17 @@ public class PeriodicalController {
         PeriodicalDto updatedPeriodical = periodicalService.processPeriodicalUpdate(periodical, imageFile);
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.updated", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/" + updatedPeriodical.getId();
+        return "redirect:/periodicals/" + updatedPeriodical.getId();
+    }
+
+    @LogInvocation
+    @PostMapping("/update/{id}/status")
+    public String updatePeriodicalStatus(@PathVariable Long id, @RequestParam String statusDto, HttpSession session) {
+        PeriodicalDto updatedPeriodical = periodicalService.updatePeriodicalStatus(PeriodicalDto.StatusDto.valueOf(statusDto), id);
+
+        session.setAttribute("message", messageSource.getMessage("msg.success.periodical.status.updated", null,
+                LocaleContextHolder.getLocale()));
+        return "redirect:/periodicals/" + updatedPeriodical.getId();
     }
 
     @LogInvocation
@@ -113,12 +142,12 @@ public class PeriodicalController {
         periodicalService.deleteById(id);
         session.setAttribute("message", messageSource.getMessage("msg.success.periodical.deleted", null,
                 LocaleContextHolder.getLocale()));
-        return "redirect:/periodical/all";
+        return "redirect:/periodicals/all";
     }
 
     @LogInvocation
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handlePeriodicalNotFoundException(PeriodicalNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.periodical.not.found", null,
                 LocaleContextHolder.getLocale()));

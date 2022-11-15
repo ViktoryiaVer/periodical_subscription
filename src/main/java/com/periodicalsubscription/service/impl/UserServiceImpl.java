@@ -11,6 +11,7 @@ import com.periodicalsubscription.exceptions.user.UserServiceException;
 import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
+import com.periodicalsubscription.model.specification.UserSpecifications;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.service.dto.UserDto;
@@ -19,7 +20,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 
@@ -51,8 +54,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public UserDto save(@Valid UserDto dto) {
-        if (userRepository.findByEmail(dto.getEmail()) != null) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.email.exists", null,
                     LocaleContextHolder.getLocale()));
         }
@@ -62,8 +66,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public UserDto update(UserDto dto) {
-        User existingUser = userRepository.findByEmail(dto.getEmail());
+        User existingUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null && !existingUser.getId().equals(dto.getId())) {
             throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.email.exists", null,
@@ -75,6 +80,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public void deleteById(Long id) {
         UserDto userDto = findById(id);
 
@@ -94,12 +100,23 @@ public class UserServiceImpl implements UserService {
     @LogInvocationService
     @LoginEx
     public UserDto login(String email, String password) {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null || !password.equals(user.getPassword())) {
             throw new LoginException(messageSource.getMessage("msg.error.login", null,
                     LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(user);
+    }
+
+    @Override
+    @LogInvocationService
+    public Page<UserDto> searchForUserByKeyword(String keyword, Pageable pageable) {
+        Specification<User> specification = UserSpecifications.hasIdLike(keyword)
+                .or(UserSpecifications.hasFirstNameLike(keyword))
+                .or(UserSpecifications.hasLastNameLike(keyword))
+                .or(UserSpecifications.hasEmailLike(keyword))
+                .or(UserSpecifications.hasPhoneNumberLike(keyword));
+        return userRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 }

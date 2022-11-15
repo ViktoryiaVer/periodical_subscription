@@ -25,16 +25,16 @@
                 <th><spring:message code="msg.general.status"/></th>
             </tr>
             <tr>
-                <td><a href="/subscription/${subscription.id}">${subscription.id}</a></td>
+                <td><a href="/subscriptions/${subscription.id}">${subscription.id}</a></td>
                 <td>
-                    <a href="/user/${subscription.userDto.id}">${subscription.userDto.email}</a>
+                    <a href="/users/${subscription.userDto.id}">${subscription.userDto.email}</a>
                 </td>
                 <td>
                     <c:forEach var="detail" items="${subscription.subscriptionDetailDtos}">
-                        <a href="/periodical/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} <spring:message code="msg.general.usd"/> x ${detail.subscriptionDurationInYears}
+                        <a href="/periodicals/${detail.periodicalDto.id}">${detail.periodicalDto.title}</a>(${detail.periodicalCurrentPrice} <spring:message code="msg.general.usd"/> x ${detail.subscriptionDurationInYears}
                         <spring:message code="msg.subscription.years"/>)
                         <br>
-                            <c:if test="${subscription.statusDto == 'PAYED'}">
+                            <c:if test="${subscription.statusDto == 'PAYED' || subscription.statusDto == 'COMPLETED'}">
                                 <spring:message code="msg.subscription.start.date"/>: ${detail.subscriptionStartDate}
                                 <br>
                                 <spring:message code="msg.subscription.end.date"/>: ${detail.subscriptionEndDate}
@@ -48,18 +48,25 @@
                 <c:if test="${sessionScope.user.roleDto == 'ADMIN'}">
                     <c:if test="${subscription.statusDto == 'PENDING'}">
                         <td>
-                            <form action="/subscription/update/${subscription.id}" method="post">
+                            <form action="/subscriptions/update/${subscription.id}" method="post">
                                 <button class="btn btn-light" type="submit" name="statusDto" value="AWAITING_PAYMENT" title="<spring:message code="msg.subscription.confirm.title"/>"><spring:message code="msg.subscription.confirm"/></button>
                             </form>
-                            <form action="/subscription/update/${subscription.id}" method="post">
+                            <form action="/subscriptions/update/${subscription.id}" method="post">
                                 <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="<spring:message code="msg.subscription.reject.title"/>"><spring:message code="msg.subscription.reject"/></button>
                             </form>
                         </td>
                     </c:if>
                     <c:if test="${subscription.statusDto == 'AWAITING_PAYMENT'}">
                         <td>
-                            <form action="/payment/register/${subscription.id}">
+                            <form action="/payments/register/${subscription.id}">
                                 <button class="btn btn-light" type="submit" title="<spring:message code="msg.payment.register"/>"><spring:message code="msg.payment.register"/></button>
+                            </form>
+                        </td>
+                    </c:if>
+                    <c:if test="${subscription.statusDto == 'PAYED'}">
+                        <td>
+                            <form action="/subscriptions/update/${subscription.id}" method="post">
+                                <button class="btn btn-light" type="submit" name="statusDto" value="COMPLETED"><spring:message code="msg.subscription.mark.completed"/></button>
                             </form>
                         </td>
                     </c:if>
@@ -67,7 +74,7 @@
 
                 <c:if test="${sessionScope.user.roleDto == 'READER' && subscription.statusDto != 'CANCELED'}">
                     <td>
-                        <form action="/subscription/update/${subscription.id}" method="post">
+                        <form action="/subscriptions/update/${subscription.id}" method="post">
                             <button class="btn btn-light" type="submit" name="statusDto" value="CANCELED" title="<spring:message code="msg.subscription.cancel.title"/>"><spring:message code="msg.subscription.cancel"/></button>
                         </form>
                     </td>

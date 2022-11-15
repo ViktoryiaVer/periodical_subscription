@@ -16,7 +16,7 @@
     <body>
         <jsp:include page="../navbar.jsp"/>
         <h2><spring:message code="msg.payment.register.title"/></h2>
-        <form id="pform" action="/payment/register/" method="post">
+        <form id="pform" action="/payments/register/" method="post">
             <input name="subscriptionId" type="hidden" value="${subscriptionId}"/>
             <div class="form-group">
                 <label for="paymentTime"><spring:message code="msg.payment.time"/></label>
