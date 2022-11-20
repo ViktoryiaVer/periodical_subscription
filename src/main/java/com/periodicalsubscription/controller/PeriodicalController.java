@@ -12,8 +12,6 @@ import com.periodicalsubscription.service.dto.filter.PeriodicalFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,10 +43,8 @@ public class PeriodicalController {
     public String getAllPeriodicals(PeriodicalFilterDto filterDto, @RequestParam(required = false) String keyword,
                                     @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                                     @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PERIODICAL);
-        Page<PeriodicalDto> periodicalPage = getPeriodicalDtoPage(filterDto, keyword, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, periodicalPage, "/periodicals/all");
-        List<PeriodicalDto> periodicals = periodicalPage.toList();
+
+        List<PeriodicalDto> periodicals = pagingUtil.getPeriodicalListFromPageAndRequestParams(page, pageSize, keyword, model, filterDto);
 
         if (periodicals.isEmpty()) {
             model.addAttribute("message", messageSource.getMessage("msg.error.periodicals.not.found", null,
@@ -58,21 +54,6 @@ public class PeriodicalController {
 
         model.addAttribute("periodicals", periodicals);
         return PageConstant.PERIODICALS;
-    }
-
-    @LogInvocation
-    private Page<PeriodicalDto> getPeriodicalDtoPage(PeriodicalFilterDto filterDto, String keyword, Model model, Pageable pageable) {
-        Page<PeriodicalDto> periodicalPage;
-        if (keyword != null) {
-            periodicalPage = periodicalService.searchForPeriodicalByKeyword(keyword, pageable);
-            model.addAttribute("search", keyword);
-        } else if (filterDto.getCategory() != null || filterDto.getType() != null) {
-            periodicalPage = periodicalService.filterPeriodical(filterDto, pageable);
-            model.addAttribute("periodicalFilter", filterDto);
-        } else {
-            periodicalPage = periodicalService.findAll(pageable);
-        }
-        return periodicalPage;
     }
 
     @LogInvocation
