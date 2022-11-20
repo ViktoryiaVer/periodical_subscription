@@ -2,8 +2,8 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
+import com.periodicalsubscription.exceptions.periodicalcategory.PeriodicalCategoryNotFoundException;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
-import com.periodicalsubscription.exceptions.periodical.PeriodicalServiceException;
 import com.periodicalsubscription.exceptions.periodicalcategory.PeriodicalCategoryServiceException;
 import com.periodicalsubscription.mapper.PeriodicalCategoryMapper;
 import com.periodicalsubscription.mapper.PeriodicalMapper;
@@ -38,7 +38,7 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     @ServiceEx
     public PeriodicalCategoryDto findById(Long id) {
         PeriodicalCategory category = periodicalCategoryRepository.findById(id).orElseThrow(() -> {
-            throw new PeriodicalCategoryServiceException(messageSource.getMessage("msg.error.periodical.category.find.by.id", null,
+            throw new PeriodicalCategoryNotFoundException(messageSource.getMessage("msg.error.periodical.category.find.by.id", null,
                     LocaleContextHolder.getLocale()));
         });
         return mapper.toDto(category);
@@ -51,7 +51,7 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     public void deleteById(Long id) {
         periodicalCategoryRepository.deleteById(id);
         if (periodicalCategoryRepository.existsById(id)) {
-            throw new PeriodicalServiceException(messageSource.getMessage("msg.error.periodical.category.service.delete", null,
+            throw new PeriodicalCategoryServiceException(messageSource.getMessage("msg.error.periodical.category.service.delete", null,
                     LocaleContextHolder.getLocale()));
         }
     }
@@ -63,7 +63,7 @@ public class PeriodicalCategoryServiceImpl implements PeriodicalCategoryService 
     public void deleteAllCategoriesForPeriodical(PeriodicalDto dto) {
         periodicalCategoryRepository.deleteAllByPeriodical(periodicalMapper.toEntity(dto));
         if (periodicalCategoryRepository.existsByPeriodical(periodicalMapper.toEntity(dto))) {
-            throw new PeriodicalServiceException(messageSource.getMessage("msg.error.periodical.category.service.delete.by.periodical", null,
+            throw new PeriodicalCategoryServiceException(messageSource.getMessage("msg.error.periodical.category.service.delete.by.periodical", null,
                     LocaleContextHolder.getLocale()));
         }
     }

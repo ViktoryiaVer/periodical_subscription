@@ -19,7 +19,7 @@ public interface PeriodicalRepository extends JpaRepository<Periodical, Long>, J
 
     @Modifying
     @Query(HqlConstant.HQL_UPDATE_PERIODICAL_STATUS)
-    void updateSubscriptionStatus(Periodical.Status status, Long id);
+    void updatePeriodicalStatus(Periodical.Status status, Long id);
 
     boolean existsPeriodicalByStatusEqualsAndId(Periodical.Status status, Long id);
 }

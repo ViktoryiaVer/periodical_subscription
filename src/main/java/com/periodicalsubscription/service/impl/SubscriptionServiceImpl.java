@@ -3,13 +3,13 @@ package com.periodicalsubscription.service.impl;
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionCompletedStatusException;
+import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
 import com.periodicalsubscription.model.specification.SubscriptionSpecifications;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
 import com.periodicalsubscription.service.dto.UserDto;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionServiceException;
 import com.periodicalsubscription.mapper.SubscriptionMapper;
-import com.periodicalsubscription.mapper.UserMapper;
 import com.periodicalsubscription.model.repository.SubscriptionRepository;
 import com.periodicalsubscription.model.entity.Subscription;
 import com.periodicalsubscription.service.api.PeriodicalService;
@@ -38,7 +38,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final PeriodicalService periodicalService;
     private final SubscriptionMapper mapper;
-    private final UserMapper userMapper;
     private final MessageSource messageSource;
 
     @Override
@@ -52,7 +51,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @ServiceEx
     public SubscriptionDto findById(Long id) {
         Subscription subscription = subscriptionRepository.findById(id).orElseThrow(() -> {
-            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.find.by.id", null,
+            throw new SubscriptionNotFoundException(messageSource.getMessage("msg.error.subscription.find.by.id", null,
                     LocaleContextHolder.getLocale()));
         });
         return mapper.toDto(subscription);
@@ -145,8 +144,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return findById(id);
     }
 
-    @Override
-    public void checkIfSubscriptionCanBeCompleted(Long id) {
+    private void checkIfSubscriptionCanBeCompleted(Long id) {
         SubscriptionDto subscriptionDto = findById(id);
         subscriptionDto.getSubscriptionDetailDtos().forEach(detail -> {
             if (detail.getSubscriptionEndDate().compareTo(LocalDate.now()) > 0) {
@@ -157,8 +155,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
-    public boolean checkIfSubscriptionExistsByUSer(UserDto userDto) {
-        return subscriptionRepository.existsSubscriptionByUser(userMapper.toEntity(userDto));
+    public boolean checkIfSubscriptionExistsByUSer(Long id) {
+        return subscriptionRepository.existsSubscriptionByUserId(id);
     }
 
     @Override

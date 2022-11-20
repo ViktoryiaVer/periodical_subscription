@@ -82,9 +82,7 @@ public class UserServiceImpl implements UserService {
     @ServiceEx
     @Transactional
     public void deleteById(Long id) {
-        UserDto userDto = findById(id);
-
-        if (subscriptionService.checkIfSubscriptionExistsByUSer(userDto)) {
+        if (subscriptionService.checkIfSubscriptionExistsByUSer(id)) {
             throw new UserDeleteException(messageSource.getMessage("msg.error.user.delete.subscription", null,
                     LocaleContextHolder.getLocale()));
         }

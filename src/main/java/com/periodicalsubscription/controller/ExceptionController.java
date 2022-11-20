@@ -25,7 +25,7 @@ public class ExceptionController {
     private final MessageSource messageSource;
     @LogInvocation
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleServiceException(ServiceException e, Model model) {
         model.addAttribute("message", e.getMessage());
         return PageConstant.ERROR;
@@ -44,7 +44,7 @@ public class ExceptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleImageUploadingException(ImageUploadException e, Model model) {
-        model.addAttribute("message", e.getMessage() + ". Reason: " + e.getCause().getMessage());
+        model.addAttribute("message", e.getMessage());
         return PageConstant.ERROR;
     }
 
