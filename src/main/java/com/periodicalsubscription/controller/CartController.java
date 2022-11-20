@@ -2,7 +2,7 @@ package com.periodicalsubscription.controller;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalUnavailableException;
-import com.periodicalsubscription.service.api.PeriodicalService;
+import com.periodicalsubscription.service.api.CartService;
 import com.periodicalsubscription.service.dto.SubscriptionDto;
 import com.periodicalsubscription.service.dto.UserDto;
 import com.periodicalsubscription.constant.PageConstant;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -30,7 +29,7 @@ import java.util.Map;
 @RequestMapping("/cart")
 public class CartController {
     private final SubscriptionService subscriptionService;
-    private final PeriodicalService periodicalService;
+    private final CartService cartService;
     private final MessageSource messageSource;
 
     @LogInvocation
@@ -38,11 +37,8 @@ public class CartController {
     public String addToCart(@PathVariable("id") Long periodicalId, @RequestParam Integer subscriptionDurationInYears, HttpSession session) {
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new HashMap<>();
-        }
-        periodicalService.checkIfPeriodicalIsUnavailable(periodicalId);
-        cart.put(periodicalId, subscriptionDurationInYears);
+        cart = cartService.add(periodicalId, subscriptionDurationInYears, cart);
+
         session.setAttribute("cart", cart);
         session.setAttribute("message", messageSource.getMessage("msg.success.cart.added", null,
                 LocaleContextHolder.getLocale()));
@@ -71,10 +67,6 @@ public class CartController {
     public String deleteFromCart(@PathVariable("id") Long periodicalId, HttpSession session) {
         @SuppressWarnings("unchecked")
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new HashMap<>();
-        }
-
         cart.remove(periodicalId);
 
         if (cart.isEmpty()) {
