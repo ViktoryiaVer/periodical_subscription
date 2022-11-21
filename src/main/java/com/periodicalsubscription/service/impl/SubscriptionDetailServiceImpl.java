@@ -2,10 +2,8 @@ package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
-import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.exceptions.subscriptiondetail.SubscriptionDetailNotFoundException;
 import com.periodicalsubscription.exceptions.subscriptiondetail.SubscriptionDetailServiceException;
-import com.periodicalsubscription.mapper.PeriodicalMapper;
 import com.periodicalsubscription.mapper.SubscriptionDetailMapper;
 import com.periodicalsubscription.model.repository.SubscriptionDetailRepository;
 import com.periodicalsubscription.model.entity.SubscriptionDetail;
@@ -26,7 +24,6 @@ import java.time.LocalDate;
 public class SubscriptionDetailServiceImpl implements SubscriptionDetailService {
     private final SubscriptionDetailRepository subscriptionDetailRepository;
     private final SubscriptionDetailMapper mapper;
-    private final PeriodicalMapper periodicalMapper;
     private final MessageSource messageSource;
 
     @Override
@@ -95,7 +92,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
 
     @Override
     @LogInvocationService
-    public boolean checkIfSubscriptionExistsByPeriodical(PeriodicalDto periodicalDto) {
-        return subscriptionDetailRepository.existsSubscriptionDetailByPeriodical(periodicalMapper.toEntity(periodicalDto));
+    public boolean checkIfSubscriptionDetailExistsByPeriodicalId(Long id) {
+        return subscriptionDetailRepository.existsSubscriptionDetailByPeriodicalId(id);
     }
 }

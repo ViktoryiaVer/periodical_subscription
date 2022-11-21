@@ -89,8 +89,7 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @ServiceEx
     @Transactional
     public void deleteById(Long id) {
-        PeriodicalDto periodicalDto = findById(id);
-        if (subscriptionDetailService.checkIfSubscriptionExistsByPeriodical(periodicalDto)) {
+        if (subscriptionDetailService.checkIfSubscriptionDetailExistsByPeriodicalId(id)) {
             throw new PeriodicalDeleteException(messageSource.getMessage("msg.error.periodical.delete.subscription", null,
                     LocaleContextHolder.getLocale()));
         }
@@ -150,11 +149,12 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @LogInvocationService
     @Transactional
     public PeriodicalDto updatePeriodicalStatus(PeriodicalDto.StatusDto status, Long id) {
-        periodicalRepository.updateSubscriptionStatus(Periodical.Status.valueOf(status.toString()), id);
+        periodicalRepository.updatePeriodicalStatus(Periodical.Status.valueOf(status.toString()), id);
         return findById(id);
     }
 
     @Override
+    @LogInvocationService
     public void checkIfPeriodicalIsUnavailable(Long id) {
         boolean isUnavailable = periodicalRepository.existsPeriodicalByStatusEqualsAndId(Periodical.Status.UNAVAILABLE, id);
         if (isUnavailable) {

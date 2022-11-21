@@ -11,8 +11,6 @@ import com.periodicalsubscription.service.dto.filter.PaymentFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,10 +38,8 @@ public class PaymentController {
     public String getAllPayments(PaymentFilterDto filterDto, @RequestParam(required = false) String keyword,
                                  @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                                  @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_PAYMENT);
-        Page<PaymentDto> paymentPage = getPaymentDtoPage(filterDto, keyword, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, paymentPage, "/payments/all");
-        List<PaymentDto> payments = paymentPage.toList();
+
+        List<PaymentDto> payments = pagingUtil.getPaymentListFromPageAndRequestParams(page, pageSize, keyword, model, filterDto);
 
         if (payments.isEmpty()) {
             model.addAttribute("message", messageSource.getMessage("msg.error.payments.not.found", null,
@@ -52,21 +48,6 @@ public class PaymentController {
         }
         model.addAttribute("payments", payments);
         return PageConstant.PAYMENTS;
-    }
-
-    @LogInvocation
-    private Page<PaymentDto> getPaymentDtoPage(PaymentFilterDto filterDto, String keyword, Model model, Pageable pageable) {
-        Page<PaymentDto> paymentPage;
-        if (keyword != null) {
-            paymentPage = paymentService.searchForPaymentByKeyword(keyword, pageable);
-            model.addAttribute("search", keyword);
-        } else if (filterDto.getPaymentMethod() != null || filterDto.getPaymentDate() != null) {
-            paymentPage = paymentService.filterPayment(filterDto, pageable);
-            model.addAttribute("paymentFilter", filterDto);
-        } else {
-            paymentPage = paymentService.findAll(pageable);
-        }
-        return paymentPage;
     }
 
     @LogInvocation

@@ -1,6 +1,5 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,5 +19,5 @@ public interface SubscriptionDetailService {
 
     void updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id);
 
-    boolean checkIfSubscriptionExistsByPeriodical(PeriodicalDto periodicalDto);
+    boolean checkIfSubscriptionDetailExistsByPeriodicalId(Long id);
 }

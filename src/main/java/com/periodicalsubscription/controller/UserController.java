@@ -11,8 +11,6 @@ import com.periodicalsubscription.service.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,10 +40,8 @@ public class UserController {
     @GetMapping(value = "/all")
     public String getAllUsers(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                               @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
-        Pageable pageable = pagingUtil.getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_USER);
-        Page<UserDto> userPage = getUserDtoPage(keyword, model, pageable);
-        pagingUtil.setAttributesForPagingDisplay(model, pageSize, userPage, "/users/all");
-        List<UserDto> users = userPage.toList();
+
+        List<UserDto> users = pagingUtil.getUserListFromPageAndRequestParams(page, pageSize, keyword, model);
 
         if (users.isEmpty()) {
             model.addAttribute("message", messageSource.getMessage("msg.error.users.not.found", null,
@@ -54,18 +50,6 @@ public class UserController {
         }
         model.addAttribute("users", users);
         return PageConstant.USERS;
-    }
-
-    @LogInvocation
-    private Page<UserDto> getUserDtoPage(String keyword, Model model, Pageable pageable) {
-        Page<UserDto> userPage;
-        if (keyword != null) {
-            userPage = userService.searchForUserByKeyword(keyword, pageable);
-            model.addAttribute("search", keyword);
-        } else {
-            userPage = userService.findAll(pageable);
-        }
-        return userPage;
     }
 
     @LogInvocation
