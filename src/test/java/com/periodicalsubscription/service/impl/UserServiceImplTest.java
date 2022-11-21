@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.LoginException;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserDeleteException;

@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.periodicalcategory.PeriodicalCategoryNotFoundException;
 import com.periodicalsubscription.exceptions.periodicalcategory.PeriodicalCategoryServiceException;
 import com.periodicalsubscription.mapper.PeriodicalCategoryMapper;

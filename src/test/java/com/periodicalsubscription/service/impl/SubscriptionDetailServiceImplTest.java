@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.subscriptiondetail.SubscriptionDetailNotFoundException;
 import com.periodicalsubscription.exceptions.subscriptiondetail.SubscriptionDetailServiceException;
 import com.periodicalsubscription.mapper.SubscriptionDetailMapper;

@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.ImageUploadException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalAlreadyExistsException;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalDeleteException;

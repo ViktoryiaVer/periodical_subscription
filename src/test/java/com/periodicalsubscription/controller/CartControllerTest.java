@@ -1,6 +1,6 @@
 package com.periodicalsubscription.controller;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.exceptions.periodical.PeriodicalUnavailableException;
 import com.periodicalsubscription.service.api.CartService;

@@ -1,12 +1,11 @@
 package com.periodicalsubscription.controller;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.exceptions.payment.PaymentNotFoundException;
 import com.periodicalsubscription.service.api.PaymentService;
 import com.periodicalsubscription.service.dto.PaymentDto;
-import com.periodicalsubscription.service.dto.filter.PaymentFilterDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.ui.Model;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import static org.mockito.Mockito.when;

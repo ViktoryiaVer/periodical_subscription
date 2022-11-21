@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.service.api.CartService;
 import com.periodicalsubscription.service.api.PeriodicalService;
 import org.junit.jupiter.api.BeforeEach;

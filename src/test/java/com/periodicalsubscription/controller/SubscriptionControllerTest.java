@@ -1,6 +1,6 @@
 package com.periodicalsubscription.controller;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;

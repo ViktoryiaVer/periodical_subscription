@@ -1,6 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
-import com.periodicalsubscription.TestObjectUtil;
+import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionCompletedStatusException;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionServiceException;
