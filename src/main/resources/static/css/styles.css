@@ -1,29 +1,17 @@
-body {
-    width:100%;
-    margin:auto;
-}
-nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
+body{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-nav li {
-    float: left;
+div.main-image {
+    width: 80%;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-bottom: 25px;
 }
 
-nav li a {
-    display: block;
-    color: white;
+div.container {
     text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-nav li a:hover {
-    background-color: #111;
+    padding: 10px 20px;
 }
 
 #message {
@@ -31,12 +19,92 @@ nav li a:hover {
     color: deepskyblue;
 }
 
+.card {
+    width: 320px;
+    height: 300px;
+    margin: 2em;
+    border-radius: 1em;
+    text-align: center;
+    padding: 1em;
+}
+
+.card img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.card:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#periodical-container {
+    margin: auto;
+}
+
+#periodical-list li {
+    display: block;
+    text-decoration:none;
+    list-style-type: none;
+    float: left;
+}
+
 #page-size-form {
     width: 10%;
-    padding: 5px;
+    padding-top: 5px;
+}
+#pagination-container {
+    padding: 7px;
 }
 
 #filter-form {
+    width: 20%;
+    padding: 5px 5px 10px;
+    margin: 3px;
+}
+
+#users-table, #subscriptions-table, #payments-table {
+    width: 60%;
+    padding: 7px;
+}
+
+#user-table, #subscription-table, #payment-table, #cart-table {
+    width: 40%;
+    padding: 7px;
+}
+
+#lform, #sform, #uuform {
+    width: 20%;
+    padding: 7px;
+}
+
+#pform, #upform {
     width: 30%;
+    padding: 7px;
+}
+.pagination {
+    display: inline-block;
+}
+
+.pagination a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #ddd;
+}
+
+.btn {
+    margin: 5px !important;
+}
+
+.pagination-container {
     padding: 5px;
 }
