@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
@@ -12,10 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
@@ -26,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = SubscriptionController.class)
+@WebMvcTest(controllers = SubscriptionController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @ExtendWith(MockitoExtension.class)
 class SubscriptionControllerTest {
     @Autowired
@@ -34,6 +38,8 @@ class SubscriptionControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private SubscriptionService subscriptionService;
+    @MockBean
+    private UserService userService;
     @MockBean
     private PagingUtil pagingUtil;
     @MockBean
@@ -54,7 +60,10 @@ class SubscriptionControllerTest {
     }
 
     @Test
+    @WithMockUser
     void whenRequestAllSubscriptionsByUser_thenReturnCorrectView() throws Exception {
+        UserDto userDto = TestObjectUtil.getUserDtoWithId();
+        when(userService.findByUsername("user")).thenReturn(userDto);
         this.mockMvc.perform(get("/subscriptions/user/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -72,7 +81,9 @@ class SubscriptionControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     void givenUserNotLoggedIn_whenRequestSubscriptionCreation_thenReturnLoginPage() throws Exception {
+        when(userService.findByUsername("anonymous")).thenReturn(null);
         this.mockMvc.perform(post("/subscriptions/create"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -81,13 +92,14 @@ class SubscriptionControllerTest {
     }
 
     @Test
+    @WithMockUser
     void givenUserLoggedIn_whenRequestSubscriptionCreation_thenReturnCorrectViewAndAttributesAndRedirect() throws Exception {
         UserDto userDto = TestObjectUtil.getUserDtoWithId();
         Map<Long, Integer> cart = TestObjectUtil.getCartWithOneItem();
 
+        when(userService.findByUsername("user")).thenReturn(userDto);
         when(subscriptionService.createSubscriptionFromCart(userDto, cart)).thenReturn(TestObjectUtil.getSubscriptionDtoWithId());
         this.mockMvc.perform(post("/subscriptions/create")
-                        .sessionAttr("user", userDto)
                         .sessionAttr("cart", cart))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())

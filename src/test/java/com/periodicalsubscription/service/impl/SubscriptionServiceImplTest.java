@@ -22,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, SpringExtension.class})
 class SubscriptionServiceImplTest {
     @Mock
     private SubscriptionRepository subscriptionRepository;
@@ -177,6 +179,7 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void whenUpdateSubscriptionStatus_thenReturnUpdatedSubscription() {
         subscription = TestObjectUtil.getSubscriptionWithId();
         subscriptionDto = TestObjectUtil.getSubscriptionDtoWithId();
@@ -192,6 +195,14 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
+    @WithMockUser(roles = "READER")
+    void givenUserReader_whenUpdateSubscriptionStatusNotCanceled_thenThrowException() {
+        assertThrows(SubscriptionServiceException.class, () -> subscriptionService.updateSubscriptionStatus(subscriptionDto.getStatusDto(), subscriptionDto.getId()));
+        verify(subscriptionRepository, never()).updateSubscriptionStatus(subscription.getStatus(), subscription.getId());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void givenEndDateBeforeToday_whenUpdateSubscriptionStatusToCompleted_thenReturnUpdatedSubscription() {
         subscription = TestObjectUtil.getPayedSubscription();
         subscriptionDto = TestObjectUtil.getPayedSubscriptionDto();
@@ -210,6 +221,7 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void givenEndDateAfterToday_whenUpdateSubscriptionStatusToCompleted_thenThrowException() {
         subscription = TestObjectUtil.getPayedSubscription();
         LocalDate subscriptionEndDate = subscription.getSubscriptionDetails().get(0).getSubscriptionEndDate();

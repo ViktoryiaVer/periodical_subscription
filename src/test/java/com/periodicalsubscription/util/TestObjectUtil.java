@@ -1,5 +1,6 @@
 package com.periodicalsubscription.util;
 
+import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class TestObjectUtil {
     public static User getUserWithoutId() {
         User user = new User();
+        user.setUsername(TestObjectConstant.USERNAME);
         user.setFirstName(TestObjectConstant.USER_FIRSTNAME);
         user.setLastName(TestObjectConstant.USER_LASTNAME);
         user.setEmail(TestObjectConstant.USER_EMAIL);
@@ -41,6 +43,7 @@ public class TestObjectUtil {
 
     public static UserDto getUserDtoWithoutId() {
         UserDto userDto = new UserDto();
+        userDto.setUsername(TestObjectConstant.USERNAME);
         userDto.setFirstName(TestObjectConstant.USER_FIRSTNAME);
         userDto.setLastName(TestObjectConstant.USER_LASTNAME);
         userDto.setEmail(TestObjectConstant.USER_EMAIL);
