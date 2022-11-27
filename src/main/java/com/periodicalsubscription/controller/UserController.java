@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -36,6 +38,7 @@ public class UserController {
     private final PagingUtil pagingUtil;
     private final MessageSource messageSource;
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @GetMapping(value = "/all")
     public String getAllUsers(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
@@ -55,15 +58,16 @@ public class UserController {
     @LogInvocation
     @GetMapping("/{id}")
     public String getUser(@PathVariable Long id, Model model) {
-        UserDto user = userService.findById(id);
+        UserDto user = userService.processFindingUserConsideringUserRole(id);
+
         model.addAttribute("user", user);
         return PageConstant.USER;
     }
 
     @LogInvocation
     @GetMapping("/create")
-    public String createUserForm(HttpSession session) {
-        if (session.getAttribute("user") != null) {
+    public String createUserForm() {
+        if (!SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().startsWith("anonymous")) {
             return PageConstant.ALREADY_LOGGED_IN;
         }
         return PageConstant.SIGNUP;
@@ -77,10 +81,7 @@ public class UserController {
             return PageConstant.SIGNUP;
         }
 
-        user.setRoleDto(UserDto.RoleDto.READER);
-        UserDto createdUser = userService.save(user);
-
-        session.setAttribute("user", createdUser);
+        UserDto createdUser = userService.processUserCreation(user);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.created", null,
                 LocaleContextHolder.getLocale()));
         return "redirect:/users/" + createdUser.getId();
@@ -109,6 +110,7 @@ public class UserController {
         return "redirect:/users/" + updatedUser.getId();
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id, HttpSession session) {
@@ -131,7 +133,7 @@ public class UserController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUserAlreadyExistsException(UserAlreadyExistsException e, Model model) {
-        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.user.email.exists", null,
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.user.exists", null,
                 LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
