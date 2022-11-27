@@ -23,6 +23,8 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,8 +137,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
+    @ServiceEx
     @Transactional
     public SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id) {
+        if (!status.equals(SubscriptionDto.StatusDto.CANCELED)  && !SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.update", null, LocaleContextHolder.getLocale()));
+        }
+
         if (status.equals(SubscriptionDto.StatusDto.COMPLETED)) {
             checkIfSubscriptionCanBeCompleted(id);
         }

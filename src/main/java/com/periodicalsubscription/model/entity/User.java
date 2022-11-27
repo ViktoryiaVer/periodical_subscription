@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +31,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column
+    private String username;
     @Column(name = "first_name")
     private String firstName;
     @Column(name = "last_name")
@@ -47,10 +50,15 @@ public class User {
     @Column(name = "role")
     private Role role;
 
-    public enum Role {
-        ADMIN,
-        READER,
-        GUEST
+    public enum Role implements GrantedAuthority {
+        ROLE_ADMIN,
+        ROLE_READER,
+        ROLE_GUEST;
+
+        @Override
+        public String getAuthority() {
+            return name();
+        }
     }
 
     @Override

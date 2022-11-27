@@ -9,13 +9,19 @@ public interface UserService {
 
     UserDto findById(Long id);
 
+    UserDto findByUsername(String username);
+
     UserDto save(UserDto dto);
 
     UserDto update(UserDto dto);
 
     void deleteById(Long id);
 
-    UserDto login(String email, String password);
-
     Page<UserDto> searchForUserByKeyword(String keyword, Pageable pageable);
+
+    Long getCorrectUserId(Long userId);
+
+    UserDto processFindingUserConsideringUserRole(Long id);
+
+    UserDto processUserCreation(UserDto userDto);
 }
