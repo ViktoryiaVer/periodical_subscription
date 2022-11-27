@@ -1,0 +1,17 @@
+UPDATE users SET username = 'Ivan_Ivanov_111', password = '$2a$12$vdV1GTsrL.JiBK.1xeo49ecULAFyWNs.WNmk/DzdNWJIByZKWdmVS', role = 'ROLE_ADMIN' WHERE id = 1;
+UPDATE users SET username = 'John_Snowman', password = '$2a$12$vkVjA1e1xYOjRx4HcgQFBO/hK0QN3RFF0QdWXfqqxEaLCrT650rYK', role = 'ROLE_ADMIN' WHERE id = 2;
+UPDATE users SET username = 'M_Patterson', password = '$2a$12$XQ7Pmiccvj48tMIM/Bg6Wec7wXZHUSe4bEbxnUIxE/WWn159BdCbO', role = 'ROLE_ADMIN' WHERE id = 3;
+UPDATE users SET username = 'Marina_Petrova_333', password = '$2a$12$IzUVbLwguRgsxJJGd8j5JOwDXexInnMW2VU5oWd4QwvSx.V9Y/FuS', role = 'ROLE_READER' WHERE id = 4;
+UPDATE users SET username = 'Sergei_Sidorov_2022', password = '$2a$12$uI2IB3PpryEibc1CpF1Sce/rAaiORhTbQ0uTdRrXtX.m0rUxPJ1ai', role = 'ROLE_READER' WHERE id = 5;
+UPDATE users SET username = 'MariaBystrova23', password = '$2a$12$pHu5tN3KxDVnZlosj0rsIekx4Dkhem3VsfZnBGAO.uTBEjwTjofxK', role = 'ROLE_READER' WHERE id = 6;
+UPDATE users SET username = 'Pavel_Shery_New', password = '$2a$12$BeL5.FVJADLbNu083tTnS.ZcgMFwTdtf2mW9h57WjFzPRLSdBAprK', role = 'ROLE_READER' WHERE id = 7;
+UPDATE users SET username = 'Irene_Johnson', password = '$2a$12$ZW9rV/akrH3DLeFv0KgAcO6Sfac0A76VO0hCB94IiZ9b8GYLVPhXi', role = 'ROLE_READER' WHERE id = 8;
+UPDATE users SET username = 'John_Doe_Login_1', password = '$2a$12$vP.RzrZ2MwYyhZpYoOvK/edKWzynp8jS0VR/YRNx2obx1bQ5WK/Kq', role = 'ROLE_READER' WHERE id = 9;
+UPDATE users SET username = 'ErvinNewman', password = '$2a$12$0IsEoqYzfJZC.xhjT0qbV.wYDxvoamJlYsxi4/v3ztlrYIN85FQXa', role = 'ROLE_READER' WHERE id = 10;
+UPDATE users SET username = 'Julia_Schmidt_123', password = '$2a$12$.EUDe/Vx7xie00fPBCNFTO1H0w6G/W/IM0bQzgTcuXwCVWKgnnlra', role = 'ROLE_READER' WHERE id = 11;
+UPDATE users SET username = 'Hans_Dieter', password = '$2a$12$xd8JM2fFdHJwVEWP9iauzOJBcKtfsIF/xYsg7ZoDj48QrxC9AfAYq', role = 'ROLE_READER' WHERE id = 12;
+UPDATE users SET username = 'Viki_HUBER', password = '$2a$12$UfpYR2PXBW9qLZpJtNnnNuK7azDqMTWhLJ7THQm0L6hjitjcZrPtO', role = 'ROLE_READER' WHERE id = 13;
+UPDATE users SET username = 'Bars_Maria_1987', password = '$2a$12$W.427Jc6vZxS0j9jHWNc5eQJfMalxKKfNaJSo88AONNSX6yfe3CGK', role = 'ROLE_READER' WHERE id = 14;
+UPDATE users SET username = 'Julia_Anders', password = '$2a$12$Lr1kAcHCuy4EqWRS7xgC0.i5zR6nG1lG2ur5EaMEM6v7Y1Rj3GBeG', role = 'ROLE_READER' WHERE id = 15;
+UPDATE users SET username = 'admin', password = '$2a$12$4x2jWbgcljXwRnnNaIeaWOEi2zkBEF9Jn/g5l9Sq.4K.rSc.eV57u', role = 'ROLE_ADMIN' WHERE id = 16;
+UPDATE users SET username = 'reader', password = '$2a$12$Z2vUeaE/vE69OXHHxRF8P.B/UPXMI6jnOVenF7TpgsP1eEgxGt3Wq', role = 'ROLE_READER' WHERE id = 17;
