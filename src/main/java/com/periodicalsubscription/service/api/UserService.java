@@ -1,27 +1,28 @@
 package com.periodicalsubscription.service.api;
 
 import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
-    Page<UserDto> findAll(Pageable pageable);
+    Page<UserWithoutPasswordDto> findAll(Pageable pageable);
 
-    UserDto findById(Long id);
+    UserWithoutPasswordDto findById(Long id);
 
     UserDto findByUsername(String username);
 
-    UserDto save(UserDto dto);
+    UserWithoutPasswordDto save(UserDto dto);
 
-    UserDto update(UserDto dto);
+    UserWithoutPasswordDto update(UserWithoutPasswordDto dto);
 
     void deleteById(Long id);
 
-    Page<UserDto> searchForUserByKeyword(String keyword, Pageable pageable);
+    Page<UserWithoutPasswordDto> searchForUserByKeyword(String keyword, Pageable pageable);
 
     Long getCorrectUserId(Long userId);
 
-    UserDto processFindingUserConsideringUserRole(Long id);
+    UserWithoutPasswordDto processFindingUserConsideringUserRole(Long id);
 
-    UserDto processUserCreation(UserDto userDto);
+    UserWithoutPasswordDto processUserCreation(UserDto userDto);
 }
