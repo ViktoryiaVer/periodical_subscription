@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
@@ -39,11 +40,11 @@ class UserControllerTest {
     private PagingUtil pagingUtil;
     @MockBean
     private MessageSource messageSource;
-    private UserDto userDtoWithId;
+    private UserWithoutPasswordDto userWithoutPasswordDto;
 
     @BeforeEach
     public void setup() {
-        userDtoWithId = TestObjectUtil.getUserDtoWithId();
+        userWithoutPasswordDto = TestObjectUtil.getUserWithoutPasswordDtoWithId();
     }
 
     @Test
@@ -56,29 +57,28 @@ class UserControllerTest {
 
     @Test
     void givenUserWithRoleReader_whenRequestOneUser_thenReturnCorrectViewWithModelAttribute() throws Exception {
-        when(userService.processFindingUserConsideringUserRole(userDtoWithId.getId())).thenReturn(userDtoWithId);
-        this.mockMvc.perform(get("/users/" + userDtoWithId.getId()))
+        when(userService.processFindingUserConsideringUserRole(userWithoutPasswordDto.getId())).thenReturn(userWithoutPasswordDto);
+        this.mockMvc.perform(get("/users/" + userWithoutPasswordDto.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("user", userDtoWithId))
+                .andExpect(model().attribute("user", userWithoutPasswordDto))
                 .andExpect(view().name(PageConstant.USER));
     }
 
     @Test
     void givenUserWithRoleAdmin_whenRequestOneUser_thenReturnCorrectViewWithModelAttribute() throws Exception {
-        userDtoWithId.setRoleDto(UserDto.RoleDto.ROLE_ADMIN);
-        when(userService.processFindingUserConsideringUserRole(userDtoWithId.getId())).thenReturn(userDtoWithId);
-        this.mockMvc.perform(get("/users/" + userDtoWithId.getId()))
+        userWithoutPasswordDto.setRoleDto(UserWithoutPasswordDto.RoleDto.ROLE_ADMIN);
+        when(userService.processFindingUserConsideringUserRole(userWithoutPasswordDto.getId())).thenReturn(userWithoutPasswordDto);
+        this.mockMvc.perform(get("/users/" + userWithoutPasswordDto.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("user", userDtoWithId))
+                .andExpect(model().attribute("user", userWithoutPasswordDto))
                 .andExpect(view().name(PageConstant.USER));
     }
-
     @Test
     void whenRequestNonExistingUser_thenReturnCorrectViewAndExceptionMessage() throws Exception {
-        when(userService.processFindingUserConsideringUserRole(userDtoWithId.getId())).thenThrow(UserNotFoundException.class);
-        this.mockMvc.perform(get("/users/" + userDtoWithId.getId()))
+        when(userService.processFindingUserConsideringUserRole(userWithoutPasswordDto.getId())).thenThrow(UserNotFoundException.class);
+        this.mockMvc.perform(get("/users/" + userWithoutPasswordDto.getId()))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(model().attributeExists("message"))
@@ -97,8 +97,7 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void givenAlreadyLoggedInUser_whenRequestUserCreationForm_thenReturnCorrectView() throws Exception {
-        this.mockMvc.perform(get("/users/create")
-                        .sessionAttr("user", userDtoWithId))
+        this.mockMvc.perform(get("/users/create"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(view().name(PageConstant.ALREADY_LOGGED_IN));
@@ -108,7 +107,7 @@ class UserControllerTest {
     void whenSendUserCreationFormCorrectData_thenReceiveCorrectDataAndDoRedirect() throws Exception {
         UserDto userDtoWithoutId = TestObjectUtil.getUserDtoWithoutId();
         userDtoWithoutId.setRoleDto(null);
-        when(userService.processUserCreation(userDtoWithoutId)).thenReturn(userDtoWithId);
+        when(userService.processUserCreation(userDtoWithoutId)).thenReturn(userWithoutPasswordDto);
         this.mockMvc.perform(post("/users/create")
                         .param("username", userDtoWithoutId.getUsername())
                         .param("firstName", userDtoWithoutId.getFirstName())
@@ -118,7 +117,7 @@ class UserControllerTest {
                         .param("phoneNumber", userDtoWithoutId.getPhoneNumber()))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/users/" + userDtoWithId.getId()))
+                .andExpect(header().string("Location", "/users/" + userWithoutPasswordDto.getId()))
                 .andExpect(request().sessionAttribute("message", messageSource.getMessage("msg.success.user.created", null, LocaleContextHolder.getLocale())));
     }
 
@@ -157,39 +156,38 @@ class UserControllerTest {
 
     @Test
     void whenRequestUserUpdateForm_thenReturnCorrectView() throws Exception {
-        when(userService.findById(userDtoWithId.getId())).thenReturn(userDtoWithId);
-        this.mockMvc.perform(get("/users/update/" + userDtoWithId.getId()))
+        when(userService.findById(userWithoutPasswordDto.getId())).thenReturn(userWithoutPasswordDto);
+        this.mockMvc.perform(get("/users/update/" + userWithoutPasswordDto.getId()))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("user", userDtoWithId))
+                .andExpect(model().attribute("user", userWithoutPasswordDto))
                 .andExpect(view().name(PageConstant.UPDATE_USER));
     }
 
     @Test
     void whenSendUserUpdateFormCorrectData_thenReceiveCorrectDataAndDoRedirect() throws Exception {
-        when(userService.update(userDtoWithId)).thenReturn(userDtoWithId);
+        when(userService.update(userWithoutPasswordDto)).thenReturn(userWithoutPasswordDto);
         this.mockMvc.perform(post("/users/update")
-                        .param("id", String.valueOf(userDtoWithId.getId()))
-                        .param("username", userDtoWithId.getUsername())
-                        .param("firstName", userDtoWithId.getFirstName())
-                        .param("lastName", userDtoWithId.getLastName())
-                        .param("email", userDtoWithId.getEmail())
-                        .param("password", userDtoWithId.getPassword())
-                        .param("phoneNumber", userDtoWithId.getPhoneNumber())
-                        .param("roleDto", userDtoWithId.getRoleDto().toString()))
+                        .param("id", String.valueOf(userWithoutPasswordDto.getId()))
+                        .param("username", userWithoutPasswordDto.getUsername())
+                        .param("firstName", userWithoutPasswordDto.getFirstName())
+                        .param("lastName", userWithoutPasswordDto.getLastName())
+                        .param("email", userWithoutPasswordDto.getEmail())
+                        .param("phoneNumber", userWithoutPasswordDto.getPhoneNumber())
+                        .param("roleDto", userWithoutPasswordDto.getRoleDto().toString()))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/users/" + userDtoWithId.getId()))
+                .andExpect(header().string("Location", "/users/" + userWithoutPasswordDto.getId()))
                 .andExpect(request().sessionAttribute("message", messageSource.getMessage("msg.success.user.updated", null, LocaleContextHolder.getLocale())));
     }
 
     @Test
     void whenSendUserUpdateFormIncorrectData_thenGetErrorsAndReturnSamePage() throws Exception {
         this.mockMvc.perform(post("/users/update")
-                        .param("id", String.valueOf(userDtoWithId.getId()))
-                        .param("firstName", userDtoWithId.getFirstName())
-                        .param("lastName", userDtoWithId.getLastName())
-                        .param("email", userDtoWithId.getEmail())
-                        .param("phoneNumber", userDtoWithId.getPhoneNumber()))
+                        .param("id", String.valueOf(userWithoutPasswordDto.getId()))
+                        .param("firstName", userWithoutPasswordDto.getFirstName())
+                        .param("lastName", userWithoutPasswordDto.getLastName())
+                        .param("email", userWithoutPasswordDto.getEmail())
+                        .param("phoneNumber", userWithoutPasswordDto.getPhoneNumber()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("errors"))
@@ -199,8 +197,8 @@ class UserControllerTest {
 
     @Test
     void whenRequestUserDeleteSuccessfully_thenReturnCorrectMessageAndView() throws Exception {
-        doNothing().when(userService).deleteById(userDtoWithId.getId());
-        this.mockMvc.perform(post("/users/delete/" + userDtoWithId.getId()))
+        doNothing().when(userService).deleteById(userWithoutPasswordDto.getId());
+        this.mockMvc.perform(post("/users/delete/" + userWithoutPasswordDto.getId()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/users/all"))
                 .andExpect(request().sessionAttribute("message", messageSource.getMessage("msg.success.user.deleted", null, LocaleContextHolder.getLocale())));
@@ -208,16 +206,15 @@ class UserControllerTest {
 
     @Test
     void whenSendUserUpdateFormCorrectDataAndRuntimeExceptionOccurs_thenReturnErrorPage() throws Exception {
-        when(userService.update(userDtoWithId)).thenThrow(RuntimeException.class);
+        when(userService.update(userWithoutPasswordDto)).thenThrow(RuntimeException.class);
         this.mockMvc.perform(post("/users/update")
-                        .param("id", String.valueOf(userDtoWithId.getId()))
-                        .param("username", userDtoWithId.getUsername())
-                        .param("firstName", userDtoWithId.getFirstName())
-                        .param("lastName", userDtoWithId.getLastName())
-                        .param("email", userDtoWithId.getEmail())
-                        .param("password", userDtoWithId.getPassword())
-                        .param("phoneNumber", userDtoWithId.getPhoneNumber())
-                        .param("roleDto", userDtoWithId.getRoleDto().toString()))
+                        .param("id", String.valueOf(userWithoutPasswordDto.getId()))
+                        .param("username", userWithoutPasswordDto.getUsername())
+                        .param("firstName", userWithoutPasswordDto.getFirstName())
+                        .param("lastName", userWithoutPasswordDto.getLastName())
+                        .param("email", userWithoutPasswordDto.getEmail())
+                        .param("phoneNumber", userWithoutPasswordDto.getPhoneNumber())
+                        .param("roleDto", userWithoutPasswordDto.getRoleDto().toString()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(view().name(PageConstant.ERROR));

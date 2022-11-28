@@ -1,6 +1,5 @@
 package com.periodicalsubscription.util;
 
-import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.model.entity.Payment;
 import com.periodicalsubscription.model.entity.Periodical;
 import com.periodicalsubscription.model.entity.PeriodicalCategory;
@@ -13,6 +12,7 @@ import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
 import com.periodicalsubscription.service.dto.SubscriptionDto;
 import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import com.periodicalsubscription.util.constant.TestObjectConstant;
 
 import java.math.BigDecimal;
@@ -56,6 +56,18 @@ public class TestObjectUtil {
     public static UserDto getUserDtoWithId() {
         UserDto userDto = getUserDtoWithoutId();
         userDto.setId(TestObjectConstant.USER_ID);
+        return userDto;
+    }
+
+    public static UserWithoutPasswordDto getUserWithoutPasswordDtoWithId() {
+        UserWithoutPasswordDto userDto = new UserWithoutPasswordDto();
+        userDto.setId(TestObjectConstant.USER_ID);
+        userDto.setUsername(TestObjectConstant.USERNAME);
+        userDto.setFirstName(TestObjectConstant.USER_FIRSTNAME);
+        userDto.setLastName(TestObjectConstant.USER_LASTNAME);
+        userDto.setEmail(TestObjectConstant.USER_EMAIL);
+        userDto.setPhoneNumber(TestObjectConstant.USER_PHONE_NUMBER);
+        userDto.setRoleDto(UserWithoutPasswordDto.RoleDto.valueOf(TestObjectConstant.USER_ROLE));
         return userDto;
     }
 
