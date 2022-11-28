@@ -1,0 +1,1 @@
+ALTER TABLE users ADD column username VARCHAR(255) UNIQUE;

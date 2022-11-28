@@ -1,5 +1,5 @@
 const showDurationInYearsToSelect = () => {
-    document.getElementById("selectDuration").innerText = "Select subscription duration";
+    document.getElementById("selectDuration").innerText = "Select subscription duration:";
     const radioButtonsWrapElem = document.getElementsByClassName("form-check");
 
     for (let radioButtonsWrapElemKey of radioButtonsWrapElem) {

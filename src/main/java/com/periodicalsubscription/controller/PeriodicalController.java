@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -42,7 +43,7 @@ public class PeriodicalController {
     @GetMapping(value = "/all")
     public String getAllPeriodicals(PeriodicalFilterDto filterDto, @RequestParam(required = false) String keyword,
                                     @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
-                                    @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
+                                    @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PERIODICAL_PAGE_SIZE_STRING) Integer pageSize, Model model) {
 
         List<PeriodicalDto> periodicals = pagingUtil.getPeriodicalListFromPageAndRequestParams(page, pageSize, keyword, model, filterDto);
 
@@ -64,12 +65,14 @@ public class PeriodicalController {
         return PageConstant.PERIODICAL;
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @GetMapping("/create")
     public String createPeriodicalForm() {
         return PageConstant.CREATE_PERIODICAL;
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @PostMapping("/create")
     public String createPeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
@@ -84,6 +87,7 @@ public class PeriodicalController {
         return "redirect:/periodicals/" + createdPeriodical.getId();
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @GetMapping("/update/{id}")
     public String updatePeriodicalForm(@PathVariable Long id, Model model) {
@@ -92,6 +96,7 @@ public class PeriodicalController {
         return PageConstant.UPDATE_PERIODICAL;
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @PostMapping("/update")
     public String updatePeriodical(@ModelAttribute @Valid PeriodicalDto periodical, Errors errors, MultipartFile imageFile, Model model, HttpSession session) {
@@ -107,6 +112,7 @@ public class PeriodicalController {
         return "redirect:/periodicals/" + updatedPeriodical.getId();
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @PostMapping("/update/{id}/status")
     public String updatePeriodicalStatus(@PathVariable Long id, @RequestParam String statusDto, HttpSession session) {
@@ -117,6 +123,7 @@ public class PeriodicalController {
         return "redirect:/periodicals/" + updatedPeriodical.getId();
     }
 
+    @Secured("ROLE_ADMIN")
     @LogInvocation
     @PostMapping("/delete/{id}")
     public String deletePeriodical(@PathVariable Long id, HttpSession session) {

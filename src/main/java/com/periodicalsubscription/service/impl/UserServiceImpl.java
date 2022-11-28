@@ -1,9 +1,7 @@
 package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService;
-import com.periodicalsubscription.aspect.logging.annotation.LoginEx;
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
-import com.periodicalsubscription.exceptions.LoginException;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserDeleteException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
@@ -21,10 +19,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.Valid;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
     private final SubscriptionService subscriptionService;
     private final MessageSource messageSource;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @LogInvocationService
@@ -54,12 +53,28 @@ public class UserServiceImpl implements UserService {
     @Override
     @LogInvocationService
     @ServiceEx
+    public UserDto findByUsername(String username) {
+        if ("anonymousUser".equals(username)) {
+            return null;
+        }
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            throw new UserNotFoundException(messageSource.getMessage("msg.error.login", null,
+                    LocaleContextHolder.getLocale()));
+        });
+        return mapper.toDto(user);
+    }
+
+    @Override
+    @LogInvocationService
+    @ServiceEx
     @Transactional
-    public UserDto save(@Valid UserDto dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.email.exists", null,
+    public UserDto save(UserDto dto) {
+        if (userRepository.existsByUsername(dto.getUsername()) || userRepository.existsByEmail(dto.getEmail())) {
+            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists", null,
                     LocaleContextHolder.getLocale()));
         }
+        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
     }
 
@@ -71,7 +86,7 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null && !existingUser.getId().equals(dto.getId())) {
-            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.email.exists", null,
+            throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists", null,
                     LocaleContextHolder.getLocale()));
         }
         return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
@@ -96,15 +111,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LogInvocationService
-    @LoginEx
-    public UserDto login(String email, String password) {
-        User user = userRepository.findByEmail(email).orElse(null);
-
-        if (user == null || !password.equals(user.getPassword())) {
-            throw new LoginException(messageSource.getMessage("msg.error.login", null,
-                    LocaleContextHolder.getLocale()));
-        }
-        return mapper.toDto(user);
+    @Transactional
+    public UserDto processUserCreation(UserDto userDto) {
+        userDto.setRoleDto(UserDto.RoleDto.ROLE_READER);
+        return save(userDto);
     }
 
     @Override
@@ -116,5 +126,22 @@ public class UserServiceImpl implements UserService {
                 .or(UserSpecifications.hasEmailLike(keyword))
                 .or(UserSpecifications.hasPhoneNumberLike(keyword));
         return userRepository.findAll(specification, pageable).map(mapper::toDto);
+    }
+
+    @Override
+    @LogInvocationService
+    public Long getCorrectUserId(Long userId) {
+        UserDto user = findByUsername(SecurityContextHolder.getContext().getAuthentication()
+                .getName());
+        if ("ROLE_READER".equals(user.getRoleDto().toString())) {
+            userId = user.getId();
+        }
+        return userId;
+    }
+
+    @Override
+    @LogInvocationService
+    public UserDto processFindingUserConsideringUserRole(Long id) {
+        return findById(getCorrectUserId(id));
     }
 }

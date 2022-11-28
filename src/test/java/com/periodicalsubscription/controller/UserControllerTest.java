@@ -12,20 +12,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = UserController.class)
+@WebMvcTest(controllers = UserController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
     @Autowired
@@ -53,8 +55,19 @@ class UserControllerTest {
     }
 
     @Test
-    void whenRequestOneUser_thenReturnCorrectViewWithModelAttribute() throws Exception {
-        when(userService.findById(userDtoWithId.getId())).thenReturn(userDtoWithId);
+    void givenUserWithRoleReader_whenRequestOneUser_thenReturnCorrectViewWithModelAttribute() throws Exception {
+        when(userService.processFindingUserConsideringUserRole(userDtoWithId.getId())).thenReturn(userDtoWithId);
+        this.mockMvc.perform(get("/users/" + userDtoWithId.getId()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", userDtoWithId))
+                .andExpect(view().name(PageConstant.USER));
+    }
+
+    @Test
+    void givenUserWithRoleAdmin_whenRequestOneUser_thenReturnCorrectViewWithModelAttribute() throws Exception {
+        userDtoWithId.setRoleDto(UserDto.RoleDto.ROLE_ADMIN);
+        when(userService.processFindingUserConsideringUserRole(userDtoWithId.getId())).thenReturn(userDtoWithId);
         this.mockMvc.perform(get("/users/" + userDtoWithId.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -64,7 +77,7 @@ class UserControllerTest {
 
     @Test
     void whenRequestNonExistingUser_thenReturnCorrectViewAndExceptionMessage() throws Exception {
-        when(userService.findById(userDtoWithId.getId())).thenThrow(UserNotFoundException.class);
+        when(userService.processFindingUserConsideringUserRole(userDtoWithId.getId())).thenThrow(UserNotFoundException.class);
         this.mockMvc.perform(get("/users/" + userDtoWithId.getId()))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -73,6 +86,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     void whenRequestUserCreationForm_thenReturnCorrectView() throws Exception {
         this.mockMvc.perform(get("/users/create"))
                 .andDo(print())
@@ -81,6 +95,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     void givenAlreadyLoggedInUser_whenRequestUserCreationForm_thenReturnCorrectView() throws Exception {
         this.mockMvc.perform(get("/users/create")
                         .sessionAttr("user", userDtoWithId))
@@ -92,8 +107,10 @@ class UserControllerTest {
     @Test
     void whenSendUserCreationFormCorrectData_thenReceiveCorrectDataAndDoRedirect() throws Exception {
         UserDto userDtoWithoutId = TestObjectUtil.getUserDtoWithoutId();
-        when(userService.save(userDtoWithoutId)).thenReturn(userDtoWithId);
+        userDtoWithoutId.setRoleDto(null);
+        when(userService.processUserCreation(userDtoWithoutId)).thenReturn(userDtoWithId);
         this.mockMvc.perform(post("/users/create")
+                        .param("username", userDtoWithoutId.getUsername())
                         .param("firstName", userDtoWithoutId.getFirstName())
                         .param("lastName", userDtoWithoutId.getLastName())
                         .param("email", userDtoWithoutId.getEmail())
@@ -102,7 +119,6 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/users/" + userDtoWithId.getId()))
-                .andExpect(request().sessionAttribute("user", userDtoWithId))
                 .andExpect(request().sessionAttribute("message", messageSource.getMessage("msg.success.user.created", null, LocaleContextHolder.getLocale())));
     }
 
@@ -110,6 +126,7 @@ class UserControllerTest {
     void whenSendUserCreationFormIncorrectData_thenGetErrorsAndReturnSamePage() throws Exception {
         UserDto userDtoWithoutId = TestObjectUtil.getUserDtoWithoutId();
         this.mockMvc.perform(post("/users/create")
+                        .param("username", userDtoWithoutId.getUsername())
                         .param("firstName", userDtoWithoutId.getFirstName())
                         .param("lastName", userDtoWithoutId.getLastName())
                         .param("email", userDtoWithoutId.getEmail())
@@ -123,8 +140,10 @@ class UserControllerTest {
     @Test
     void whenSendUserCreationFormWithExistingEmail_thenReturnErrorViewAndExceptionMessage() throws Exception {
         UserDto userDtoWithoutId = TestObjectUtil.getUserDtoWithoutId();
-        when(userService.save(userDtoWithoutId)).thenThrow(UserAlreadyExistsException.class);
+        userDtoWithoutId.setRoleDto(null);
+        when(userService.processUserCreation(userDtoWithoutId)).thenThrow(UserAlreadyExistsException.class);
         this.mockMvc.perform(post("/users/create")
+                        .param("username", userDtoWithoutId.getUsername())
                         .param("firstName", userDtoWithoutId.getFirstName())
                         .param("lastName", userDtoWithoutId.getLastName())
                         .param("email", userDtoWithoutId.getEmail())
@@ -150,6 +169,7 @@ class UserControllerTest {
         when(userService.update(userDtoWithId)).thenReturn(userDtoWithId);
         this.mockMvc.perform(post("/users/update")
                         .param("id", String.valueOf(userDtoWithId.getId()))
+                        .param("username", userDtoWithId.getUsername())
                         .param("firstName", userDtoWithId.getFirstName())
                         .param("lastName", userDtoWithId.getLastName())
                         .param("email", userDtoWithId.getEmail())
@@ -191,6 +211,7 @@ class UserControllerTest {
         when(userService.update(userDtoWithId)).thenThrow(RuntimeException.class);
         this.mockMvc.perform(post("/users/update")
                         .param("id", String.valueOf(userDtoWithId.getId()))
+                        .param("username", userDtoWithId.getUsername())
                         .param("firstName", userDtoWithId.getFirstName())
                         .param("lastName", userDtoWithId.getLastName())
                         .param("email", userDtoWithId.getEmail())

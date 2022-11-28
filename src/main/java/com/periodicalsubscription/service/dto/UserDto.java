@@ -3,6 +3,7 @@ package com.periodicalsubscription.service.dto;
 import com.periodicalsubscription.constant.RegExpConstant;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +14,9 @@ import javax.validation.constraints.Size;
 @Data
 public class UserDto {
     private Long id;
+    @NotBlank(message = "msg.validation.user.username.empty")
+    @Pattern(regexp = RegExpConstant.USERNAME, message = "{msg.validation.user.username.not.valid}")
+    private String username;
     @NotBlank(message = "{msg.validation.user.first.name.empty}")
     @Pattern(regexp = RegExpConstant.NAME, message = "{msg.validation.user.first.name.not.valid}")
     private String firstName;
@@ -24,7 +28,7 @@ public class UserDto {
     private String email;
     @NotBlank(message = "{msg.validation.user.password.empty}")
     @Pattern(regexp = RegExpConstant.PASSWORD, message = "{msg.validation.user.password.not.valid}")
-    @Size(min = 8, max = 20, message = "{msg.validation.user.password.length}")
+    @Size(min = 6, message = "{msg.validation.user.password.length}")
     @ToString.Exclude
     private String password;
     @NotBlank(message = "{msg.validation.user.phone.empty}")
@@ -34,9 +38,14 @@ public class UserDto {
     private String avatarPath;
     private RoleDto roleDto;
 
-    public enum RoleDto {
-        ADMIN,
-        READER,
-        GUEST
+    public enum RoleDto implements GrantedAuthority {
+        ROLE_ADMIN,
+        ROLE_READER,
+        ROLE_GUEST;
+
+        @Override
+        public String getAuthority() {
+            return name();
+        }
     }
 }

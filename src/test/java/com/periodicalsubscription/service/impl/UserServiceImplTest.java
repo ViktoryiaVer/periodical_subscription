@@ -1,7 +1,6 @@
 package com.periodicalsubscription.service.impl;
 
 import com.periodicalsubscription.util.TestObjectUtil;
-import com.periodicalsubscription.exceptions.LoginException;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserDeleteException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
@@ -12,6 +11,7 @@ import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.util.constant.TestObjectConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -29,7 +32,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, SpringExtension.class})
 class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
@@ -46,7 +49,7 @@ class UserServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        userService = new UserServiceImpl(userRepository, mapper, subscriptionService, messageSource);
+        userService = new UserServiceImpl(userRepository, mapper, subscriptionService, messageSource, new BCryptPasswordEncoder());
         user = TestObjectUtil.getUserWithoutId();
         userDto = TestObjectUtil.getUserDtoWithoutId();
     }
@@ -86,6 +89,36 @@ class UserServiceImplTest {
 
         assertThrows(UserNotFoundException.class, () -> userService.findById(userId));
         verify(mapper, never()).toDto(any(User.class));
+    }
+
+    @Test
+    void whenFindExitingUserByUserName_thenReturnUser() {
+        String username = user.getUsername();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        mockMapperToDto();
+
+        UserDto foundUser = userService.findByUsername(username);
+
+        assertEquals(userDto, foundUser);
+        verify(userRepository, times(1)).findByUsername(username);
+    }
+
+
+    @Test
+    void whenFindNonExitingUserByUserName_thenThrowException() {
+        String username = user.getUsername();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.findByUsername(username));
+        verify(mapper, never()).toDto(any(User.class));
+    }
+
+    @Test
+    void whenFindUserByUserNameAnonymous_thenReturnNull() {
+        String username = "anonymousUser";
+
+        assertNull(userService.findByUsername(username));
+        verify(userRepository, never()).findByUsername(username);
     }
 
     @Test
@@ -174,21 +207,45 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenLoginWithCorrectData_thenReturnUser() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    void whenProcessUserCreation_thenReturnSavedUser() {
+        userDto.setRoleDto(null);
+
+        mockMapperToEntity();
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
         mockMapperToDto();
 
-        UserDto foundUser = userService.login(userDto.getEmail(), userDto.getPassword());
+        UserDto savedUser = userService.processUserCreation(userDto);
 
-        assertEquals(userDto, foundUser);
-        verify(userRepository, times(1)).findByEmail(anyString());
+        assertEquals(userDto, savedUser);
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
-    void whenLoginWithInCorrectData_thenThrowException() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+    @WithMockUser(username = TestObjectConstant.USERNAME)
+    void whenGetCorrectUserId_thenReturnCorrectUserId() {
+        user = TestObjectUtil.getUserWithId();
+        userDto = TestObjectUtil.getUserDtoWithId();
 
-        assertThrows(LoginException.class, () -> userService.login(userDto.getEmail(), userDto.getPassword()));
+        when(userRepository.findByUsername(TestObjectConstant.USERNAME)).thenReturn(Optional.of(user));
+        mockMapperToDto();
+
+        assertEquals(userDto.getId(), userService.getCorrectUserId(userDto.getId()));
+        verify(userRepository, times(1)).findByUsername(TestObjectConstant.USERNAME);
+    }
+
+    @Test
+    @WithMockUser(username = TestObjectConstant.USERNAME)
+    void whenProcessFindingCorrectUserConsideringUserRole_thenReturnCorrectUser() {
+        user = TestObjectUtil.getUserWithId();
+        userDto = TestObjectUtil.getUserDtoWithId();
+
+        when(userRepository.findByUsername(TestObjectConstant.USERNAME)).thenReturn(Optional.of(user));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        mockMapperToDto();
+
+        assertEquals(userDto, userService.processFindingUserConsideringUserRole(userDto.getId()));
+        verify(userRepository, times(1)).findByUsername(TestObjectConstant.USERNAME);
     }
 
     private void mockMapperToEntity() {

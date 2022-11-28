@@ -4,12 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class TestObjectConstant {
+    public static final String USERNAME = "TestTest123";
     public static final String USER_FIRSTNAME = "Test";
     public static final String USER_LASTNAME = "Test";
     public static final String USER_EMAIL = "Test@mail.ru";
     public static final String USER_PASSWORD = "TestTest1234!";
     public static final String USER_PHONE_NUMBER = "+375333333333";
-    public static final String USER_ROLE = "READER";
+    public static final String USER_ROLE = "ROLE_READER";
     public static final Long USER_ID = 1L;
 
     public static final String PERIODICAL_TITLE = "Test periodical";
