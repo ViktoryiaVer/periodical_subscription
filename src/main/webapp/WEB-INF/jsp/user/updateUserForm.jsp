@@ -54,18 +54,18 @@
                         <label for="phoneNumber"><spring:message code="msg.general.phone"/></label>
                         <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${requestScope.user.phoneNumber}" min="10" required>
                     </div>
-                    <sec:authorize access="hasRole('ROLE_ADMIN')">
+                    <sec:authorize access="hasRole('ROLE_READER')">
                         <input name="roleDto" type="hidden" value="${requestScope.user.roleDto}"/>
                     </sec:authorize>
                     <sec:authorize access="hasRole('ROLE_ADMIN')">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="roleDto" id="role-radio-admin" value="USER_ADMIN" ${requestScope.user.roleDto=='ROLE_ADMIN' ? 'checked' : ''}/>
+                            <input class="form-check-input" type="radio" name="roleDto" id="role-radio-admin" value="ROLE_ADMIN" ${requestScope.user.roleDto=='ROLE_ADMIN' ? 'checked' : ''}/>
                             <label class="form-check-label" for="role-radio-admin">
                                 <spring:message code="msg.user.admin"/>
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="roleDto" id="role-radio-reader" value="USER_READER" ${requestScope.user.roleDto=='ROLE_READER' ? 'checked' : ''}>
+                            <input class="form-check-input" type="radio" name="roleDto" id="role-radio-reader" value="ROLE_READER" ${requestScope.user.roleDto=='ROLE_READER' ? 'checked' : ''}>
                             <label class="form-check-label" for="role-radio-reader">
                                 <spring:message code="msg.user.reader"/>
                             </label>
