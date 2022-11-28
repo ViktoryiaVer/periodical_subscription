@@ -9,7 +9,7 @@ import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.service.dto.PaymentDto;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDto;
-import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import com.periodicalsubscription.service.dto.filter.PaymentFilterDto;
 import com.periodicalsubscription.service.dto.filter.PeriodicalFilterDto;
 import lombok.RequiredArgsConstructor;
@@ -62,9 +62,9 @@ public class PagingUtil {
     }
 
     @LogInvocation
-    public List<UserDto> getUserListFromPageAndRequestParams(Integer page, Integer pageSize, String keyword, Model model) {
+    public List<UserWithoutPasswordDto> getUserListFromPageAndRequestParams(Integer page, Integer pageSize, String keyword, Model model) {
         Pageable pageable = getPageableFromRequest(page, pageSize, PagingConstant.DEFAULT_SORTING_USER);
-        Page<UserDto> userPage = getUserDtoPage(keyword, model, pageable);
+        Page<UserWithoutPasswordDto> userPage = getUserDtoPage(keyword, model, pageable);
         setAttributesForPagingDisplay(model, pageSize, userPage, "/users/all");
         return userPage.toList();
     }
@@ -143,8 +143,8 @@ public class PagingUtil {
     }
 
     @LogInvocation
-    private Page<UserDto> getUserDtoPage(String keyword, Model model, Pageable pageable) {
-        Page<UserDto> userPage;
+    private Page<UserWithoutPasswordDto> getUserDtoPage(String keyword, Model model, Pageable pageable) {
+        Page<UserWithoutPasswordDto> userPage;
         if (keyword != null) {
             userPage = userService.searchForUserByKeyword(keyword, pageable);
             model.addAttribute("search", keyword);

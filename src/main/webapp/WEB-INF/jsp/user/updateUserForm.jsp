@@ -49,7 +49,6 @@
                         <label for="username"><spring:message code="msg.general.username"/></label>
                         <input type="text" class="form-control" id="username" name="username" value="${requestScope.user.username}" required/>
                     </div>
-                    <input name="password" type="hidden" value="${requestScope.user.password}"/>
                     <div class="form-group">
                         <label for="phoneNumber"><spring:message code="msg.general.phone"/></label>
                         <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="${requestScope.user.phoneNumber}" min="10" required>
