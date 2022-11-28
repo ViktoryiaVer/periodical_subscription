@@ -13,7 +13,7 @@ public interface SubscriptionDetailService {
 
     SubscriptionDetailDto save(SubscriptionDetailDto dto);
 
-    SubscriptionDetailDto update (SubscriptionDetailDto dto);
+    SubscriptionDetailDto update(SubscriptionDetailDto dto);
 
     void deleteById(Long id);
 
