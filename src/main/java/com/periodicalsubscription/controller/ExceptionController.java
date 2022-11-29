@@ -51,6 +51,15 @@ public class ExceptionController {
 
     @LogInvocation
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleIllegalArgumentException(IllegalArgumentException e, Model model) {
+        model.addAttribute("message", messageSource.getMessage("msg.error.wrong.url.format", null,
+                LocaleContextHolder.getLocale()));
+        return PageConstant.ERROR;
+    }
+
+    @LogInvocation
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(RuntimeException e, Model model) {
         model.addAttribute("message",  messageSource.getMessage("msg.error.something.wrong", null,

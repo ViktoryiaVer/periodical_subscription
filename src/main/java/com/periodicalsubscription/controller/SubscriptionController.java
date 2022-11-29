@@ -3,6 +3,7 @@ package com.periodicalsubscription.controller;
 import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.constant.PagingConstant;
 import com.periodicalsubscription.controller.util.PagingUtil;
+import com.periodicalsubscription.exceptions.user.UserNotFoundException;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.service.dto.SubscriptionDto;
 import com.periodicalsubscription.service.dto.UserDto;
@@ -76,7 +77,7 @@ public class SubscriptionController {
 
     @LogInvocation
     @GetMapping("/{id}")
-    public String getSubscription(Model model, @PathVariable Long id) {
+    public String getSubscription(@PathVariable Long id, Model model) {
         SubscriptionDto subscription = subscriptionService.findById(id);
 
         model.addAttribute("subscription", subscription);
@@ -119,6 +120,15 @@ public class SubscriptionController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleSubscriptionNotFoundException(SubscriptionNotFoundException e, Model model) {
         model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.subscription.not.found", null,
+                LocaleContextHolder.getLocale()));
+        return PageConstant.ERROR;
+    }
+
+    @LogInvocation
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleUserNotFoundException(UserNotFoundException e, Model model) {
+        model.addAttribute("message", e.getMessage() + messageSource.getMessage("msg.error.action.user.not.found", null,
                 LocaleContextHolder.getLocale()));
         return PageConstant.ERROR;
     }
