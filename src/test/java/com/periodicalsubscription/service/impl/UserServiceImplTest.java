@@ -184,9 +184,10 @@ class UserServiceImplTest {
     @Test
     void whenDeleteUserWithoutSubscriptions_thenUserIsDeleted() {
         Long userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(false);
         doNothing().when(userRepository).deleteById(userId);
-
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
         userService.deleteById(userId);
         verify(userRepository, times(1)).deleteById(userId);
     }
@@ -194,7 +195,7 @@ class UserServiceImplTest {
     @Test
     void whenDeleteUserWithSubscriptions_thenThrowException() {
         Long userId = 1L;
-
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(true);
 
         assertThrows(UserDeleteException.class, () -> userService.deleteById(userId));
@@ -205,11 +206,20 @@ class UserServiceImplTest {
     void whenFailureWhileDeletingUser_thenThroeException() {
         Long userId = 1L;
 
-        when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(false);
-        doNothing().when(userRepository).deleteById(userId);
-        when(userRepository.existsById(userId)).thenReturn(true);
-
+        lenient().when(userRepository.existsById(userId)).thenReturn(true);
+        lenient().when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(false);
+        lenient().doNothing().when(userRepository).deleteById(userId);
+        lenient().when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         assertThrows(UserServiceException.class, () -> userService.deleteById(userId));
+    }
+
+    @Test
+    void whenDeletingNonExistingUser_thenThroeException() {
+        Long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+        assertThrows(UserNotFoundException.class, () -> userService.deleteById(userId));
+        verify(userRepository, never()).deleteById(userId);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.periodicalsubscription.controller;
 
+import com.periodicalsubscription.exceptions.user.UserNotFoundException;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.constant.PageConstant;
@@ -124,6 +125,17 @@ class SubscriptionControllerTest {
     void whenRequestNonExistingSubscription_thenReturnCorrectViewAndExceptionMessage() throws Exception {
         when(subscriptionService.findById(subscriptionDtoWithId.getId())).thenThrow(SubscriptionNotFoundException.class);
         this.mockMvc.perform(get("/subscriptions/" + subscriptionDtoWithId.getId()))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(model().attributeExists("message"))
+                .andExpect(view().name(PageConstant.ERROR));
+    }
+
+    @Test
+    void whenRequestSubscriptionsForNonExistingUser_thenReturnCorrectViewAndExceptionMessage() throws Exception {
+        Long userId = 1L;
+        when(userService.getCorrectUserId(userId)).thenThrow(UserNotFoundException.class);
+        this.mockMvc.perform(get("/subscriptions/user/" + userId))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(model().attributeExists("message"))

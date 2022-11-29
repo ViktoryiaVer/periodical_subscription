@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -126,6 +127,24 @@ class PaymentControllerTest {
         this.mockMvc.perform(get("/payments/" + paymentDtoWithId.getId()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
+                .andExpect(view().name(PageConstant.ERROR));
+    }
+
+    @Test
+    void whenRequestOnePaymentAndIllegalArgumentExceptionOccurs_thenReturnErrorPage() throws Exception {
+        when(paymentService.findById(paymentDtoWithId.getId())).thenThrow(IllegalArgumentException.class);
+        this.mockMvc.perform(get("/payments/" + paymentDtoWithId.getId()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name(PageConstant.ERROR));
+    }
+
+    @Test
+    void whenRequestOnePaymentAndAccessDeniedExceptionOccurs_thenReturnErrorPage() throws Exception {
+        when(paymentService.findById(paymentDtoWithId.getId())).thenThrow(AccessDeniedException.class);
+        this.mockMvc.perform(get("/payments/" + paymentDtoWithId.getId()))
+                .andDo(print())
+                .andExpect(status().isForbidden())
                 .andExpect(view().name(PageConstant.ERROR));
     }
 }
