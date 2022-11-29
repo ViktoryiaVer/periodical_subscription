@@ -1,0 +1,1024 @@
+---
+openapi: 3.0.0
+info:
+  title: Periodical subscription API (MVC)
+  description: This is a project for susbcription for periodicals
+  contact:
+    name: Viktoryia Verpechynskis
+    url: https://www.linkedin.com/in/viktoryia-verpechynskis/
+    email: viktoryia_verpechynskis@yahoo.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/viktoryiaver/periodicalSubscription/1.0.0
+  description: SwaggerHub API Auto Mocking
+- url: http://localhost:{port}
+  description: Local hosting
+  variables:
+    port:
+      description: port for running app locally
+      default: "8080"
+security:
+- basicAuth: []
+tags:
+- name: periodicals
+  description: Operations about periodicals
+- name: subscriptions
+  description: Operations about subscriptions
+- name: payments
+  description: Operations about payments
+- name: users
+  description: Operations about users
+- name: cart
+  description: Operations about cart
+paths:
+  /periodicals/{id}:
+    get:
+      tags:
+      - periodicals
+      summary: gets one periodical data and returns page to be displayed
+      description: This operation puts found periodicals data into model and provides view for displaying periodical page. Parameter id specifies id of the periodical to be displayed.
+      operationId: getPeriodical
+      parameters:
+      - name: id
+        in: path
+        description: pass periodical id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: periodical not found
+  /periodicals/all:
+    get:
+      tags:
+      - periodicals
+      summary: gets all periodicals data and returns page to be displayed
+      description: This operation puts found periodicals data into model and provides view for displaying periodicals page. Parameters for paginated view can also be passed into. Moreover, parameters for filtering and a keyword for searching can also bepassed to filter data.
+      operationId: getAllPeriodicals
+      parameters:
+      - name: filterDto
+        in: query
+        description: pass an optional filter for filtering periodicals
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/periodicalFilterDto'
+      - name: keyword
+        in: query
+        description: pass an oprional keyword string for searching for specific periodicals
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: page of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: page_size
+        in: query
+        description: amounts of records to be shown on one page
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+  /periodicals/create:
+    get:
+      tags:
+      - periodicals
+      summary: gets form for periodical creation
+      description: This operation gets and returns form for periodical creation. If there will be errors while filling out a form, the form will be returned with errors put in model. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: createPeriodicalForm
+      responses:
+        "200":
+          description: form returned successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+    post:
+      tags:
+      - periodicals
+      summary: creates a new periodical
+      description: This operation creates a new periodical and returns it. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: createPeriodical
+      requestBody:
+        description: periodical data for creation of a new periodical
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/periodicalDto'
+        required: true
+      responses:
+        "302":
+          description: Periodical was created successfully and page is redirected to the new periodical page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /periodicals/update/{id}:
+    get:
+      tags:
+      - periodicals
+      summary: gets form for periodical update
+      description: This operation gets and returns form for periodical update. If there will be errors while filling out a form, the form will be returned with errors put in model. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: updatePeriodicalForm
+      parameters:
+      - name: id
+        in: path
+        description: pass periodical id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: form returned successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: periodical not found
+        "400":
+          description: bad input parameter
+  /periodicals/update:
+    post:
+      tags:
+      - periodicals
+      summary: updates periodical
+      description: This operation updates periodical and returns it. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: updatePeriodical
+      requestBody:
+        description: periodical data for update of a periodical
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/periodicalDto'
+        required: true
+      responses:
+        "302":
+          description: Periodical was updated successfully and page is redirected to the updated periodical page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /periodicals/delete/{id}:
+    get:
+      tags:
+      - periodicals
+      summary: deletes periodical
+      description: This operation deletes periodical and redirects to all periodicals page. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: deletePeriodical
+      parameters:
+      - name: id
+        in: path
+        description: pass periodical id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "302":
+          description: Periodical was deleted successfully and page is redirected to all periodicals
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: periodical not found
+        "400":
+          description: bad input parameter
+        "500":
+          description: Internal server error
+  /users/{id}:
+    get:
+      tags:
+      - users
+      summary: gets one user data and returns page to be displayed
+      description: This operation puts found user data into model and provides view for displaying user page. Parameter id specifies id of the user to be displayed.
+      operationId: getUser
+      parameters:
+      - name: id
+        in: path
+        description: pass user id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: user not found
+  /users/all:
+    get:
+      tags:
+      - users
+      summary: gets all users data and returns page to be displayed
+      description: This operation puts found users data into model and provides view for displaying users page. Parameters for paginated view can also be passed into. Moreover,  keyword for searching can also bepassed to filter data. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: getAllUsers
+      parameters:
+      - name: keyword
+        in: query
+        description: pass an oprional keyword string for searching for specific users
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: page of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: page_size
+        in: query
+        description: amounts of records to be shown on one page
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+  /users/create:
+    get:
+      tags:
+      - users
+      summary: gets form for user creation
+      description: This operation gets and returns form for user creation. If there will be errors while filling out a form, the form will be returned with errors put in model.
+      operationId: creatUserForm
+      responses:
+        "200":
+          description: form returned successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+    post:
+      tags:
+      - users
+      summary: creates a new user
+      description: This operation creates a new user and returns it.
+      operationId: createUser
+      requestBody:
+        description: user data for creation of a new user
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/userDto'
+        required: true
+      responses:
+        "302":
+          description: User was created successfully and page is redirected to the new user page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /users/update/{id}:
+    get:
+      tags:
+      - users
+      summary: gets form for user update
+      description: This operation gets and returns form for user update. If there will be errors while filling out a form, the form will be returned with errors put in model.
+      operationId: updateUserForm
+      parameters:
+      - name: id
+        in: path
+        description: pass user id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: form returned successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: user not found
+        "400":
+          description: bad input parameter
+  /users/update:
+    post:
+      tags:
+      - users
+      summary: updates user
+      description: This operation updates user and returns it.
+      operationId: updateUser
+      requestBody:
+        description: user data for update of a user
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/userWithoutPasswordDto'
+        required: true
+      responses:
+        "302":
+          description: User was updated successfully and page is redirected to the updated user page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /users/delete/{id}:
+    get:
+      tags:
+      - users
+      summary: deletes user
+      description: This operation deletes users and redirects to all periodicals page. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        description: pass user id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "302":
+          description: User was deleted successfully and page is redirected to all users page
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: user not found
+        "400":
+          description: bad input parameter
+        "500":
+          description: Internal server error
+  /subscriptions/{id}:
+    get:
+      tags:
+      - subscriptions
+      summary: gets one subscription data and returns page to be displayed
+      description: This operation puts found subscription data into model and provides view for displaying subscription page. Parameter id specifies id of the subscription to be displayed.
+      operationId: getSusbcription
+      parameters:
+      - name: id
+        in: path
+        description: pass subscription id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: susbcription not found
+  /subscriptions/all:
+    get:
+      tags:
+      - subscriptions
+      summary: gets all susbcriptions data and returns page to be displayed
+      description: This operation puts found susbcriptions data into model and provides view for displaying subscriptions page. Parameters for paginated view can also be passed into. Moreover, parameters for filtering and keyword for searching can also be passed to filter data. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: getAllSusbcriptions
+      parameters:
+      - name: keyword
+        in: query
+        description: pass an oprional keyword string for searching for specific susbcriptions
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: pass an oprional status for searching for subsciptions with specific status
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - AWAITING_PAYMENT
+          - PAYED
+          - CANCELED
+          - COMPLETED
+      - name: page
+        in: query
+        description: page of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: page_size
+        in: query
+        description: amounts of records to be shown on one page
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+  /subscriptions/user/{id}:
+    get:
+      tags:
+      - subscriptions
+      summary: gets all susbcriptions data and returns page to be displayed
+      description: This operation puts found susbcriptions for a user into model and provides view for displaying subscriptions page. Parameters for paginated view can also be passed into.
+      operationId: getAllSusbcriptionsByUser
+      parameters:
+      - name: id
+        in: path
+        description: pass user id to see subscriptions for a specific user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: page
+        in: query
+        description: page of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: page_size
+        in: query
+        description: amounts of records to be shown on one page
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+        "404":
+          description: user not found
+  /subscriptions/create:
+    post:
+      tags:
+      - subscriptions
+      summary: creates a new subscription by retrieving cart from the session
+      description: This operation creates a new subscription and returns it.
+      operationId: createUbscription
+      responses:
+        "302":
+          description: Subscription was created successfully and page is redirected to the new subscription page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /subscriptions/update/{id}:
+    post:
+      tags:
+      - subscriptions
+      summary: updates subscription status
+      description: This operation updates subscription status and returns updated subscription.
+      operationId: updateSubscriptions
+      parameters:
+      - name: id
+        in: path
+        description: pass subscription id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        description: status data for update of a subscription
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: true
+      responses:
+        "302":
+          description: Subscription was updated successfully and page is redirected to the updated subscription page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /payments/{id}:
+    get:
+      tags:
+      - payments
+      summary: gets one payment and returns page to be displayed
+      description: This operation puts found payment data into model and provides view for displaying payment page. Parameter id specifies id of the payment to be displayed. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: getPayment
+      parameters:
+      - name: id
+        in: path
+        description: pass payment id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: payment not found
+  /payments/all:
+    get:
+      tags:
+      - payments
+      summary: gets all payments data and returns page to be displayed
+      description: This operation puts found payments data into model and provides view for displaying payments page. Parameters for paginated view can also be passed into. Moreover, parameters for filtering and a keyword for searching can also be passed to filter data. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: getAllPayments
+      parameters:
+      - name: filterDto
+        in: query
+        description: pass an optional filter for filtering payments
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/paymentFilterDto'
+      - name: keyword
+        in: query
+        description: pass an oprional keyword string for searching for specific periodicals
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: page of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: page_size
+        in: query
+        description: amounts of records to be shown on one page
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+  /payments/register:
+    get:
+      tags:
+      - payments
+      summary: gets form for payment registration
+      description: This operation gets and returns form for payment registration. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: createPaymentForm
+      responses:
+        "200":
+          description: form returned successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+    post:
+      tags:
+      - payments
+      summary: creates a new payment
+      description: This operation creates a new payment and returns it. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: createPayment
+      requestBody:
+        description: payment data for creation of a new payment
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/paymentDto'
+        required: true
+      responses:
+        "302":
+          description: Payment was created successfully and page is redirected to the new payment page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /payments/update/{id}:
+    get:
+      tags:
+      - payments
+      summary: gets form for payment update
+      description: This operation gets and returns form for payment update. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: updatePaymentForm
+      parameters:
+      - name: id
+        in: path
+        description: pass payment id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: form returned successfully
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: payment not found
+        "400":
+          description: bad input parameter
+  /payments/update:
+    post:
+      tags:
+      - payments
+      summary: updates payment
+      description: This operation updates payment and returns it. This method can be used only by a user with the role ROLE_ADMIN.
+      operationId: updatePayment
+      requestBody:
+        description: payment data for update of a payment
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/paymentDto'
+        required: true
+      responses:
+        "302":
+          description: Payment was updated successfully and page is redirected to the updated payment page.
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /cart/add/{id}:
+    post:
+      tags:
+      - cart
+      summary: adds one periodical to cart and returns this periodical page
+      description: This operation adds a periodical to cart and redirects to the periodical page.
+      operationId: addToCart
+      parameters:
+      - name: id
+        in: path
+        description: pass periodical id to be added to cart
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        description: body with subscription duration for periodical
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: true
+      responses:
+        "302":
+          description: Periodical was added to cart and page is redirected to this periodical page
+          content:
+            text/html:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+  /cart/show:
+    get:
+      tags:
+      - cart
+      summary: gets all periodicals and their subscription duration in the cart and returns page to be displayed
+      description: This operation puts found cart data into model and provides view for displaying cart page.
+      operationId: getCart
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            text/html:
+              schema:
+                type: string
+        "400":
+          description: bad input parameter
+  /cart/delete/{id}:
+    post:
+      tags:
+      - cart
+      summary: deletes periodical from cart
+      description: This operation deletes one periodical form cart and returns cart.
+      operationId: deleteFromCart
+      parameters:
+      - name: id
+        in: path
+        description: pass periodical id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "302":
+          description: Periodical was successfully deleted from cart and page is redirected to the cart.
+          content:
+            text/html:
+              schema:
+                type: string
+  /cart/delete/all:
+    post:
+      tags:
+      - cart
+      summary: deletes all periodicals from cart
+      description: This operation deletes all periodicals form cart and returns cart.
+      operationId: deleteAllFromCart
+      responses:
+        "200":
+          description: Periodicals were successfully deleted from cart
+          content:
+            text/html:
+              schema:
+                type: string
+components:
+  schemas:
+    periodicalFilterDto:
+      type: object
+      properties:
+        category:
+          type: string
+          enum:
+          - ART_AND_ARCHITECTURE
+          - SCIENCE
+          - BUSINESS_AND_FINANCE
+          - NEWS_AND_POLITICS
+          - CULTURE_AND_LITERATURE
+          - TRAVEL_AND_OUTDOOR
+        type:
+          type: string
+          enum:
+          - MAGAZINE
+          - JOURNAL
+          - NEWSPAPER
+    paymentFilterDto:
+      type: object
+      properties:
+        paymentMethod:
+          type: string
+        paymentDate:
+          type: string
+    periodicalDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        publisher:
+          type: string
+        description:
+          type: string
+        publicationDate:
+          type: string
+        issuesAmountInYear:
+          type: integer
+        price:
+          type: number
+        language:
+          type: string
+        imagePath:
+          type: string
+        typeDto:
+          type: string
+          enum:
+          - MAGAZINE
+          - JOURNAL
+          - NEWSPAPER
+        statusDto:
+          type: string
+          enum:
+          - AVAILABLE
+          - UNAVAILABLE
+        categoryDto:
+          type: array
+          items:
+            type: string
+            enum:
+            - ART_AND_ARCHITECTURE
+            - SCIENCE
+            - BUSINESS_AND_FINANCE
+            - NEWS_AND_POLITICS
+            - CULTURE_AND_LITERATURE
+            - TRAVEL_AND_OUTDOOR
+    userDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          minLength: 5
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          minLength: 8
+          type: string
+        phoneNumber:
+          minLength: 10
+          type: string
+        avatarPath:
+          type: string
+        roleDto:
+          type: string
+          enum:
+          - ROLE_READER
+          - ROLE_ADMIN
+    userWithoutPasswordDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          minLength: 5
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          minLength: 10
+          type: string
+        avatarPath:
+          type: string
+        roleDto:
+          type: string
+          enum:
+          - ROLE_READER
+          - ROLE_ADMIN
+    paymentDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        userDto:
+          $ref: '#/components/schemas/userDto'
+        subscriptionDto:
+          $ref: '#/components/schemas/subscriptionDto'
+        paymentTime:
+          type: string
+        paymentMethodDto:
+          type: string
+          enum:
+          - CASH
+          - CHECK
+          - CREDIT_OR_DEVIT_CARD
+          - ONLINE_PAYMENT_SERVICE
+    subscriptionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        userDto:
+          $ref: '#/components/schemas/userDto'
+        totalCost:
+          type: number
+        statusDto:
+          type: string
+          enum:
+          - PENDING
+          - AWAITING_PAYMENT
+          - PAYED
+          - CANCELED
+          - COMPLETED
+        subscriptionDetailDtos:
+          type: array
+          items:
+            $ref: '#/components/schemas/subscriptionDetailDto'
+    subscriptionDetailDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        subscriptionDto:
+          $ref: '#/components/schemas/subscriptionDto'
+        periodicalDto:
+          $ref: '#/components/schemas/periodicalDto'
+        subscriptionDurationInYears:
+          type: integer
+        subscriptionStartDate:
+          type: string
+        subscriptionEndDate:
+          type: string
+        periodicalCurrentPrice:
+          type: number
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
