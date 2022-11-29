@@ -89,13 +89,18 @@ public class PeriodicalServiceImpl implements PeriodicalService {
     @ServiceEx
     @Transactional
     public void deleteById(Long id) {
+        if (!periodicalRepository.existsById(id)) {
+            throw new PeriodicalNotFoundException(messageSource.getMessage("msg.error.periodical.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
+        }
+
         if (subscriptionDetailService.checkIfSubscriptionDetailExistsByPeriodicalId(id)) {
             throw new PeriodicalDeleteException(messageSource.getMessage("msg.error.periodical.delete.subscription", null,
                     LocaleContextHolder.getLocale()));
         }
         periodicalRepository.deleteById(id);
 
-        if (periodicalRepository.existsById(id)) {
+        if (periodicalRepository.findById(id).isPresent()) {
             throw new PeriodicalServiceException(messageSource.getMessage("msg.error.periodical.service.delete", null,
                     LocaleContextHolder.getLocale()));
         }

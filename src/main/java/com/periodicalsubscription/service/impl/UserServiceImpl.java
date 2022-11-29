@@ -103,13 +103,18 @@ public class UserServiceImpl implements UserService {
     @ServiceEx
     @Transactional
     public void deleteById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
+        }
+
         if (subscriptionService.checkIfSubscriptionExistsByUSer(id)) {
             throw new UserDeleteException(messageSource.getMessage("msg.error.user.delete.subscription", null,
                     LocaleContextHolder.getLocale()));
         }
         userRepository.deleteById(id);
 
-        if (userRepository.existsById(id)) {
+        if (userRepository.findById(id).isPresent()) {
             throw new UserServiceException(messageSource.getMessage("msg.error.user.service.delete", null,
                     LocaleContextHolder.getLocale()));
         }

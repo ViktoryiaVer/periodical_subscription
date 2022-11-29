@@ -28,7 +28,7 @@ public class UserDto {
     private String email;
     @NotBlank(message = "{msg.validation.user.password.empty}")
     @Pattern(regexp = RegExpConstant.PASSWORD, message = "{msg.validation.user.password.not.valid}")
-    @Size(min = 6, message = "{msg.validation.user.password.length}")
+    @Size(min = 8, message = "{msg.validation.user.password.length}")
     @ToString.Exclude
     private String password;
     @NotBlank(message = "{msg.validation.user.phone.empty}")

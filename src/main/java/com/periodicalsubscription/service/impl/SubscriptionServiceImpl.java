@@ -4,6 +4,8 @@ import com.periodicalsubscription.aspect.logging.annotation.LogInvocationService
 import com.periodicalsubscription.aspect.logging.annotation.ServiceEx;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionCompletedStatusException;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
+import com.periodicalsubscription.exceptions.user.UserNotFoundException;
+import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.specification.SubscriptionSpecifications;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
 import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
@@ -41,6 +43,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final PeriodicalService periodicalService;
     private final SubscriptionMapper mapper;
     private final MessageSource messageSource;
+    private final UserRepository userRepository;
 
     @Override
     @LogInvocationService
@@ -140,7 +143,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @ServiceEx
     @Transactional
     public SubscriptionDto updateSubscriptionStatus(SubscriptionDto.StatusDto status, Long id) {
-        if (!status.equals(SubscriptionDto.StatusDto.CANCELED)  && !SecurityContextHolder.getContext().getAuthentication()
+        if (!status.equals(SubscriptionDto.StatusDto.CANCELED) && !SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.update", null, LocaleContextHolder.getLocale()));
         }
@@ -170,6 +173,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @LogInvocationService
     public Page<SubscriptionDto> findAllSubscriptionsByUserId(Long id, Pageable pageable) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
+        }
         return subscriptionRepository.findAllByUserId(id, pageable).map(mapper::toDto);
     }
 
