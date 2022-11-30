@@ -52,7 +52,7 @@
                 </sec:authorize>
                 <table class="table table-sm">
                     <tr>
-                        <td>
+                        <td style="width:30%">
                             <table>
                                 <tr>
                                     <td>
@@ -87,7 +87,7 @@
                                     </td>
                                 </tr>
                             </table>
-                        <td>
+                        <td style="width:70%">
                             <table class="table table-sm">
                                 <tr>
                                     <th scope="row"><spring:message code="msg.periodical.title"/></th>
