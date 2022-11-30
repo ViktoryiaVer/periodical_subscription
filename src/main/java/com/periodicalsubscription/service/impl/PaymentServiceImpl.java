@@ -54,6 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public PaymentDto save(PaymentDto dto) {
         PaymentDto savedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
         if (savedPayment == null) {
@@ -66,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public PaymentDto update(PaymentDto dto) {
         PaymentDto updatedPayment = mapper.toDto(paymentRepository.save(mapper.toEntity(dto)));
         if (updatedPayment == null) {
@@ -101,6 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @LogInvocationService
+    @Transactional
     public PaymentDto processPaymentUpdate(Long paymentId, String paymentTime, String paymentMethodDto) {
         PaymentDto foundPayment = findById(paymentId);
         foundPayment.setPaymentTime(LocalDateTime.parse(paymentTime));

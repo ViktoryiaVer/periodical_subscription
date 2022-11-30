@@ -47,6 +47,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public SubscriptionDetailDto save(SubscriptionDetailDto dto) {
         SubscriptionDetailDto savedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
         if (savedDetail == null) {
@@ -59,6 +60,7 @@ public class SubscriptionDetailServiceImpl implements SubscriptionDetailService 
     @Override
     @LogInvocationService
     @ServiceEx
+    @Transactional
     public SubscriptionDetailDto update(SubscriptionDetailDto dto) {
         SubscriptionDetailDto updatedDetail = mapper.toDto(subscriptionDetailRepository.save(mapper.toEntity(dto)));
         if (updatedDetail == null) {
