@@ -22,6 +22,9 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Class describing the object Payment
+ */
 @Getter
 @Setter
 @ToString

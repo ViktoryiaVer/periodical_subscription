@@ -6,6 +6,9 @@ import org.springframework.security.core.userdetails.User;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * class to be returned from UserDetailService for Spring Security
+ */
 public class AuthenticatedUser extends User {
     private final Long id;
     private final String firstName;

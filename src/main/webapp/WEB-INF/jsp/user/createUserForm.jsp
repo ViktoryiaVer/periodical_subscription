@@ -33,7 +33,7 @@
                 <form id="sform" action="/users/create/" method="post">
                     <div class="form-group">
                         <label for="firstName"><spring:message code="msg.general.first.name"/></label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="<spring:message code="msg.signup.enter.first.name"/>" pattern="^[A-Za-z-А-Яа-я]+" >
+                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="<spring:message code="msg.signup.enter.first.name"/>" pattern="^[A-Za-z-А-Яа-я]+" required>
                     </div>
                     <div class="form-group">
                         <label for="lastName"><spring:message code="msg.general.last.name"/></label>

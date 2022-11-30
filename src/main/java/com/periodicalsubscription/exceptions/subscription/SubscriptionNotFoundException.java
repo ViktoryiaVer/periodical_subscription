@@ -1,14 +1,10 @@
 package com.periodicalsubscription.exceptions.subscription;
 
+/**
+ * class of exception thrown when not able to find a subscription
+ */
 public class SubscriptionNotFoundException extends SubscriptionServiceException {
-    public SubscriptionNotFoundException() {
-    }
-
     public SubscriptionNotFoundException(String message) {
         super(message);
-    }
-
-    public SubscriptionNotFoundException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

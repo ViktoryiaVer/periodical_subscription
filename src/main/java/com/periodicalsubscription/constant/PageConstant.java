@@ -1,5 +1,8 @@
 package com.periodicalsubscription.constant;
 
+/**
+ * class with jsp pages constants
+ */
 public class PageConstant {
     public static final String HOME = "index";
 

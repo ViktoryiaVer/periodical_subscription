@@ -25,6 +25,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+
+/**
+ * class for processing payments requests
+ * Swagger documentation for endpoints can be found in resources package
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/payments")

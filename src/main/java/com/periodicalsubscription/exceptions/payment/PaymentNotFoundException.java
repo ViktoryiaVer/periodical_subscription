@@ -1,14 +1,10 @@
 package com.periodicalsubscription.exceptions.payment;
 
+/**
+ * class of exception thrown when not able to find a payment
+ */
 public class PaymentNotFoundException extends PaymentServiceException {
-    public PaymentNotFoundException() {
-    }
-
     public PaymentNotFoundException(String message) {
         super(message);
-    }
-
-    public PaymentNotFoundException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

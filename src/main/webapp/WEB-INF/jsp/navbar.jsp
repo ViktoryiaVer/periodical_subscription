@@ -8,6 +8,9 @@
 </sec:authorize>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="myNav">
     <div class="container-fluid">
+        <a class="navbar-brand p-0" href="/">
+            <img src="/images/logo.svg" alt="Logo" style="width: 40px"/>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -38,9 +41,6 @@
                         <a class="nav-link" href="/subscriptions/user/${authenticatedUser.id}"><spring:message code="msg.main.my.subscriptions"/></a>
                     </li>
                 </sec:authorize>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart/show"><spring:message code="msg.main.cart"/></a>
-                </li>
                 <sec:authorize access="isAuthenticated()">
                     <li class="nav-item" id="logout-tab">
                         <a class="nav-link" href="/logout"><spring:message code="msg.main.logout"/></a>
@@ -63,6 +63,11 @@
                         <li><a class="dropdown-item" href="?lang=de">DE</a></li>
                         <li><a class="dropdown-item" href="?lang=ru">RU</a></li>
                     </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart/show">
+                        <img src="/images/icons8-shopping-cart-64.png" alt="cart-icon" style="width: 25px"/>
+                    </a>
                 </li>
             </ul>
         </div>

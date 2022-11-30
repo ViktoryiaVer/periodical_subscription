@@ -19,6 +19,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
 
+/**
+ * Class describing the object User
+ */
 @Getter
 @Setter
 @ToString

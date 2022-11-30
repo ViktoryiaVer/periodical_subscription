@@ -4,6 +4,9 @@ import com.periodicalsubscription.aspect.logging.annotation.LogInvocation;
 import com.periodicalsubscription.model.entity.User;
 import org.springframework.data.jpa.domain.Specification;
 
+/**
+ * class with implementations of Specification interface for searching and filtering of users
+ */
 public class UserSpecifications {
     @LogInvocation
     public static Specification<User> hasIdLike(String keyword) {

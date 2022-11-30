@@ -1,5 +1,7 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.mapper.UserWithoutPasswordMapper;
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserDeleteException;
@@ -39,6 +41,8 @@ class UserServiceImplTest {
     @Mock
     private UserMapper mapper;
     @Mock
+    private UserWithoutPasswordMapper mapperWithoutPassword;
+    @Mock
     private SubscriptionService subscriptionService;
     @Mock
     private MessageSource messageSource;
@@ -46,24 +50,26 @@ class UserServiceImplTest {
     private UserService userService;
     private User user;
     private UserDto userDto;
+    private UserWithoutPasswordDto userWithoutPasswordDto;
 
     @BeforeEach
     public void setup() {
-        userService = new UserServiceImpl(userRepository, mapper, subscriptionService, messageSource, new BCryptPasswordEncoder());
+        userService = new UserServiceImpl(userRepository, mapper, mapperWithoutPassword, subscriptionService, messageSource, new BCryptPasswordEncoder());
         user = TestObjectUtil.getUserWithoutId();
         userDto = TestObjectUtil.getUserDtoWithoutId();
+        userWithoutPasswordDto = TestObjectUtil.getUserWithoutPasswordDtoWithId();
     }
 
     @Test
     void whenFindAllUsers_thenReturnUsers() {
         Pageable pageable = PageRequest.of(0, 5);
         Page<User> pageUser = new PageImpl<>(new ArrayList<>());
-        Page<UserDto> pageUserDto = new PageImpl<>(new ArrayList<>());
+        Page<UserWithoutPasswordDto> pageUserDto = new PageImpl<>(new ArrayList<>());
 
         when(userRepository.findAll(pageable)).thenReturn(pageUser);
-        when(userRepository.findAll(pageable).map(mapper::toDto)).thenReturn(pageUserDto);
+        when(userRepository.findAll(pageable).map(mapperWithoutPassword::toDto)).thenReturn(pageUserDto);
 
-        Page<UserDto> foundPage = userService.findAll(pageable);
+        Page<UserWithoutPasswordDto> foundPage = userService.findAll(pageable);
 
         assertNotNull(foundPage);
         verify(userRepository, times(1)).findAll(pageable);
@@ -74,11 +80,11 @@ class UserServiceImplTest {
     void whenFindExitingUserById_thenReturnUser() {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        mockMapperToDto();
+        mockMapperWithoutPasswordToDto();
 
-        UserDto foundUser = userService.findById(userId);
+        UserWithoutPasswordDto foundUser = userService.findById(userId);
 
-        assertEquals(userDto, foundUser);
+        assertEquals(userWithoutPasswordDto, foundUser);
         verify(userRepository, times(1)).findById(userId);
     }
 
@@ -126,11 +132,11 @@ class UserServiceImplTest {
         mockMapperToEntity();
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepository.save(user)).thenReturn(user);
-        mockMapperToDto();
+        mockMapperWithoutPasswordToDto();
 
-        UserDto savedUser = userService.save(userDto);
+        UserWithoutPasswordDto savedUser = userService.save(userDto);
 
-        assertEquals(userDto, savedUser);
+        assertEquals(userWithoutPasswordDto, savedUser);
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -141,46 +147,47 @@ class UserServiceImplTest {
         assertThrows(UserAlreadyExistsException.class, () -> userService.save(userDto));
         verify(userRepository, never()).save(any(User.class));
     }
-
     @Test
     void whenUpdateUser_thenReturnUpdatedUser() {
         user = TestObjectUtil.getUserWithId();
-        userDto = TestObjectUtil.getUserDtoWithId();
 
-        mockMapperToEntity();
+        mockMapperWithoutPasswordToEntity();
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user));
         when(userRepository.save(user)).thenReturn(user);
-        mockMapperToDto();
+        when(userRepository.getPasswordByUserId(user.getId())).thenReturn(user.getPassword());
+        mockMapperWithoutPasswordToDto();
 
         user.setFirstName("Updated Test");
         user.setLastName("Updated Test");
-        userDto.setFirstName("Updated Test");
-        userDto.setLastName("Updated Test");
+        userWithoutPasswordDto.setFirstName("Updated Test");
+        userWithoutPasswordDto.setLastName("Updated Test");
 
-        UserDto updatedUser = userService.update(userDto);
-        assertEquals(userDto, updatedUser);
+        UserWithoutPasswordDto updatedUser = userService.update(userWithoutPasswordDto);
+        assertEquals(userWithoutPasswordDto, updatedUser);
+        verify(userRepository, times(1)).findByEmail(user.getEmail());
         verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).getPasswordByUserId(user.getId());
     }
 
     @Test
     void whenUpdateUserWithSameEmailButAnotherId_thenThrowException() {
         user = TestObjectUtil.getUserWithId();
-        userDto = TestObjectUtil.getUserDtoWithId();
         User existingUser = TestObjectUtil.getUserWithId();
         existingUser.setId(2L);
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(existingUser));
 
-        assertThrows(UserAlreadyExistsException.class, () -> userService.update(userDto));
+        assertThrows(UserAlreadyExistsException.class, () -> userService.update(userWithoutPasswordDto));
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void whenDeleteUserWithoutSubscriptions_thenUserIsDeleted() {
         Long userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(false);
         doNothing().when(userRepository).deleteById(userId);
-
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
         userService.deleteById(userId);
         verify(userRepository, times(1)).deleteById(userId);
     }
@@ -188,7 +195,7 @@ class UserServiceImplTest {
     @Test
     void whenDeleteUserWithSubscriptions_thenThrowException() {
         Long userId = 1L;
-
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(true);
 
         assertThrows(UserDeleteException.class, () -> userService.deleteById(userId));
@@ -199,11 +206,20 @@ class UserServiceImplTest {
     void whenFailureWhileDeletingUser_thenThroeException() {
         Long userId = 1L;
 
-        when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(false);
-        doNothing().when(userRepository).deleteById(userId);
-        when(userRepository.existsById(userId)).thenReturn(true);
-
+        lenient().when(userRepository.existsById(userId)).thenReturn(true);
+        lenient().when(subscriptionService.checkIfSubscriptionExistsByUSer(userId)).thenReturn(false);
+        lenient().doNothing().when(userRepository).deleteById(userId);
+        lenient().when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         assertThrows(UserServiceException.class, () -> userService.deleteById(userId));
+    }
+
+    @Test
+    void whenDeletingNonExistingUser_thenThroeException() {
+        Long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+        assertThrows(UserNotFoundException.class, () -> userService.deleteById(userId));
+        verify(userRepository, never()).deleteById(userId);
     }
 
     @Test
@@ -213,11 +229,11 @@ class UserServiceImplTest {
         mockMapperToEntity();
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepository.save(user)).thenReturn(user);
-        mockMapperToDto();
+        mockMapperWithoutPasswordToDto();
 
-        UserDto savedUser = userService.processUserCreation(userDto);
+        UserWithoutPasswordDto savedUser = userService.processUserCreation(userDto);
 
-        assertEquals(userDto, savedUser);
+        assertEquals(userWithoutPasswordDto, savedUser);
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -243,8 +259,9 @@ class UserServiceImplTest {
         when(userRepository.findByUsername(TestObjectConstant.USERNAME)).thenReturn(Optional.of(user));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         mockMapperToDto();
+        mockMapperWithoutPasswordToDto();
 
-        assertEquals(userDto, userService.processFindingUserConsideringUserRole(userDto.getId()));
+        assertEquals(userWithoutPasswordDto, userService.processFindingUserConsideringUserRole(userDto.getId()));
         verify(userRepository, times(1)).findByUsername(TestObjectConstant.USERNAME);
     }
 
@@ -252,7 +269,15 @@ class UserServiceImplTest {
         when(mapper.toEntity(userDto)).thenReturn(user);
     }
 
+    private void mockMapperWithoutPasswordToEntity() {
+        when(mapperWithoutPassword.toEntity(userWithoutPasswordDto)).thenReturn(user);
+    }
+
     private void mockMapperToDto() {
         when(mapper.toDto(user)).thenReturn(userDto);
+    }
+
+    private void mockMapperWithoutPasswordToDto() {
+        when(mapperWithoutPassword.toDto(user)).thenReturn(userWithoutPasswordDto);
     }
 }

@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * class with implementation of UserDetailService interface for Spring Security
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor

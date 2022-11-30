@@ -31,6 +31,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * class for processing periodicals requests
+ * Swagger documentation for endpoints can be found in resources package
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/periodicals")

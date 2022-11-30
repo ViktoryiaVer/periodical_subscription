@@ -1,23 +1,24 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.service.dto.SubscriptionDetailDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDate;
 
+/**
+ * interface with methods for subscription detail business logic
+ */
 public interface SubscriptionDetailService {
-    Page<SubscriptionDetailDto> findAll(Pageable pageable);
 
-    SubscriptionDetailDto findById(Long id);
-
-    SubscriptionDetailDto save(SubscriptionDetailDto dto);
-
-    SubscriptionDetailDto update (SubscriptionDetailDto dto);
-
-    void deleteById(Long id);
-
+    /**
+     * updates subscription period of the subscription detail
+     * @param startDate start date as LocalDate to be set
+     * @param subscriptionDuration end date as LocalDate to be set
+     * @param id id of the subscription detail
+     */
     void updateSubscriptionPeriod(LocalDate startDate, Integer subscriptionDuration, Long id);
 
+    /**
+     * checks if subscription detail exists by periodical
+     * @param id id of the periodical
+     * @return true if exists, false otherwise
+     */
     boolean checkIfSubscriptionDetailExistsByPeriodicalId(Long id);
 }

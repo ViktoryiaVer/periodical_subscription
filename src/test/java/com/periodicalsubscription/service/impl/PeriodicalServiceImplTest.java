@@ -150,8 +150,10 @@ class PeriodicalServiceImplTest {
     @Test
     void whenDeletePeriodicalWithoutSubscriptions_thenPeriodicalIsDeleted() {
         Long periodicalId = 1L;
+        when(periodicalRepository.existsById(periodicalId)).thenReturn(true);
         when(subscriptionDetailService.checkIfSubscriptionDetailExistsByPeriodicalId(periodicalId)).thenReturn(false);
         doNothing().when(periodicalRepository).deleteById(periodicalId);
+        when(periodicalRepository.findById(periodicalId)).thenReturn(Optional.empty());
 
         periodicalService.deleteById(periodicalId);
         verify(periodicalRepository, times(1)).deleteById(periodicalId);
@@ -161,6 +163,7 @@ class PeriodicalServiceImplTest {
     void whenDeletePeriodicalWithSubscriptions_thenThrowException() {
         Long periodicalId = 1L;
 
+        when(periodicalRepository.existsById(periodicalId)).thenReturn(true);
         when(subscriptionDetailService.checkIfSubscriptionDetailExistsByPeriodicalId(periodicalId)).thenReturn(true);
 
         assertThrows(PeriodicalDeleteException.class, () -> periodicalService.deleteById(periodicalId));
@@ -168,12 +171,23 @@ class PeriodicalServiceImplTest {
     }
 
     @Test
+    void whenDeleteNonExistingPeriodical_thenThrowException() {
+        Long periodicalId = 1L;
+
+        when(periodicalRepository.existsById(periodicalId)).thenReturn(false);
+
+        assertThrows(PeriodicalNotFoundException.class, () -> periodicalService.deleteById(periodicalId));
+        verify(periodicalRepository, never()).deleteById(periodicalId);
+    }
+
+    @Test
     void whenFailureWhileDeletingPeriodical_thenThroeException() {
         Long periodicalId = 1L;
 
-        when(subscriptionDetailService.checkIfSubscriptionDetailExistsByPeriodicalId(periodicalId)).thenReturn(false);
-        doNothing().when(periodicalRepository).deleteById(periodicalId);
-        when(periodicalRepository.existsById(periodicalId)).thenReturn(true);
+        lenient().when(periodicalRepository.existsById(periodicalId)).thenReturn(true);
+        lenient().when(subscriptionDetailService.checkIfSubscriptionDetailExistsByPeriodicalId(periodicalId)).thenReturn(false);
+        lenient().doNothing().when(periodicalRepository).deleteById(periodicalId);
+        lenient().when(periodicalRepository.findById(periodicalId)).thenReturn(Optional.of(periodical));
 
         assertThrows(PeriodicalServiceException.class, () -> periodicalService.deleteById(periodicalId));
     }

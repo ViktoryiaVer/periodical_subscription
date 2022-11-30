@@ -24,6 +24,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
+/**
+ * class for processing cart requests
+ * Swagger documentation for endpoints can be found in resources package
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/cart")

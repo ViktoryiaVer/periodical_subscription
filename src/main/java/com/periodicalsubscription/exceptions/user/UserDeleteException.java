@@ -1,14 +1,10 @@
 package com.periodicalsubscription.exceptions.user;
 
+/**
+ * class of exception thrown when problem while deleting user occurs
+ */
 public class UserDeleteException extends UserServiceException{
-    public UserDeleteException() {
-    }
-
     public UserDeleteException(String message) {
         super(message);
-    }
-
-    public UserDeleteException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

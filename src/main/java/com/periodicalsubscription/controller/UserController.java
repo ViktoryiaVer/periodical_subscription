@@ -8,6 +8,7 @@ import com.periodicalsubscription.exceptions.user.UserAlreadyExistsException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
 import com.periodicalsubscription.constant.PageConstant;
 import com.periodicalsubscription.service.api.UserService;
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -30,6 +31,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * class for processing users requests
+ * Swagger documentation for endpoints can be found in resources package
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -44,7 +49,7 @@ public class UserController {
     public String getAllUsers(@RequestParam(required = false) String keyword, @RequestParam(defaultValue = PagingConstant.FIRST_PAGE_STRING) Integer page,
                               @RequestParam(value = "page_size", defaultValue = PagingConstant.DEFAULT_PAGE_SIZE_STRING) Integer pageSize, Model model) {
 
-        List<UserDto> users = pagingUtil.getUserListFromPageAndRequestParams(page, pageSize, keyword, model);
+        List<UserWithoutPasswordDto> users = pagingUtil.getUserListFromPageAndRequestParams(page, pageSize, keyword, model);
 
         if (users.isEmpty()) {
             model.addAttribute("message", messageSource.getMessage("msg.error.users.not.found", null,
@@ -58,7 +63,7 @@ public class UserController {
     @LogInvocation
     @GetMapping("/{id}")
     public String getUser(@PathVariable Long id, Model model) {
-        UserDto user = userService.processFindingUserConsideringUserRole(id);
+        UserWithoutPasswordDto user = userService.processFindingUserConsideringUserRole(id);
 
         model.addAttribute("user", user);
         return PageConstant.USER;
@@ -81,7 +86,7 @@ public class UserController {
             return PageConstant.SIGNUP;
         }
 
-        UserDto createdUser = userService.processUserCreation(user);
+        UserWithoutPasswordDto createdUser = userService.processUserCreation(user);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.created", null,
                 LocaleContextHolder.getLocale()));
         return "redirect:/users/" + createdUser.getId();
@@ -90,21 +95,21 @@ public class UserController {
     @LogInvocation
     @GetMapping("/update/{id}")
     public String updateUserForm(@PathVariable Long id, Model model) {
-        UserDto user = userService.findById(id);
+        UserWithoutPasswordDto user = userService.findById(id);
         model.addAttribute("user", user);
         return PageConstant.UPDATE_USER;
     }
 
     @LogInvocation
     @PostMapping("/update")
-    public String updateUser(@Valid @ModelAttribute UserDto user, Errors errors, Model model, HttpSession session) {
+    public String updateUser(@Valid @ModelAttribute UserWithoutPasswordDto user, Errors errors, Model model, HttpSession session) {
         if (errors.hasErrors()) {
             model.addAttribute("errors", errors.getFieldErrors());
             model.addAttribute("user", user);
             return PageConstant.UPDATE_USER;
         }
 
-        UserDto updatedUser = userService.update(user);
+        UserWithoutPasswordDto updatedUser = userService.update(user);
         session.setAttribute("message", messageSource.getMessage("msg.success.user.updated", null,
                 LocaleContextHolder.getLocale()));
         return "redirect:/users/" + updatedUser.getId();

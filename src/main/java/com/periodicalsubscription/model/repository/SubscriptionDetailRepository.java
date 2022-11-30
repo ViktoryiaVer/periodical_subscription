@@ -9,15 +9,34 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 
+/**
+ * Interface extending JpaRepository interface for managing SubscriptionDetail entities
+ */
 @Repository
 public interface SubscriptionDetailRepository extends JpaRepository<SubscriptionDetail, Long> {
+
+    /**
+     * updates subscription start date
+     * @param date date to be set
+     * @param id id of subscription detail to be updated
+     */
     @Modifying
     @Query(HqlConstant.HQL_UPDATE_SUBSCRIPTION_START_DATE)
     void updateSubscriptionStartDate(LocalDate date, Long id);
 
+    /**
+     * updates subscription end date
+     * @param date date to be set
+     * @param id id of subscription detail to be updated
+     */
     @Modifying
     @Query(HqlConstant.HQL_UPDATE_SUBSCRIPTION_END_DATE)
     void updateSubscriptionEndDate(LocalDate date, Long id);
 
+    /**
+     * checks if subscription detail exist by periodical
+     * @param id id of periodical to be checked
+     * @return true if subscription detail exists, false otherwise
+     */
     boolean existsSubscriptionDetailByPeriodicalId(Long id);
 }

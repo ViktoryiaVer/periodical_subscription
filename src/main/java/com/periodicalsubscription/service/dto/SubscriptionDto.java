@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class describing dto object for subscription entity
+ */
 @Data
 public class SubscriptionDto {
     private Long id;

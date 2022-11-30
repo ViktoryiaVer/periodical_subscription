@@ -2,6 +2,9 @@ package com.periodicalsubscription.service.dto;
 
 import lombok.Data;
 
+/**
+ * Class describing dto object for periodical category entity
+ */
 @Data
 public class PeriodicalCategoryDto {
     private Long id;

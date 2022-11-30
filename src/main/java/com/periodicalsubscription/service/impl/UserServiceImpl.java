@@ -7,12 +7,14 @@ import com.periodicalsubscription.exceptions.user.UserDeleteException;
 import com.periodicalsubscription.exceptions.user.UserNotFoundException;
 import com.periodicalsubscription.exceptions.user.UserServiceException;
 import com.periodicalsubscription.mapper.UserMapper;
+import com.periodicalsubscription.mapper.UserWithoutPasswordMapper;
 import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.model.entity.User;
 import com.periodicalsubscription.model.specification.UserSpecifications;
 import com.periodicalsubscription.service.api.SubscriptionService;
 import com.periodicalsubscription.service.api.UserService;
 import com.periodicalsubscription.service.dto.UserDto;
+import com.periodicalsubscription.service.dto.UserWithoutPasswordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -29,25 +31,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
+    private final UserWithoutPasswordMapper mapperWithoutPassword;
     private final SubscriptionService subscriptionService;
     private final MessageSource messageSource;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     @LogInvocationService
-    public Page<UserDto> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(mapper::toDto);
+    public Page<UserWithoutPasswordDto> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(mapperWithoutPassword::toDto);
     }
 
     @Override
     @LogInvocationService
     @ServiceEx
-    public UserDto findById(Long id) {
+    public UserWithoutPasswordDto findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> {
             throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
                     LocaleContextHolder.getLocale()));
         });
-        return mapper.toDto(user);
+        return mapperWithoutPassword.toDto(user);
     }
 
     @Override
@@ -69,27 +72,30 @@ public class UserServiceImpl implements UserService {
     @LogInvocationService
     @ServiceEx
     @Transactional
-    public UserDto save(UserDto dto) {
+    public UserWithoutPasswordDto save(UserDto dto) {
         if (userRepository.existsByUsername(dto.getUsername()) || userRepository.existsByEmail(dto.getEmail())) {
             throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists", null,
                     LocaleContextHolder.getLocale()));
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
+        return mapperWithoutPassword.toDto(userRepository.save(mapper.toEntity(dto)));
     }
 
     @Override
     @LogInvocationService
     @ServiceEx
     @Transactional
-    public UserDto update(UserDto dto) {
+    public UserWithoutPasswordDto update(UserWithoutPasswordDto dto) {
         User existingUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null && !existingUser.getId().equals(dto.getId())) {
             throw new UserAlreadyExistsException(messageSource.getMessage("msg.error.user.exists", null,
                     LocaleContextHolder.getLocale()));
         }
-        return mapper.toDto(userRepository.save(mapper.toEntity(dto)));
+
+        User userToUpdate = mapperWithoutPassword.toEntity(dto);
+        userToUpdate.setPassword(userRepository.getPasswordByUserId(dto.getId()));
+        return mapperWithoutPassword.toDto(userRepository.save(userToUpdate));
     }
 
     @Override
@@ -97,13 +103,18 @@ public class UserServiceImpl implements UserService {
     @ServiceEx
     @Transactional
     public void deleteById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(messageSource.getMessage("msg.error.user.find.by.id", null,
+                    LocaleContextHolder.getLocale()));
+        }
+
         if (subscriptionService.checkIfSubscriptionExistsByUSer(id)) {
             throw new UserDeleteException(messageSource.getMessage("msg.error.user.delete.subscription", null,
                     LocaleContextHolder.getLocale()));
         }
         userRepository.deleteById(id);
 
-        if (userRepository.existsById(id)) {
+        if (userRepository.findById(id).isPresent()) {
             throw new UserServiceException(messageSource.getMessage("msg.error.user.service.delete", null,
                     LocaleContextHolder.getLocale()));
         }
@@ -112,20 +123,20 @@ public class UserServiceImpl implements UserService {
     @Override
     @LogInvocationService
     @Transactional
-    public UserDto processUserCreation(UserDto userDto) {
+    public UserWithoutPasswordDto processUserCreation(UserDto userDto) {
         userDto.setRoleDto(UserDto.RoleDto.ROLE_READER);
         return save(userDto);
     }
 
     @Override
     @LogInvocationService
-    public Page<UserDto> searchForUserByKeyword(String keyword, Pageable pageable) {
+    public Page<UserWithoutPasswordDto> searchForUserByKeyword(String keyword, Pageable pageable) {
         Specification<User> specification = UserSpecifications.hasIdLike(keyword)
                 .or(UserSpecifications.hasFirstNameLike(keyword))
                 .or(UserSpecifications.hasLastNameLike(keyword))
                 .or(UserSpecifications.hasEmailLike(keyword))
                 .or(UserSpecifications.hasPhoneNumberLike(keyword));
-        return userRepository.findAll(specification, pageable).map(mapper::toDto);
+        return userRepository.findAll(specification, pageable).map(mapperWithoutPassword::toDto);
     }
 
     @Override
@@ -141,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @LogInvocationService
-    public UserDto processFindingUserConsideringUserRole(Long id) {
+    public UserWithoutPasswordDto processFindingUserConsideringUserRole(Long id) {
         return findById(getCorrectUserId(id));
     }
 }

@@ -1,5 +1,7 @@
 package com.periodicalsubscription.service.impl;
 
+import com.periodicalsubscription.exceptions.user.UserNotFoundException;
+import com.periodicalsubscription.model.repository.UserRepository;
 import com.periodicalsubscription.util.TestObjectUtil;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionCompletedStatusException;
 import com.periodicalsubscription.exceptions.subscription.SubscriptionNotFoundException;
@@ -46,13 +48,15 @@ class SubscriptionServiceImplTest {
     private SubscriptionMapper mapper;
     @Mock
     private MessageSource messageSource;
+    @Mock
+    private UserRepository userRepository;
     private SubscriptionService subscriptionService;
     private Subscription subscription;
     private SubscriptionDto subscriptionDto;
 
     @BeforeEach
     public void setup() {
-        subscriptionService = new SubscriptionServiceImpl(subscriptionRepository, periodicalService, mapper, messageSource);
+        subscriptionService = new SubscriptionServiceImpl(subscriptionRepository, periodicalService, mapper, messageSource, userRepository);
         subscription = TestObjectUtil.getSubscriptionWithoutId();
         subscriptionDto = TestObjectUtil.getSubscriptionDtoWithoutId();
     }
@@ -113,49 +117,6 @@ class SubscriptionServiceImplTest {
 
         assertThrows(SubscriptionServiceException.class, () -> subscriptionService.save(subscriptionDto));
         verify(subscriptionRepository, times(1)).save(any(Subscription.class));
-    }
-
-    @Test
-    void whenUpdateSubscription_thenReturnUpdatedSubscription() {
-        mockMapperToEntity();
-        when(subscriptionRepository.save(subscription)).thenReturn(subscription);
-        mockMapperToDto();
-
-        subscription.setStatus(Subscription.Status.PAYED);
-        subscriptionDto.setStatusDto(SubscriptionDto.StatusDto.PAYED);
-
-        SubscriptionDto updatedSubscription = subscriptionService.update(subscriptionDto);
-        assertEquals(subscriptionDto, updatedSubscription);
-        verify(subscriptionRepository, times(1)).save(any(Subscription.class));
-    }
-
-    @Test
-    void whenFailureByUpdatingSubscription_thenThrowException() {
-        mockMapperToEntity();
-        when(subscriptionRepository.save(subscription)).thenReturn(null);
-        when(mapper.toDto(null)).thenReturn(null);
-
-        assertThrows(SubscriptionServiceException.class, () -> subscriptionService.update(subscriptionDto));
-        verify(subscriptionRepository, times(1)).save(any(Subscription.class));
-    }
-
-    @Test
-    void whenDeleteSubscription_thenSubscriptionIsDeleted() {
-        Long subscriptionId = 1L;
-        doNothing().when(subscriptionRepository).deleteById(subscriptionId);
-
-        subscriptionService.deleteById(subscriptionId);
-        verify(subscriptionRepository, times(1)).deleteById(subscriptionId);
-    }
-
-    @Test
-    void whenFailureWhileDeletingSubscription_thenThrowException() {
-        Long subscriptionId = 1L;
-
-        doNothing().when(subscriptionRepository).deleteById(subscriptionId);
-        when(subscriptionRepository.existsById(subscriptionId)).thenReturn(true);
-
-        assertThrows(SubscriptionServiceException.class, () -> subscriptionService.deleteById(subscriptionId));
     }
 
     @Test
@@ -259,6 +220,7 @@ class SubscriptionServiceImplTest {
         Page<Subscription> pageSubscription = new PageImpl<>(new ArrayList<>());
         Page<SubscriptionDto> pageSubscriptionDto = new PageImpl<>(new ArrayList<>());
 
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(subscriptionRepository.findAllByUserId(userId, pageable)).thenReturn(pageSubscription);
         when(subscriptionRepository.findAllByUserId(userId, pageable).map(mapper::toDto)).thenReturn(pageSubscriptionDto);
 
@@ -266,6 +228,15 @@ class SubscriptionServiceImplTest {
 
         assertNotNull(foundPage);
         verify(subscriptionRepository, times(1)).findAllByUserId(userId, pageable);
+    }
+
+    @Test
+    void whenFindAllSubscriptionsByNonExistingUser_thenThrowException() {
+        Long userId = 1L;
+        Pageable pageable = PageRequest.of(0, 5);
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+        assertThrows(UserNotFoundException.class, () -> subscriptionService.findAllSubscriptionsByUserId(userId, pageable));
     }
 
 

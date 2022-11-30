@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * Class describing dto object for payment entity
+ */
 @Data
 public class PaymentDto {
     private Long id;

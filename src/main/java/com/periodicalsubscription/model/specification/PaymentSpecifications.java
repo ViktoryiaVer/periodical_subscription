@@ -9,6 +9,9 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Join;
 import java.time.LocalDate;
 
+/**
+ * class with implementations of Specification interface for searching and filtering of payments
+ */
 public class PaymentSpecifications {
     @LogInvocation
     public static Specification<Payment> hasPaymentMethod(String paymentMethod) {

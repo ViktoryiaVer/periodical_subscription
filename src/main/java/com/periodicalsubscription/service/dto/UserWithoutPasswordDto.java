@@ -2,7 +2,6 @@ package com.periodicalsubscription.service.dto;
 
 import com.periodicalsubscription.constant.RegExpConstant;
 import lombok.Data;
-import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.constraints.Email;
@@ -11,10 +10,10 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
- * Class describing dto object for user entity (with password)
+ * Class describing dto object for user entity (without password)
  */
 @Data
-public class UserDto {
+public class UserWithoutPasswordDto {
     private Long id;
     @NotBlank(message = "msg.validation.user.username.empty")
     @Pattern(regexp = RegExpConstant.USERNAME, message = "{msg.validation.user.username.not.valid}")
@@ -28,11 +27,6 @@ public class UserDto {
     @NotBlank(message = "{msg.validation.user.email.empty}")
     @Email(message = "{msg.validation.user.email.not.valid}")
     private String email;
-    @NotBlank(message = "{msg.validation.user.password.empty}")
-    @Pattern(regexp = RegExpConstant.PASSWORD, message = "{msg.validation.user.password.not.valid}")
-    @Size(min = 8, message = "{msg.validation.user.password.length}")
-    @ToString.Exclude
-    private String password;
     @NotBlank(message = "{msg.validation.user.phone.empty}")
     @Pattern(regexp = RegExpConstant.PHONE, message = "{msg.validation.user.phone.not.valid}")
     @Size(min = 10, message = "{msg.validation.user.phone.length}")
