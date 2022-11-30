@@ -1,6 +1,6 @@
 # Periodical subscription project
 
-## Backend: Java 11, Spring Data (DB: PostgreSQL), Spring AOP, Spring MVC, Spring Boot, Spring Security
+## Backend: Java 11, Spring Data (ORM: Hibernate, DB: PostgreSQL), Spring AOP, Spring MVC, Spring Boot, Spring Security
 ## Frontend: HTML, CSS, JS, Bootstrap
 
 Main functionality:
