@@ -4,6 +4,7 @@
 ## Frontend: HTML, CSS, JS, Bootstrap
 
 Main functionality:
+
 An anonymous user can:
 - view a catalog of periodicals
 - filter and search for a specific periodical by keyword
