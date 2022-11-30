@@ -31,6 +31,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * class for processing users requests
+ * Swagger documentation for endpoints can be found in resources package
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/users")

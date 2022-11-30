@@ -141,25 +141,6 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void whenDeletePayment_thenPaymentIsDeleted() {
-        Long paymentId = 1L;
-        doNothing().when(paymentRepository).deleteById(paymentId);
-
-        paymentService.deleteById(paymentId);
-        verify(paymentRepository, times(1)).deleteById(paymentId);
-    }
-
-    @Test
-    void whenFailureWhileDeletingPayment_thenThrowException() {
-        Long paymentId = 1L;
-
-        doNothing().when(paymentRepository).deleteById(paymentId);
-        when(paymentRepository.existsById(paymentId)).thenReturn(true);
-
-        assertThrows(PaymentServiceException.class, () -> paymentService.deleteById(paymentId));
-    }
-
-    @Test
     void whenProcessPaymentRegistration_thenReturnSavedPaymentAndTriggerAllOtherServices() {
         Long subscriptionId = 1L;
         String paymentTime = paymentDto.getPaymentTime().toString();

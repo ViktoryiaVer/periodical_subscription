@@ -7,6 +7,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Join;
 
+/**
+ * class with implementations of Specification interface for searching and filtering of periodicals
+ */
 public class PeriodicalSpecifications {
     @LogInvocation
     public static Specification<Periodical> hasCategory(String category) {

@@ -18,6 +18,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.Arrays;
 
+/**
+ * class for exception handling
+ */
 @ControllerAdvice
 @RequiredArgsConstructor
 @Log4j2
@@ -62,7 +65,7 @@ public class ExceptionController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(RuntimeException e, Model model) {
-        model.addAttribute("message",  messageSource.getMessage("msg.error.something.wrong", null,
+        model.addAttribute("message", messageSource.getMessage("msg.error.something.wrong", null,
                 LocaleContextHolder.getLocale()));
         log.error("Error while running application: " + e + "\n" + Arrays.toString(e.getStackTrace()));
         return PageConstant.ERROR;
@@ -74,7 +77,7 @@ public class ExceptionController {
     public String handleAccessDeniedException(AccessDeniedException e, Model model) {
         model.addAttribute("message", messageSource.getMessage("msg.error.access.denied", null,
                 LocaleContextHolder.getLocale()));
-        log.warn( e + "\n" + Arrays.toString(e.getStackTrace()));
+        log.warn(e + "\n" + Arrays.toString(e.getStackTrace()));
         return PageConstant.ERROR;
     }
 }

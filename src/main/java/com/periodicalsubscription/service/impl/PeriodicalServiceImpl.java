@@ -167,6 +167,11 @@ public class PeriodicalServiceImpl implements PeriodicalService {
         }
     }
 
+    /**
+     * gets image path for a periodical
+     * @param imageFile MultipartFile object of image
+     * @return image path as String
+     */
     @LogInvocationService
     @ImageUploadEx
     private String getImagePath(MultipartFile imageFile) {

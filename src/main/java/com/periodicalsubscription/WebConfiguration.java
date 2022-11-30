@@ -16,6 +16,9 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
+/**
+ * Class with Spring Web configuration
+ */
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
     @Override

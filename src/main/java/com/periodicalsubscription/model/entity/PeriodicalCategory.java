@@ -20,6 +20,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Objects;
 
+/**
+ * Class describing the object PeriodicalCategory
+ */
 @Getter
 @Setter
 @ToString

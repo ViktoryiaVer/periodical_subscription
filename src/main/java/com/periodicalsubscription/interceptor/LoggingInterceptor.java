@@ -8,6 +8,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * interceptor for logging requests
+ */
 @Log4j2
 public class LoggingInterceptor implements HandlerInterceptor {
     @Override

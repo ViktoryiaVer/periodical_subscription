@@ -22,6 +22,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Class describing the object SubscriptionDetail
+ */
 @Getter
 @Setter
 @ToString

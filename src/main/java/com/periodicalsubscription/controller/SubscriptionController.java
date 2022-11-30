@@ -30,6 +30,10 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * class for processing subscriptions requests
+ * Swagger documentation for endpoints can be found in resources package
+ */
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/subscriptions")

@@ -9,6 +9,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Join;
 
+/**
+ * class with implementations of Specification interface for searching and filtering of subscriptions
+ */
 public class SubscriptionSpecifications {
     @LogInvocation
     public static Specification<Subscription> hasIdLike(String keyword) {

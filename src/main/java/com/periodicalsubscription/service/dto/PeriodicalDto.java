@@ -14,6 +14,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class describing dto object for periodical entity
+ */
 @Data
 public class PeriodicalDto {
     private Long id;

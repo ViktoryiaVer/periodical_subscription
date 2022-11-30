@@ -77,31 +77,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @LogInvocationService
-    @ServiceEx
-    @Transactional
-    public SubscriptionDto update(SubscriptionDto dto) {
-        SubscriptionDto updatedSubscription = mapper.toDto(subscriptionRepository.save(mapper.toEntity(dto)));
-        if (updatedSubscription == null) {
-            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.update", null,
-                    LocaleContextHolder.getLocale()));
-        }
-        return updatedSubscription;
-    }
-
-    @Override
-    @LogInvocationService
-    @ServiceEx
-    @Transactional
-    public void deleteById(Long id) {
-        subscriptionRepository.deleteById(id);
-        if (subscriptionRepository.existsById(id)) {
-            throw new SubscriptionServiceException(messageSource.getMessage("msg.error.subscription.service.delete", null,
-                    LocaleContextHolder.getLocale()));
-        }
-    }
-
-    @Override
-    @LogInvocationService
     @Transactional
     public SubscriptionDto createSubscriptionFromCart(UserDto userDto, Map<Long, Integer> cart) {
         SubscriptionDto subscription = processSubscriptionInCart(userDto, cart);
@@ -130,6 +105,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscription;
     }
 
+    /**
+     * calculates total cost of the subscription
+     * @param details List of SubscriptionDetailDto objects in the subscription
+     * @return total price of the subscription
+     */
     @LogInvocationService
     private BigDecimal calculateTotalCost(List<SubscriptionDetailDto> details) {
         BigDecimal totalCost = BigDecimal.ZERO;
@@ -157,6 +137,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return findById(id);
     }
 
+    /**
+     * checks if the subscription can be completed
+     * if not, an SubscriptionCompletedStatusException exception is thrown
+     * @param id id of the subscription
+     */
     private void checkIfSubscriptionCanBeCompleted(Long id) {
         SubscriptionDto subscriptionDto = findById(id);
         subscriptionDto.getSubscriptionDetailDtos().forEach(detail -> {

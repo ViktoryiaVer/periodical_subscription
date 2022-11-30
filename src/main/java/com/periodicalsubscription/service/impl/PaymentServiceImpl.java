@@ -79,18 +79,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @LogInvocationService
-    @ServiceEx
-    @Transactional
-    public void deleteById(Long id) {
-        paymentRepository.deleteById(id);
-        if (paymentRepository.existsById(id)) {
-            throw new PaymentServiceException(messageSource.getMessage("msg.error.payment.service.delete", null,
-                    LocaleContextHolder.getLocale()));
-        }
-    }
-
-    @Override
-    @LogInvocationService
     @Transactional
     public PaymentDto processPaymentRegistration(Long subscriptionId, String paymentTime, String paymentMethod) {
         PaymentDto paymentDto = createPaymentDto(subscriptionId, paymentTime, paymentMethod);
@@ -130,6 +118,13 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findAll(specification, pageable).map(mapper::toDto);
     }
 
+    /**
+     * creates PaymentDto object
+     * @param subscriptionId id of the subscription for the payment
+     * @param paymentTime time of the payment as string
+     * @param paymentMethod method of the payment as string
+     * @return created PaymentDto object
+     */
     @LogInvocationService
     private PaymentDto createPaymentDto(Long subscriptionId, String paymentTime, String paymentMethod) {
         PaymentDto paymentDto = new PaymentDto();

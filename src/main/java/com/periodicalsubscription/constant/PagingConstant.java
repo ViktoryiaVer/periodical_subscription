@@ -1,5 +1,8 @@
 package com.periodicalsubscription.constant;
 
+/**
+ * class with constants for paging
+ */
 public class PagingConstant {
     public static final int FIRST_PAGE = 1;
     public static final int DEFAULT_PAGE_SIZE = 10;

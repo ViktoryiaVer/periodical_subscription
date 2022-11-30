@@ -5,6 +5,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Class describing dto object for subscription detail entity
+ */
 @Data
 public class SubscriptionDetailDto {
     private Long id;

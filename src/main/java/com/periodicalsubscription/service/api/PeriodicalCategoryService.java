@@ -1,16 +1,15 @@
 package com.periodicalsubscription.service.api;
 
-import com.periodicalsubscription.service.dto.PeriodicalCategoryDto;
 import com.periodicalsubscription.service.dto.PeriodicalDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
+/**
+ * interface with methods for periodical category business logic
+ */
 public interface PeriodicalCategoryService {
-    Page<PeriodicalCategoryDto> findAll(Pageable pageable);
 
-    PeriodicalCategoryDto findById(Long id);
-
-    void deleteById(Long id);
-
+    /**
+     * deletes all periodical categories for a periodical
+     * @param dto PeriodicalDto object for periodical categories deletion
+     */
     void deleteAllCategoriesForPeriodical(PeriodicalDto dto);
 }

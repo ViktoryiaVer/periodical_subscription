@@ -120,49 +120,6 @@ class SubscriptionServiceImplTest {
     }
 
     @Test
-    void whenUpdateSubscription_thenReturnUpdatedSubscription() {
-        mockMapperToEntity();
-        when(subscriptionRepository.save(subscription)).thenReturn(subscription);
-        mockMapperToDto();
-
-        subscription.setStatus(Subscription.Status.PAYED);
-        subscriptionDto.setStatusDto(SubscriptionDto.StatusDto.PAYED);
-
-        SubscriptionDto updatedSubscription = subscriptionService.update(subscriptionDto);
-        assertEquals(subscriptionDto, updatedSubscription);
-        verify(subscriptionRepository, times(1)).save(any(Subscription.class));
-    }
-
-    @Test
-    void whenFailureByUpdatingSubscription_thenThrowException() {
-        mockMapperToEntity();
-        when(subscriptionRepository.save(subscription)).thenReturn(null);
-        when(mapper.toDto(null)).thenReturn(null);
-
-        assertThrows(SubscriptionServiceException.class, () -> subscriptionService.update(subscriptionDto));
-        verify(subscriptionRepository, times(1)).save(any(Subscription.class));
-    }
-
-    @Test
-    void whenDeleteSubscription_thenSubscriptionIsDeleted() {
-        Long subscriptionId = 1L;
-        doNothing().when(subscriptionRepository).deleteById(subscriptionId);
-
-        subscriptionService.deleteById(subscriptionId);
-        verify(subscriptionRepository, times(1)).deleteById(subscriptionId);
-    }
-
-    @Test
-    void whenFailureWhileDeletingSubscription_thenThrowException() {
-        Long subscriptionId = 1L;
-
-        doNothing().when(subscriptionRepository).deleteById(subscriptionId);
-        when(subscriptionRepository.existsById(subscriptionId)).thenReturn(true);
-
-        assertThrows(SubscriptionServiceException.class, () -> subscriptionService.deleteById(subscriptionId));
-    }
-
-    @Test
     void whenCreateSubscriptionFromCart_thenSubscriptionIsSaved() {
         UserDto userDto = TestObjectUtil.getUserDtoWithoutId();
         Long periodicalId = subscription.getSubscriptionDetails().get(0).getPeriodical().getId();

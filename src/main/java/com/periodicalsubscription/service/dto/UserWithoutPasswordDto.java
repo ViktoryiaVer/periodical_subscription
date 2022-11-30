@@ -9,7 +9,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-
+/**
+ * Class describing dto object for user entity (without password)
+ */
 @Data
 public class UserWithoutPasswordDto {
     private Long id;
